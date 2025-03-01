@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/human_eval_converter'
+
+begin
+  converter = HumanEvalConverter.new
+  converter.process
+  puts "Конвертация успешно завершена"
+rescue StandardError => e
+  puts "Ошибка: #{e.message}"
+  exit 1
+end 
