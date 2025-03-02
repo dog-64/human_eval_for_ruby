@@ -31,30 +31,32 @@ bundle install
 
 - `--create-rules` - Создать каталог rules с файлами промптов (только при первом запуске)
 - `-k, --keep-existing` - Сохранять существующие файлы (не перезаписывать)
+- `--preserve-old` - Сохранять старые файлы с временной меткой
+- `--task NUMBER` - Сгенерировать только одно задание с указанным номером
 
-### Справка по использованию
+### Примеры использования
+
 ```bash
-./bin/human_eval_converter help convert
+# Базовая конвертация
+./bin/human_eval_converter convert _src/HumanEval.jsonl tasks
+
+# Генерация только задания номер 0 (первое задание)
+./bin/human_eval_converter convert _src/HumanEval.jsonl tasks --task 0
+
+# Генерация только задания номер 42
+./bin/human_eval_converter convert _src/HumanEval.jsonl tasks --task 42
+
+# Генерация одного задания с сохранением старых файлов
+./bin/human_eval_converter convert _src/HumanEval.jsonl tasks --task 42 --preserve-old
 ```
 
-## Структура выходных данных
+### Структура выходных данных
 
-Для каждой задачи создается отдельная директория в каталоге `tasks`, содержащая:
-- `README.md` - описание задачи
-- `test_check.rb` - файл с тестами
-- `t{task_id}.jsonl` - исходная строка в формате JSONL
-- `t{task_id}.json` - отформатированный JSON
+Для задания 0 будут созданы файлы:
+- `tasks/t0.md` - описание задачи
+- `tasks/t0_asserts.rb` - файл с тестами
+- `tasks/t0.jsonl` - исходная строка в формате JSONL
+- `tasks/t0.json` - отформатированный JSON
 
-При использовании опции `--create-rules` создается директория `rules` со следующими файлами:
-- `description_prompt.txt` - промпт для генерации описания
-- `assertions_prompt.txt` - промпт для генерации проверок
-
-## Разработка
-
-```bash
-# Запуск тестов
-bundle exec rspec
-
-# Запуск линтера
-bundle exec rubocop
+### Справка по использованию
 ```

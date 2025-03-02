@@ -5,7 +5,8 @@ require 'uri'
 
 class HumanEvalConverter
   OPENROUTER_API_KEY = ENV['OPENROUTER_API_KEY']
-  AI_MODEL = 'mistralai/mistral-7b-instruct'
+  # AI_MODEL = 'mistralai/mistral-7b-instruct'
+  AI_MODEL = 'google/gemini-flash-1.5'
 
   def initialize(input_file, output_dir, options = {})
     @input_file = input_file
@@ -13,15 +14,27 @@ class HumanEvalConverter
     @create_rules = options[:create_rules] || false
     @keep_existing = options[:keep_existing] || false
     @preserve_old = options[:preserve_old] || false
+    @task_number = options[:task_number]
     @src_file = '_src/HumanEval.jsonl'
     validate_environment
   end
 
   def process
     puts "#{__FILE__}:#{__LINE__} [DEBUG] | Начинаем обработку задач"
-    read_tasks.each do |task|
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | Обработка задачи #{task['task_id']}"
-      process_task(task)
+    tasks = read_tasks
+    
+    if @task_number
+      task = tasks.find { |t| t['task_id'] == "HumanEval/#{@task_number}" }
+      if task
+        process_task(task)
+      else
+        puts "Задача с номером #{@task_number} не найдена"
+      end
+    else
+      tasks.each do |task|
+        puts "#{__FILE__}:#{__LINE__} [DEBUG] | Обработка задачи #{task['task_id']}"
+        process_task(task)
+      end
     end
   end
 
@@ -56,10 +69,10 @@ class HumanEvalConverter
         puts "Пропускаем существующие README и test файлы в #{@output_dir}"
       else
         puts "Создаем README в: #{readme_path}"
-        create_task_markdown(@output_dir, task, task_number)
+        description = create_task_markdown(@output_dir, task, task_number)
 
         puts "Создаем test файл в: #{test_path}"
-        create_assertions(@output_dir, task, task_number)
+        create_assertions(@output_dir, task, task_number, description)
       end
     rescue StandardError => e
       puts "Предупреждение: Ошибка при создании дополнительных файлов для #{task_id}: #{e.message}"
@@ -116,36 +129,36 @@ class HumanEvalConverter
 
     File.write(file_path, content)
     puts "\nОтвет от LLM сохранен в: #{file_path}"
+    llm_response
   end
 
-  def create_assertions(dir, task, task_number)
-    file_path = File.join(dir, "t#{task_number}-asserts.rb")
+  def create_assertions(dir, task, task_number, description)
+    file_path = File.join(dir, "t#{task_number}_asserts.rb")
     return if @keep_existing && File.exist?(file_path)
     puts "#{__FILE__}:#{__LINE__} [DEBUG] | Генерируем тесты для задачи #{task['task_id']}"
-    prompt = <<~PROMPT
-      Создай 10 тестовых примеров на Ruby для этой задачи:
-
-      Описание задачи:
+    
+    prompt_path = File.join('rules', 'test_prompt.txt')
+    prompt = File.read(prompt_path)
+    
+    request = <<~PROMPT
       #{task['prompt']}
+      
+      Описание задачи на :
+      #{description}
 
-      Формат вывода должен быть в виде вызовов метода с проверкой assert через ==, по одному на строку.
-      Используй разные входные данные для каждого теста.
+      #{prompt}
     PROMPT
 
-    assertions = call_openrouter(prompt)
+    puts "\nЗапрос к LLM для генерации тестов task_id #{task['task_id']}:"
+    puts request
+
+    assertions = call_openrouter(request)
+    
+    puts "\nОтвет от LLM (тесты):"
+    puts assertions
+    
     File.write("#{dir}/t#{task_number}_asserts.rb", assertions)
-  end
-
-  def convert_to_ruby(python_code)
-    puts "#{__FILE__}:#{__LINE__} [DEBUG] | Отправляем запрос на конвертацию кода"
-    prompt = <<~PROMPT
-      Переведи этот код/описание с Python на Ruby 3.2:
-      #{python_code}
-
-      Убедись, что код соответствует стилю Ruby и использует его идиомы.
-    PROMPT
-
-    call_openrouter(prompt)
+    puts "\nТесты сохранены в: #{file_path}"
   end
 
   def call_openrouter(prompt)
@@ -186,9 +199,4 @@ class HumanEvalConverter
       raise "Ошибка парсинга ответа API: #{e.message}"
     end
   end
-end
-
-# Добавляем опцию в CLI если она используется
-if ARGV.include?("--preserve-old")
-  options[:preserve_old] = true
 end 
