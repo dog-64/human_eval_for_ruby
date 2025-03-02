@@ -133,7 +133,7 @@ class HumanEvalConverter
   end
 
   def create_assertions(dir, task, task_number, description)
-    file_path = File.join(dir, "t#{task_number}_asserts.rb")
+    file_path = File.join(dir, "t#{task['task_id']}-assert.rb")
     return if @keep_existing && File.exist?(file_path)
     puts "#{__FILE__}:#{__LINE__} [DEBUG] | Генерируем тесты для задачи #{task['task_id']}"
     
@@ -157,7 +157,7 @@ class HumanEvalConverter
     puts "\nОтвет от LLM (тесты):"
     puts assertions
     
-    File.write("#{dir}/t#{task_number}_asserts.rb", assertions)
+    File.write("#{dir}/t#{task['task_id']}-assert.rb", assertions)
     puts "\nТесты сохранены в: #{file_path}"
   end
 
