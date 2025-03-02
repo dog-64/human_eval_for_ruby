@@ -34,20 +34,37 @@ bundle install
 - `--preserve-old` - Сохранять старые файлы с временной меткой
 - `--task NUMBER` - Сгенерировать только одно задание с указанным номером
 
+### Уровни логирования
+
+Скрипт поддерживает три уровня логирования:
+
+- `--log-level none` - без вывода логов
+- `--log-level normal` - стандартный уровень (по умолчанию)
+- `--log-level debug` - подробный вывод для отладки
+
+Примеры использования:
+```bash
+# Без логов
+./bin/human_eval_converter convert _src/HumanEval.jsonl tasks --log-level none
+
+# Подробный вывод для отладки
+./bin/human_eval_converter convert _src/HumanEval.jsonl tasks --log-level debug
+
+# Стандартный уровень (можно не указывать)
+./bin/human_eval_converter convert _src/HumanEval.jsonl tasks --log-level normal
+```
+
 ### Примеры использования
 
 ```bash
 # Базовая конвертация
 ./bin/human_eval_converter convert _src/HumanEval.jsonl tasks
 
-# Генерация только задания номер 0 (первое задание)
-./bin/human_eval_converter convert _src/HumanEval.jsonl tasks --task 0
+# Генерация задания номер 0 с подробным логированием
+./bin/human_eval_converter convert _src/HumanEval.jsonl tasks --task 0 --log-level debug
 
-# Генерация только задания номер 42
-./bin/human_eval_converter convert _src/HumanEval.jsonl tasks --task 42
-
-# Генерация одного задания с сохранением старых файлов
-./bin/human_eval_converter convert _src/HumanEval.jsonl tasks --task 42 --preserve-old
+# Генерация задания с сохранением старых файлов и без логов
+./bin/human_eval_converter convert _src/HumanEval.jsonl tasks --task 42 --preserve-old --log-level none
 ```
 
 ### Структура выходных данных

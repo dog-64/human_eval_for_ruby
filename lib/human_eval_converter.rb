@@ -2,11 +2,46 @@ require 'json'
 require 'fileutils'
 require 'net/http'
 require 'uri'
+require 'dotenv'
 
 class HumanEvalConverter
+  # Загружаем переменные окружения из .env файла
+  Dotenv.load
+
   OPENROUTER_API_KEY = ENV['OPENROUTER_API_KEY']
-  # AI_MODEL = 'mistralai/mistral-7b-instruct'
-  AI_MODEL = 'google/gemini-flash-1.5'
+  AI_MODEL = ENV['AI_MODEL'] || 'google/gemini-flash-1.5'
+  
+  LOG_LEVELS = {
+    none: 0,
+    normal: 1,
+    debug: 2
+  }
+
+  private
+
+  def log(message, level = :normal)
+    return if @log_level < LOG_LEVELS[level]
+    
+    # Получаем информацию о вызове
+    caller_info = caller_locations(1,1).first
+    file = File.basename(caller_info.path)
+    line = caller_info.lineno
+    
+    # Форматируем сообщение в зависимости от уровня лога
+    formatted_message = if level == :debug
+      "#{file}:#{line} [DEBUG] | #{message}"
+    else
+      message
+    end
+    
+    puts formatted_message
+  end
+
+  def debug(message)
+    log(message, :debug)
+  end
+
+  public
 
   def initialize(input_file, output_dir, options = {})
     @input_file = input_file
@@ -15,12 +50,12 @@ class HumanEvalConverter
     @keep_existing = options[:keep_existing] || false
     @preserve_old = options[:preserve_old] || false
     @task_number = options[:task_number]
-    @src_file = '_src/HumanEval.jsonl'
+    @log_level = LOG_LEVELS[options[:log_level]&.to_sym || :normal]
     validate_environment
   end
 
   def process
-    puts "#{__FILE__}:#{__LINE__} [DEBUG] | Начинаем обработку задач"
+    debug "Начинаем обработку задач"
     tasks = read_tasks
     
     if @task_number
@@ -28,11 +63,11 @@ class HumanEvalConverter
       if task
         process_task(task)
       else
-        puts "Задача с номером #{@task_number} не найдена"
+        log "Задача с номером #{@task_number} не найдена"
       end
     else
       tasks.each do |task|
-        puts "#{__FILE__}:#{__LINE__} [DEBUG] | Обработка задачи #{task['task_id']}"
+        debug "Обработка задачи #{task['task_id']}"
         process_task(task)
       end
     end
@@ -40,7 +75,7 @@ class HumanEvalConverter
 
   def process_task(task)
     task_id = task['task_id']
-    puts "Обработка task_id: #{task_id}"
+    log "Обработка task_id: #{task_id}"
 
     # Извлекаем только номер из task_id (например, из "HumanEval/0" получаем "0")
     task_number = task_id.split('/').last
@@ -51,54 +86,55 @@ class HumanEvalConverter
     jsonl_path = File.join(@output_dir, "t#{task_number}.jsonl")
     json_path = File.join(@output_dir, "t#{task_number}.json")
     readme_path = File.join(@output_dir, "t#{task_number}.md")
-    test_path = File.join(@output_dir, "t#{task_number}_asserts.rb")
+    test_path = File.join(@output_dir, "t#{task_number}-assert.rb")
 
     if @keep_existing && (File.exist?(jsonl_path) || File.exist?(json_path))
-      puts "Пропускаем существующие файлы в #{@output_dir}"
+      debug "Пропускаем существующие файлы в #{@output_dir}"
     else
-      puts "Сохраняем JSONL в: #{jsonl_path}"
+      debug "Сохраняем JSONL в #{jsonl_path}"
       File.write(jsonl_path, JSON.generate(task))
 
-      puts "Сохраняем JSON в: #{json_path}"
+      debug "Сохраняем JSON в #{json_path}"
       File.write(json_path, JSON.pretty_generate(task))
     end
 
     # Генерируем остальные файлы
     begin
       if @keep_existing && (File.exist?(readme_path) || File.exist?(test_path))
-        puts "Пропускаем существующие README и test файлы в #{@output_dir}"
+        log "Пропускаем существующие README и test файлы в #{@output_dir}"
       else
-        puts "Создаем README в: #{readme_path}"
-        description = create_task_markdown(@output_dir, task, task_number)
+        log "Создаем описание задачи в #{readme_path}"
+        description = create_task_markdown(task)
 
-        puts "Создаем test файл в: #{test_path}"
+        debug "Создаем test файл в #{test_path}"
         create_assertions(@output_dir, task, task_number, description)
       end
     rescue StandardError => e
-      puts "Предупреждение: Ошибка при создании дополнительных файлов для #{task_id}: #{e.message}"
-      puts "Исходные данные сохранены в: #{jsonl_path} и #{json_path}"
+      log "Предупреждение: Ошибка при создании дополнительных файлов для #{task_id}: #{e.message}"
+      log "Исходные данные сохранены в: #{jsonl_path} и #{json_path}"
     end
   end
 
   private
 
   def validate_environment
-    unless File.exist?(@src_file)
-      raise "Файл #{@src_file} не найден. Создайте каталог _src и поместите в него файл HumanEval.jsonl"
+    unless File.exist?(@input_file)
+      raise "Файл #{@input_file} не найден"
     end
 
     unless ENV['OPENROUTER_API_KEY']
-      raise "Установите переменную окружения OPENROUTER_API_KEY"
+      raise "Установите переменную OPENROUTER_API_KEY в файле .env"
     end
   end
 
   def read_tasks
-    puts "#{__FILE__}:#{__LINE__} [DEBUG] | Читаем файл #{@src_file}"
-    File.readlines(@src_file).map { |line| JSON.parse(line) }
+    debug "Читаем файл #{@input_file}"
+    File.readlines(@input_file).map { |line| JSON.parse(line) }
   end
 
-  def create_task_markdown(dir, task, task_number)
-    file_path = File.join(dir, "t#{task_number}.md")
+  def create_task_markdown(task)
+    task_number = task['task_id'].split('/').last
+    file_path = File.join(@output_dir, "t#{task_number}.md")
     return if @keep_existing && File.exist?(file_path)
     
     prompt_path = File.join('rules', 'description_prompt.txt')
@@ -113,8 +149,8 @@ class HumanEvalConverter
       content: "#{escaped_prompt}\n\n#{escaped_rules}"
     }
 
-    puts "\nЗапрос к LLM для task_id #{task['task_id']}:"
-    puts request.to_json
+    debug "Запрос к LLM для task_id #{task['task_id']}:"
+    debug request.to_json
 
     # Получаем ответ от LLM
     llm_response = call_openrouter(request[:content])
@@ -128,14 +164,14 @@ class HumanEvalConverter
     MARKDOWN
 
     File.write(file_path, content)
-    puts "\nОтвет от LLM сохранен в: #{file_path}"
+    debug "Ответ от LLM сохранен в: #{file_path}"
     llm_response
   end
 
   def create_assertions(dir, task, task_number, description)
-    file_path = File.join(dir, "t#{task['task_id']}-assert.rb")
+    file_path = File.join(dir, "t#{task_number}-assert.rb")
     return if @keep_existing && File.exist?(file_path)
-    puts "#{__FILE__}:#{__LINE__} [DEBUG] | Генерируем тесты для задачи #{task['task_id']}"
+    debug "Генерируем тесты для задачи #{task['task_id']}"
     
     prompt_path = File.join('rules', 'test_prompt.txt')
     prompt = File.read(prompt_path)
@@ -143,26 +179,22 @@ class HumanEvalConverter
     request = <<~PROMPT
       #{task['prompt']}
       
-      Описание задачи на :
+      Описание задачи на русском языке:
       #{description}
 
       #{prompt}
     PROMPT
-
-    puts "\nЗапрос к LLM для генерации тестов task_id #{task['task_id']}:"
-    puts request
-
+    debug "Запрос к LLM для генерации тестов task_id #{task['task_id']}:\n#{request}"
+    
     assertions = call_openrouter(request)
+    debug "Ответ от LLM (тесты):\n#{assertions}"
     
-    puts "\nОтвет от LLM (тесты):"
-    puts assertions
-    
-    File.write("#{dir}/t#{task['task_id']}-assert.rb", assertions)
-    puts "\nТесты сохранены в: #{file_path}"
+    File.write(file_path, assertions)
+    debug "Тесты сохранены в #{file_path}"
   end
 
   def call_openrouter(prompt)
-    puts "#{__FILE__}:#{__LINE__} [DEBUG] | Вызов OpenRouter API"
+    debug "Вызов OpenRouter API"
     uri = URI('https://openrouter.ai/api/v1/chat/completions')
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
@@ -175,27 +207,26 @@ class HumanEvalConverter
 
     request.body = {
       model: AI_MODEL,
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 1000
+      messages: [{ role: 'user', content: prompt }]
     }.to_json
 
-    puts "#{__FILE__}:#{__LINE__} [DEBUG] | Ожидаем ответ от API"
+    debug "Ожидаем ответ от API"
     response = http.request(request)
 
     unless response.is_a?(Net::HTTPSuccess)
       error_message = "Ошибка API: #{response.code} - #{response.body}"
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | #{error_message}"
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | Запрос: #{request.body}"
+      debug error_message
+      debug "Запрос: #{request.body}"
       raise error_message
     end
 
     begin
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | Ответ получен успешно"
+      debug "Ответ получен успешно"
       parsed_response = JSON.parse(response.body)
       parsed_response.dig('choices', 0, 'message', 'content') || raise('Пустой ответ от API')
     rescue JSON::ParserError => e
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | Ошибка парсинга JSON: #{e.message}"
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | Тело ответа: #{response.body}"
+      debug "Ошибка парсинга JSON: #{e.message}"
+      debug "Тело ответа: #{response.body}"
       raise "Ошибка парсинга ответа API: #{e.message}"
     end
   end
