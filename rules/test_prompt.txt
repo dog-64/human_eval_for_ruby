@@ -6,6 +6,11 @@
 - тестовые примеры должны быть на Ruby 3.2
 - каждая проверка это одна строка с assert
 - для проверки функции из lib/assert.rb
+- только ruby код, никакого другого текста
 
-Код функции:
-{{code}} 
+пример:
+```
+assert has_close_elements([1, 2, 3, 4], 1) == true
+assert has_close_elements([1, 2, 3, 4], 0) == false
+assert has_close_elements([1, 2, 3, 4], 2) == true
+```

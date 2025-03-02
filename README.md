@@ -1,66 +1,60 @@
-# Human Eval Ruby Converter
+# Human Eval Converter
 
-Конвертер заданий из HumanEval в Ruby формат.
+Инструмент для конвертации задач из формата human-eval в отдельные задачи.
 
 ## Установка
 
-1. Создайте каталог `_src` и поместите в него файл `HumanEval.jsonl`
-2. Установите переменную окружения:
 ```bash
-export OPENROUTER_API_KEY='ваш_ключ'
+git clone <repository-url>
+cd human-eval-converter
+bundle install
 ```
 
 ## Использование
 
+### Быстрый старт
 ```bash
-chmod +x bin/convert
-./bin/convert
+# Базовая конвертация
+./bin/human_eval_converter convert _src/HumanEval.jsonl tasks
+
+# Первый запуск с созданием правил
+./bin/human_eval_converter convert _src/HumanEval.jsonl tasks --create-rules
+
+# Добавление новых задач с сохранением существующих
+./bin/human_eval_converter convert _src/HumanEval.jsonl tasks --keep-existing
+
+# Комбинация опций (если нужно)
+./bin/human_eval_converter convert _src/HumanEval.jsonl tasks --create-rules --keep-existing
 ```
 
-## Структура проекта
+### Опции
 
-- `_src/` - каталог с исходным файлом HumanEval.jsonl
-- `tasks/` - каталог с сгенерированными заданиями
-- `lib/` - код приложения
-- `bin/` - исполняемые скрипты
+- `--create-rules` - Создать каталог rules с файлами промптов (только при первом запуске)
+- `-k, --keep-existing` - Сохранять существующие файлы (не перезаписывать)
 
-## Файлы правил
-
-В каталоге `rules` находятся файлы с промптами для генерации описаний и тестов:
-
-### description_prompt.txt
-Промпт для генерации описания задачи. Включает следующие требования:
-- Описание функциональности
-- Входные параметры и их типы
-- Возвращаемое значение и его тип
-- Примеры использования
-- Особые случаи и ограничения
-- Указание на использование Ruby 3.2
-- Без включения реализации
-
-### test_prompt.txt
-Промпт для генерации тестов. Проверяет:
-- Базовую функциональность
-- Граничные случаи
-- Особые ситуации
-- Обработку ошибок
-- Тесты написаны на Ruby 3.2
-- Каждый тест - одна строка с assert
-
-## Опции запуска
-
-Скрипт поддерживает следующие опции:
-
-### --preserve-old
-При использовании этой опции старые файлы не удаляются, а сохраняются с временной меткой в имени.
-
-Пример:
+### Справка по использованию
 ```bash
-ruby lib/human_eval_converter.rb --preserve-old
+./bin/human_eval_converter help convert
 ```
 
-Это создаст файлы с именами вида:
-```
-task_20240315_143022.md
-asserts_20240315_143022.rb
+## Структура выходных данных
+
+Для каждой задачи создается отдельная директория в каталоге `tasks`, содержащая:
+- `README.md` - описание задачи
+- `test_check.rb` - файл с тестами
+- `t{task_id}.jsonl` - исходная строка в формате JSONL
+- `t{task_id}.json` - отформатированный JSON
+
+При использовании опции `--create-rules` создается директория `rules` со следующими файлами:
+- `description_prompt.txt` - промпт для генерации описания
+- `assertions_prompt.txt` - промпт для генерации проверок
+
+## Разработка
+
+```bash
+# Запуск тестов
+bundle exec rspec
+
+# Запуск линтера
+bundle exec rubocop
 ```
