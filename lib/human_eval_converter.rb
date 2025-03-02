@@ -23,9 +23,11 @@ class HumanEvalConverter
     return if @log_level < LOG_LEVELS[level]
     
     # Получаем информацию о вызове
-    caller_info = caller_locations(1,1).first
-    file = File.basename(caller_info.path)
-    line = caller_info.lineno
+    # Для debug используем глубину 2, чтобы получить место вызова debug
+    depth = level == :debug ? 2 : 1
+    caller_info = caller_locations(depth,1).first
+    file = caller_info ? File.basename(caller_info.path) : ''
+    line = caller_info ? caller_info.lineno : ''
     
     # Форматируем сообщение в зависимости от уровня лога
     formatted_message = if level == :debug
@@ -50,7 +52,11 @@ class HumanEvalConverter
     @keep_existing = options[:keep_existing] || false
     @preserve_old = options[:preserve_old] || false
     @task_number = options[:task_number]
-    @log_level = LOG_LEVELS[options[:log_level]&.to_sym || :normal]
+    @log_level = if options[:log_level]
+      LOG_LEVELS[options[:log_level].to_sym] || LOG_LEVELS[:normal]
+    else
+      LOG_LEVELS[:normal]
+    end
     validate_environment
   end
 
@@ -101,9 +107,9 @@ class HumanEvalConverter
     # Генерируем остальные файлы
     begin
       if @keep_existing && (File.exist?(readme_path) || File.exist?(test_path))
-        log "Пропускаем существующие README и test файлы в #{@output_dir}"
+        debug "Пропускаем существующие README и test файлы в #{@output_dir}"
       else
-        log "Создаем описание задачи в #{readme_path}"
+        debug "Создаем описание задачи в #{readme_path}"
         description = create_task_markdown(task)
 
         debug "Создаем test файл в #{test_path}"
