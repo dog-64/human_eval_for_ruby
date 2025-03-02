@@ -3,49 +3,18 @@ require 'fileutils'
 require 'net/http'
 require 'uri'
 require 'dotenv'
+require 'pry'
+require_relative 'logger'
 
 class HumanEvalConverter
+  include HumanEval::Logger
+
   # Загружаем переменные окружения из .env файла
   Dotenv.load
 
   OPENROUTER_API_KEY = ENV['OPENROUTER_API_KEY']
   AI_MODEL = ENV['AI_MODEL'] || 'google/gemini-flash-1.5'
   
-  LOG_LEVELS = {
-    none: 0,
-    normal: 1,
-    debug: 2,
-    error: 3
-  }
-
-  private
-
-  def log(message, level = :normal)
-    return if @log_level < LOG_LEVELS[level]
-    
-    # Получаем информацию о вызове
-    # Для debug используем глубину 2, чтобы получить место вызова debug
-    depth = level == :debug ? 2 : 1
-    caller_info = caller_locations(depth,1).first
-    file = caller_info ? File.basename(caller_info.path) : ''
-    line = caller_info ? caller_info.lineno : ''
-    
-    # Форматируем сообщение в зависимости от уровня лога
-    formatted_message = "#{file}:#{line} [#{level.to_s.upcase}] | #{message}"
-    
-    puts formatted_message
-  end
-
-  def debug(message)
-    log(message, :debug)
-  end
-
-  def error(message)
-    log(message, :error)
-  end
-
-  public
-
   def initialize(input_file, output_dir, options = {})
     @input_file = input_file
     @output_dir = output_dir
@@ -53,11 +22,7 @@ class HumanEvalConverter
     @keep_existing = options[:keep_existing] || false
     @preserve_old = options[:preserve_old] || false
     @task_number = options[:task_number]
-    @log_level = if options[:log_level]
-      LOG_LEVELS[options[:log_level].to_sym] || LOG_LEVELS[:normal]
-    else
-      LOG_LEVELS[:normal]
-    end
+    self.log_level = options[:log_level] || :normal
     validate_environment
   end
 
@@ -141,7 +106,7 @@ class HumanEvalConverter
 
   def create_task_markdown(task)
     task_number = task['task_id'].split('/').last
-    file_path = File.join(@output_dir, "t#{tasknumber}.md")
+    file_path = File.join(@output_dir, "t#{task_number}.md")
     return if @keep_existing && File.exist?(file_path)
     
     prompt_path = File.join('rules', 'description_prompt.txt')
@@ -157,10 +122,12 @@ class HumanEvalConverter
     }
 
     debug "Запрос к LLM для task_id #{task['task_id']}:"
-    debug request.to_json
+    debug "Промпт задачи: #{escaped_prompt}"
+    debug "Правила: #{escaped_rules}"
+    debug "Полный запрос: #{request.to_json}"
 
-    # Получаем ответ от LLM
     llm_response = call_openrouter(request[:content])
+    debug "Получен ответ от LLM: #{llm_response}"
 
     content = <<~MARKDOWN
       ## task_id
@@ -170,8 +137,9 @@ class HumanEvalConverter
       #{llm_response}
     MARKDOWN
 
+    debug "Сохраняем описание в файл: #{file_path}"
     File.write(file_path, content)
-    debug "Ответ от LLM сохранен в: #{file_path}"
+    debug "Описание сохранено"
     llm_response
   end
 
@@ -191,13 +159,20 @@ class HumanEvalConverter
 
       #{prompt}
     PROMPT
-    debug "Запрос к LLM для генерации тестов task_id #{task['task_id']}:\n#{request}"
+    
+    debug "Запрос к LLM для генерации тестов task_id #{task['task_id']}"
+    debug "Промпт задачи: #{task['prompt']}"
+    debug "Описание: #{description}"
+    debug "Правила: #{prompt}"
+    debug "Полный запрос: #{request}"
     
     assertions = call_openrouter(request)
-    debug "Ответ от LLM (тесты):\n#{assertions}"
+    debug "Получен ответ от LLM: #{assertions}"
     
+    debug "Сохраняем тесты в файл: #{file_path}"
     File.write(file_path, assertions)
-    debug "Тесты сохранены в #{file_path}"
+    debug "Тесты сохранены"
+    assertions
   end
 
   def call_openrouter(prompt)
@@ -209,31 +184,50 @@ class HumanEvalConverter
     request = Net::HTTP::Post.new(uri)
     request['Authorization'] = "Bearer #{OPENROUTER_API_KEY}"
     request['Content-Type'] = 'application/json'
-    request['HTTP-Referer'] = 'https://github.com/yourusername/yourrepo'
+    request['HTTP-Referer'] = ENV['HTTP_REFERER'] || 'https://github.com/yourusername/human-eval-converter'
     request['X-Title'] = 'Human Eval Converter'
+    request['OpenAI-Organization'] = 'openrouter'
+    request['User-Agent'] = 'Human Eval Converter/1.0.0'
 
     request.body = {
       model: AI_MODEL,
-      messages: [{ role: 'user', content: prompt }]
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      max_tokens: 1000,
+      stream: false
     }.to_json
+
+    debug "Запрос к API:"
+    debug request.body
 
     debug "Ожидаем ответ от API"
     response = http.request(request)
 
-    unless response.is_a?(Net::HTTPSuccess)
-      error_message = "Ошибка API: #{response.code} - #{response.body}"
-      error error_message
-      error "Запрос: #{request.body}"
-      raise error_message
-    end
+    debug "Получен ответ с кодом: #{response.code}"
+    debug "Заголовки ответа: #{response.to_hash}"
 
     begin
-      debug "Ответ получен успешно"
+      debug "Парсим ответ"
+      # Безопасно выводим тело ответа, экранируя проблемные символы
+      debug "Тело ответа: #{response.body.inspect}"
+      
       parsed_response = JSON.parse(response.body)
-      parsed_response.dig('choices', 0, 'message', 'content') || raise('Пустой ответ от API')
+      debug "Распарсенный ответ: #{parsed_response.inspect}"
+      
+      content = parsed_response.dig('choices', 0, 'message', 'content')
+      if content.nil? || content.empty?
+        error "Пустой ответ от API"
+        error "Полный ответ: #{parsed_response.inspect}"
+        raise 'Пустой ответ от API'
+      end
+      
+      # Принудительно конвертируем контент в UTF-8
+      content = content.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
+      debug "Извлечено содержимое ответа: #{content.inspect}"
+      content
     rescue JSON::ParserError => e
       error "Ошибка парсинга JSON: #{e.message}"
-      error "Тело ответа: #{response.body}"
+      error "Тело ответа: #{response.body.inspect}"
       raise "Ошибка парсинга ответа API: #{e.message}"
     end
   end
