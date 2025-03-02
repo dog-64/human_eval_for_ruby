@@ -14,7 +14,8 @@ class HumanEvalConverter
   LOG_LEVELS = {
     none: 0,
     normal: 1,
-    debug: 2
+    debug: 2,
+    error: 3
   }
 
   private
@@ -30,17 +31,17 @@ class HumanEvalConverter
     line = caller_info ? caller_info.lineno : ''
     
     # Форматируем сообщение в зависимости от уровня лога
-    formatted_message = if level == :debug
-      "#{file}:#{line} [DEBUG] | #{message}"
-    else
-      message
-    end
+    formatted_message = "#{file}:#{line} [#{level.to_s.upcase}] | #{message}"
     
     puts formatted_message
   end
 
   def debug(message)
     log(message, :debug)
+  end
+
+  def error(message)
+    log(message, :error)
   end
 
   public
@@ -116,8 +117,8 @@ class HumanEvalConverter
         create_assertions(@output_dir, task, task_number, description)
       end
     rescue StandardError => e
-      log "Предупреждение: Ошибка при создании дополнительных файлов для #{task_id}: #{e.message}"
-      log "Исходные данные сохранены в: #{jsonl_path} и #{json_path}"
+      error "Ошибка при создании дополнительных файлов для #{task_id}: #{e.message}"
+      error "Исходные данные сохранены в: #{jsonl_path} и #{json_path}"
     end
   end
 
@@ -140,7 +141,7 @@ class HumanEvalConverter
 
   def create_task_markdown(task)
     task_number = task['task_id'].split('/').last
-    file_path = File.join(@output_dir, "t#{task_number}.md")
+    file_path = File.join(@output_dir, "t#{tasknumber}.md")
     return if @keep_existing && File.exist?(file_path)
     
     prompt_path = File.join('rules', 'description_prompt.txt')
@@ -221,8 +222,8 @@ class HumanEvalConverter
 
     unless response.is_a?(Net::HTTPSuccess)
       error_message = "Ошибка API: #{response.code} - #{response.body}"
-      debug error_message
-      debug "Запрос: #{request.body}"
+      error error_message
+      error "Запрос: #{request.body}"
       raise error_message
     end
 
@@ -231,8 +232,8 @@ class HumanEvalConverter
       parsed_response = JSON.parse(response.body)
       parsed_response.dig('choices', 0, 'message', 'content') || raise('Пустой ответ от API')
     rescue JSON::ParserError => e
-      debug "Ошибка парсинга JSON: #{e.message}"
-      debug "Тело ответа: #{response.body}"
+      error "Ошибка парсинга JSON: #{e.message}"
+      error "Тело ответа: #{response.body}"
       raise "Ошибка парсинга ответа API: #{e.message}"
     end
   end
