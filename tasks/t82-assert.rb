@@ -1,0 +1,15 @@
+assert prime_length?("Hello") == true
+assert prime_length?("abcdcba") == true
+assert prime_length?("kittens") == true
+assert prime_length?("orange") == false
+assert prime_length?("") == false
+assert prime_length?("a") == false
+assert prime_length?("aa") == false
+assert prime_length?("aaa") == false
+assert prime_length?("aaaa") == false
+assert prime_length?("aaaaa") == true
+assert prime_length?("aaaaaa") == false
+assert prime_length?("aaaaaaa") == true
+assert prime_length?("aaaaaaaa") == false
+assert prime_length?("aaaaaaaaa") == true
+

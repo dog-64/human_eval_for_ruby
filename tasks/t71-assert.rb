@@ -1,0 +1,21 @@
+assert triangle_area(3, 4, 5) == 6.0
+assert triangle_area(1, 2, 10) == -1
+assert triangle_area(5, 12, 13) == 30.0
+assert triangle_area(1, 1, 1) == 0.43
+assert triangle_area(0.1, 0.1, 0.1) == 0.0
+assert triangle_area(100, 100, 100) == 4330.13
+assert triangle_area(1000, 1000, 1000) == 433012.7
+assert triangle_area(1, 1, 2) == -1
+assert triangle_area(2, 1, 1) == -1
+assert triangle_area(1, 2, 1) == -1
+assert triangle_area(-1, 2, 3) == -1
+assert triangle_area(1, -2, 3) == -1
+assert triangle_area(1, 2, -3) == -1
+assert triangle_area(0, 0, 0) == -1
+assert triangle_area(Float::INFINITY, 1, 1) == -1
+assert triangle_area(1, Float::INFINITY, 1) == -1
+assert triangle_area(1, 1, Float::INFINITY) == -1
+assert triangle_area(Float::NAN, 1, 1) == -1
+assert triangle_area(1, Float::NAN, 1) == -1
+assert triangle_area(1, 1, Float::NAN) == -1
+

@@ -1,0 +1,13 @@
+assert prime_length_words("This is a test") == "is"
+assert prime_length_words("lets go for swimming") == "go for"
+assert prime_length_words("a") == ""
+assert prime_length_words("one two three") == "two"
+assert prime_length_words("two three four five") == "two three five"
+assert prime_length_words("") == ""
+assert prime_length_words("  ") == ""
+assert prime_length_words("This is a very long sentence") == "is a long"
+assert prime_length_words("Short") == "Short"
+assert prime_length_words("Seven") == "Seven"
+assert prime_length_words("Eleven") == "Eleven"
+assert prime_length_words("Prime") == ""
+

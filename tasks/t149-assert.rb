@@ -1,0 +1,11 @@
+assert sorted_list_sum(["aa", "a", "aaa"]) == ["aa"]
+assert sorted_list_sum(["ab", "a", "aaa", "cd"]) == ["ab", "cd"]
+assert sorted_list_sum(["abc", "def", "ghi"]) == ["abc", "def", "ghi"]
+assert sorted_list_sum([]) == []
+assert sorted_list_sum(["a", "bc", "def", "ghij"]) == ["bc", "def"]
+assert sorted_list_sum(["a"]) == []
+assert sorted_list_sum(["aa", "bb", "cc"]) == ["aa", "bb", "cc"]
+assert sorted_list_sum(["abcd", "efgh", "ijkl"]) == ["abcd", "efgh", "ijkl"]
+assert sorted_list_sum(["", "a", "aa"]) == ["aa"]
+assert sorted_list_sum(["a","aa","aaa","aaaa"]) == ["aa","aaaa"]
+

@@ -1,0 +1,11 @@
+assert reverse_delete("abcde", "ae") == ["bcd", false]
+assert reverse_delete("abcdef", "b") == ["acdef", false]
+assert reverse_delete("abcdedcba", "ab") == ["cdedc", true]
+assert reverse_delete("", "") == ["", true]
+assert reverse_delete("a", "a") == ["", true]
+assert reverse_delete("hello", "o") == ["hell", false]
+assert reverse_delete("racecar", "") == ["racecar", true]
+assert reverse_delete("madam", "m") == ["ada", true]
+assert reverse_delete("aabbccddeeff", "abcdef") == ["", true]
+assert reverse_delete("A man, a plan, a canal: Panama", " ,:") == ["AmanaplanacanalPanama",true]
+

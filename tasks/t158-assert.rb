@@ -1,0 +1,13 @@
+assert find_max(["name", "of", "string"]) == "string"
+assert find_max(["name", "enam", "game"]) == "enam"
+assert find_max(["aaaaaaa", "bb", "cc"]) == "aaaaaaa"
+assert find_max([]) == ""
+assert find_max(["a", "b", "c"]) == "abc"
+assert find_max(["aa", "bb", "cc"]) == "aa"
+assert find_max(["a", "aa", "aaa"]) == "a"
+assert find_max(["abc", "abcd", "abcde"]) == "abcde"
+assert find_max(["zyxw", "vutsrqponm", "abcdefg"]) == "vutsrqponm"
+assert find_max(["", "a", "ab"]) == "ab"
+assert find_max(["a", "", "ab"]) == "ab"
+assert find_max(["ab", "a", ""]) == "ab"
+

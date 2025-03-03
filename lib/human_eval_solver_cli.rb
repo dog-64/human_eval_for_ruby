@@ -1,0 +1,36 @@
+require 'thor'
+require_relative 'human_eval_solver'
+
+module HumanEval
+  class SolverCLI < Thor
+    package_name "Human Eval Solver"
+
+    desc "solve TASKS_DIR", "Solve tasks from TASKS_DIR using AI models"
+    method_option :model,
+                 type: :string,
+                 desc: "Use specific model (#{Solver::MODELS.join(', ')})"
+    method_option :task,
+                 type: :string,
+                 desc: "Solve specific task number"
+    method_option :log_level,
+                 type: :string,
+                 enum: ["none", "normal", "debug"],
+                 default: "normal",
+                 desc: "Logging level"
+
+    def solve(tasks_dir)
+      options_hash = {
+        model: options[:model],
+        task: options[:task],
+        log_level: options[:log_level]
+      }
+
+      solver = Solver.new(tasks_dir, options_hash)
+      solver.process
+    end
+
+    def self.exit_on_failure?
+      true
+    end
+  end
+end 

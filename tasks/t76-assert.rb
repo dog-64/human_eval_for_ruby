@@ -1,0 +1,21 @@
+assert is_simple_power?(1, 4) == true
+assert is_simple_power?(2, 2) == true
+assert is_simple_power?(8, 2) == true
+assert is_simple_power?(3, 2) == false
+assert is_simple_power?(3, 1) == false
+assert is_simple_power?(5, 3) == false
+assert is_simple_power?(0, 0) == false
+assert is_simple_power?(1, 0) == false
+assert is_simple_power?(16, 2) == true
+assert is_simple_power?(27, 3) == true
+assert is_simple_power?(64, 4) == true
+assert is_simple_power?(100, 10) == true
+assert is_simple_power?(125, 5) == true
+assert is_simple_power?(1024, 2) == true
+assert is_simple_power?(0, 1) == false
+assert is_simple_power?(1, 1) == true
+assert is_simple_power?(10, 1) == true
+assert is_simple_power?(-8, 2) == false
+assert is_simple_power?(8, -2) == false
+assert is_simple_power?(100, -10) == false
+

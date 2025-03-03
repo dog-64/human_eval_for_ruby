@@ -1,0 +1,13 @@
+assert fizz_buzz(0) == 0
+assert fizz_buzz(1) == 0
+assert fizz_buzz(50) == 0
+assert fizz_buzz(78) == 2
+assert fizz_buzz(79) == 3
+assert fizz_buzz(117) == 4
+assert fizz_buzz(137) == 4
+assert fizz_buzz(143) == 4
+assert fizz_buzz(77) == 3
+assert fizz_buzz(1000) == 26
+assert fizz_buzz(-10) == 0
+assert fizz_buzz(100) == 2
+

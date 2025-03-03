@@ -1,0 +1,13 @@
+assert generate_even_numbers(2, 8) == [2, 4, 6, 8]
+assert generate_even_numbers(8, 2) == [2, 4, 6, 8]
+assert generate_even_numbers(10, 14) == []
+assert generate_even_numbers(1, 10) == [2, 4, 6, 8, 10]
+assert generate_even_numbers(3, 7) == [4, 6]
+assert generate_even_numbers(2, 2) == [2]
+assert generate_even_numbers(1, 1) == []
+assert generate_even_numbers(9, 11) == []
+assert generate_even_numbers(100, 102) == [100, 102]
+assert generate_even_numbers(101, 103) == []
+assert generate_even_numbers(1, 2) == [2]
+assert generate_even_numbers(2, 1) == [2]
+

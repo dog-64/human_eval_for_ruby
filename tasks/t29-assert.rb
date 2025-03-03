@@ -1,0 +1,10 @@
+assert filter_by_prefix([], 'a') == []
+assert filter_by_prefix(['abc', 'bcd', 'cde', 'array'], 'a') == ['abc', 'array']
+assert filter_by_prefix(['apple', 'apricot', 'banana'], 'app') == ['apple', 'apricot']
+assert filter_by_prefix(['hello', 'world'], 'xyz') == []
+assert filter_by_prefix(['abc', 'aBc', 'cde'], 'a') == ['abc']
+assert filter_by_prefix(['', 'bcd', 'cde'], '') == ['', 'bcd', 'cde']
+assert filter_by_prefix(['abc', 'bcd', 'cde'], '') == ['abc', 'bcd', 'cde']
+assert filter_by_prefix(['abc', 'bcd', 'cde'], 'aBc') == []
+assert filter_by_prefix(['a', 'aa', 'aaa'], 'a') == ['a', 'aa', 'aaa']
+

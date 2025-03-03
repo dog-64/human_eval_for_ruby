@@ -1,0 +1,10 @@
+assert concatenate([]) == ""
+assert concatenate(["a", "b", "c"]) == "abc"
+assert concatenate(["Hello", " ", "World!"]) == "Hello World!"
+assert concatenate(["", "a", ""]) == "a"
+assert concatenate(["a", "", "c"]) == "ac"
+assert concatenate([""]) == ""
+assert concatenate(["abc"]) == "abc"
+assert concatenate(["123", "456"]) == "123456"
+assert concatenate(["a", "b", "c", "d", "e", "f"]) == "abcdef"
+

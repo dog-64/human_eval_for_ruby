@@ -1,0 +1,11 @@
+assert by_length([2, 1, 1, 4, 5, 8, 2, 3]) == ["Eight", "Five", "Four", "Three", "Two", "Two", "One", "One"]
+assert by_length([]) == []
+assert by_length([1, -1, 55]) == ["One"]
+assert by_length([10, 11, 12]) == []
+assert by_length([1, 2, 3, 4, 5, 6, 7, 8, 9]) == ["Nine", "Eight", "Seven", "Six", "Five", "Four", "Three", "Two", "One"]
+assert by_length([9, 1, 9, 1]) == ["One", "One", "Nine", "Nine"]
+assert by_length([1, 1, 1, 1, 1]) == ["One", "One", "One", "One", "One"]
+assert by_length([0, 0, 0]) == []
+assert by_length([-1, -2, -3]) == []
+assert by_length([1, 9, 2, 8, 3, 7, 4, 6, 5]) == ["Five", "Six", "Four", "Seven", "Three", "Eight", "Two", "Nine", "One"]
+
