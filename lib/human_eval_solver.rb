@@ -10,13 +10,16 @@ module HumanEval
   class Solver
     include HumanEval::Logger
 
-    MODELS = [
-      'google/gemini-flash-1.5',
-      'deepseek/deepseek-chat:free',
-      'google/gemini-2.0-flash-001',
-      'openai/gpt-4o-mini',
-      'openai/gpt-4o',
-      'anthropic/claude-3.5-sonnet'
+    MODELS = %w[
+      google/gemini-flash-1.5 
+      deepseek/deepseek-chat:free 
+      qwen/qwen-2.5-coder-32b-instruct:free 
+      qwen/qwen-2.5-coder-32b 
+      google/gemini-2.0-flash-001
+ 
+      openai/gpt-4o-mini 
+      openai/gpt-4o 
+      anthropic/claude-3.5-sonnet
     ]
 
     Dotenv.load
@@ -94,8 +97,9 @@ module HumanEval
       debug prompt
       debug "---END FULL PROMPT---"
 
-      solution = call_openrouter(prompt, model)
+      raw_solution = call_openrouter(prompt, model)
       debug "Получено решение от модели #{model}"
+      solution = extract_and_join_code_blocks(raw_solution)
 
       File.write(output_file, solution)
       debug "Решение сохранено в #{output_file}"
@@ -143,6 +147,17 @@ module HumanEval
         error "Ошибка парсинга JSON: #{e.message}"
         raise "Ошибка парсинга ответа API: #{e.message}"
       end
+    end
+
+    def extract_and_join_code_blocks(input)
+      # Находим все фрагменты, обрамлённые тройными обратными кавычками.
+      # Регулярное выражение:
+      # - Ищет "```", возможно с пробелами и указанием языка до первого переноса строки.
+      # - Затем не жадно захватывает содержимое кода.
+      # - Ищет закрывающие "```", перед которыми могут быть пробелы.
+      code_blocks = input.scan(/```[^\n]*\n(.*?)\s*```/m).flatten
+      # Объединяем найденные блоки в один результат с переводами строк.
+      code_blocks.join("\n")
     end
 
     def validate_environment

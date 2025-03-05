@@ -2,9 +2,9 @@ module HumanEval
   module Logger
     LOG_LEVELS = {
       none: 0,
-      normal: 1,
-      debug: 2,
-      error: 3
+      error: 1,
+      normal: 2,
+      debug: 3,
     }
 
     def self.included(base)
