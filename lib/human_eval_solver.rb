@@ -71,31 +71,18 @@ module HumanEval
       output_file = File.join(@tasks_dir, "t#{task_number}-#{model_file_name}.rb")
 
       debug "Решаем задачу #{task_number} с моделью #{model}"
-      
-      # Убираем markdown-блоки из контента
-      code_blocks = []
-      scanner = StringScanner.new(content)
-      
-      while !scanner.eos?
-        if scanner.scan_until(/```ruby\n/)
-          start_pos = scanner.pos
-          if scanner.scan_until(/\n```/)
-            end_pos = scanner.pos - 4  # длина "\n```"
-            code_blocks << content[start_pos...end_pos]
-          end
-        else
-          scanner.terminate
-        end
-      end
-      
-      content = code_blocks.first if code_blocks.any?
-      
+
+      debug "Исходное содержимое файла:"
+      debug "---BEGIN ORIGINAL CONTENT---"
+      debug content
+      debug "---END ORIGINAL CONTENT---"
+
       solver_prompt = File.read(File.join('rules', 'model_solver_prompt.txt'))
       debug "Загружен промпт для решения:"
       debug "---BEGIN SOLVER PROMPT---"
       debug solver_prompt
       debug "---END SOLVER PROMPT---"
-      
+
       prompt = <<~PROMPT
         #{solver_prompt}
         
@@ -109,7 +96,7 @@ module HumanEval
 
       solution = call_openrouter(prompt, model)
       debug "Получено решение от модели #{model}"
-      
+
       File.write(output_file, solution)
       debug "Решение сохранено в #{output_file}"
     end
@@ -145,7 +132,7 @@ module HumanEval
       begin
         parsed_response = JSON.parse(response.body)
         content = parsed_response.dig('choices', 0, 'message', 'content')
-        
+
         if content.nil? || content.empty?
           error "Пустой ответ от API для модели #{model}"
           raise "Пустой ответ от API"
