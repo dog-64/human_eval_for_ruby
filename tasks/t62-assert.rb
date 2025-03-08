@@ -1,4 +1,3 @@
-```ruby
 assert derivative([3, 1, 2, 4, 5]) == [1, 4, 12, 20]
 assert derivative([1, 2, 3]) == [2, 6]
 assert derivative([]) == []
@@ -7,4 +6,3 @@ assert derivative([0, 0, 0]) == [0, 0]
 assert derivative([1, 0, 1]) == [0, 2]
 assert derivative([2.5, 1.5, 0.5]) == [1.5, 1.0]
 assert derivative([-1, 2, -3]) == [2, -6]
-```

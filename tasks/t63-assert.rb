@@ -9,5 +9,3 @@ assert fibfib(7) == 13
 assert fibfib(8) == 24
 assert fibfib(9) == 44
 assert fibfib(10) == 81
-assert fibfib(15) == 1597
-
