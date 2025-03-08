@@ -1,5 +1,5 @@
 assert median([3, 1, 2, 4, 5]) == 3
-assert median([-10, 4, 6, 1000, 10, 20]) == 15.0
+assert median([-10, 4, 6, 1000, 10, 20]) == 8
 assert median([1, 2]) == 1.5
 assert_raises(ArgumentError) { median([]) }
 assert median([1, 2, 3, 4, 5, 6]) == 3.5
@@ -13,4 +13,3 @@ assert median([1]) == 1.0
 assert median([-1, 0, 1]) == 0
 assert median([1.1, 2.2, 3.3]) == 2.2
 assert_raises(ArgumentError) { median([1, 2, {}]) }
-

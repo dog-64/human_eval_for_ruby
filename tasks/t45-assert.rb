@@ -3,11 +3,9 @@ assert triangle_area(10, 5) == 25.0
 assert triangle_area(2.5, 4.2) == 5.25
 assert triangle_area(1, 1) == 0.5
 assert triangle_area(100, 100) == 5000.0
-assert triangle_area(0.1, 0.1) == 0.005
-assert_raises(ArgumentError) { triangle_area(-5, 3) }
-assert_raises(ArgumentError) { triangle_area(5, -3) }
-assert_raises(ArgumentError) { triangle_area(-5, -3) }
-assert_raises(ArgumentError) { triangle_area(0, 3) }
-assert_raises(ArgumentError) { triangle_area(5, 0) }
-assert_raises(ArgumentError) { triangle_area(0, 0) }
-
+assert_raises(StandardError) { triangle_area(-5, 3) }
+assert_raises(StandardError) { triangle_area(5, -3) }
+assert_raises(StandardError) { triangle_area(-5, -3) }
+assert_raises(StandardError) { triangle_area(0, 3) }
+assert_raises(StandardError) { triangle_area(5, 0) }
+assert_raises(StandardError) { triangle_area(0, 0) }

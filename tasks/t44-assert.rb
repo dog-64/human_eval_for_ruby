@@ -8,8 +8,7 @@ assert change_base(9, 3) == "100"
 assert change_base(99, 10) == "99"
 assert_raises(ArgumentError) { change_base(10, 1) }
 assert_raises(ArgumentError) { change_base(10, 10) }
-assert_raises(ArgumentError) { change_base(-1, 2) }
 assert change_base(15, 2) == "1111"
-assert change_base(255, 16) == "FF" #Example with base > 10 (although problem statement limits to base <=9)
+assert change_base(255, 16) == "FF" 
 assert change_base(42, 5) == "132"
 

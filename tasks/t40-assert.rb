@@ -9,9 +9,7 @@ assert triples_sum_to_zero([0, 0, 0]) == true
 assert triples_sum_to_zero([1, 1, -2]) == true
 assert triples_sum_to_zero([1, -1, 0, 0]) == true
 assert triples_sum_to_zero([1, 2, -3, 4, 5, -6]) == true
-assert triples_sum_to_zero([Integer.MAX_VALUE, Integer.MIN_VALUE, 0]) == true
 assert triples_sum_to_zero([1000, -500, -500]) == true
 assert triples_sum_to_zero([-1000, 500, 500]) == true
 assert triples_sum_to_zero([1, 1, 1]) == false
-assert triples_sum_to_zero([1, -1, 1, -1]) == true
-
+assert triples_sum_to_zero([1, -1, 1, -1]) == false

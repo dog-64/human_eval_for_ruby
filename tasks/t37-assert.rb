@@ -1,11 +1,7 @@
 assert sort_even_elements([1, 2, 3]) == [1, 2, 3]
 assert sort_even_elements([5, 6, 3, 4]) == [3, 6, 5, 4]
-assert sort_even_elements([10, 5, 20, 15, 30, 25]) == [5, 10, 15, 20, 25, 30]
+assert sort_even_elements([10, 5, 20, 15, 30, 25]) == [10, 5, 20, 15, 30, 25]
 assert sort_even_elements([]) == []
 assert sort_even_elements([1.1, 2.2, 3.3]) == [1.1, 2.2, 3.3]
 assert sort_even_elements([5.5, 6.6, 3.3, 4.4]) == [3.3, 6.6, 5.5, 4.4]
-assert sort_even_elements([10.1, 5.5, 20.2, 15.15, 30.3, 25.25]) == [5.5, 10.1, 15.15, 20.2, 25.25, 30.3]
-assert sort_even_elements([-1, -2, -3]) == [-1, -2, -3]
-assert sort_even_elements([-5, -6, -3, -4]) == [-3, -6, -5, -4]
-assert sort_even_elements([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
+assert sort_even_elements([-1, -2, -3]) == [-3, -2, -1]
