@@ -1,4 +1,3 @@
-```ruby
 def poly(xs, x)
   xs.reverse.each_with_index.inject(0) { |sum, (coeff, i)| sum + coeff * (x**i) }
 end
@@ -20,4 +19,3 @@ def find_zero(xs)
   end
   (left + right) / 2.0
 end
-```

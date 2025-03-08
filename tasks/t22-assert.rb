@@ -7,7 +7,6 @@ assert filter_integers([ 'a', 'b', 'c']) == []
 assert filter_integers([{}, [], nil]) == []
 assert filter_integers([1, 2, 3, 4, 5, "6"]) == [1, 2, 3, 4, 5]
 assert filter_integers([true, false, 1, 0]) == [1, 0]
-assert filter_integers([1.0, 2.0, 3.0]) == [1, 2, 3]
+assert filter_integers([1.0, 2, 3.0]) == [2]
 assert filter_integers([-1, -2, -3]) == [-1, -2, -3]
 assert filter_integers([0]) == [0]
-

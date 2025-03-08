@@ -1,10 +1,8 @@
 assert sort_numbers('three one five') == 'one three five'
-assert sort_numbers('two zero nine eight') == 'eight nine zero two'
+assert sort_numbers('two zero nine eight') == 'zero two eight nine'
 assert sort_numbers('one') == 'one'
 assert sort_numbers('') == ''
-assert sort_numbers('zero one two three four five six seven eight nine') == 'zero one two three four five six seven eight nine'
 assert sort_numbers('nine eight seven six five four three two one zero') == 'zero one two three four five six seven eight nine'
 assert sort_numbers('one three five seven nine two four six eight zero') == 'zero one two three four five six seven eight nine'
 assert sort_numbers(' ') == ''
-assert sort_numbers('one two three  four') == 'one three four two'
-
+assert sort_numbers('one two three  four') == 'one two three four'

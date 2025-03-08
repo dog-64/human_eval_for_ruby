@@ -16,6 +16,7 @@ module HumanEval
       qwen/qwen-2.5-coder-32b-instruct:free 
       qwen/qwen-2.5-coder-32b 
       google/gemini-2.0-flash-001
+      meta-llama/llama-3.1-70b-instruct
  
       openai/gpt-4o-mini 
       openai/gpt-4o 
@@ -99,7 +100,22 @@ module HumanEval
 
       raw_solution = call_openrouter(prompt, model)
       debug "Получено решение от модели #{model}"
+      debug "---BEGIN MODEL RESPONSE---"
+      debug raw_solution
+      debug "---END MODEL RESPONSE---"
+
       solution = extract_and_join_code_blocks(raw_solution)
+      if solution.strip.empty?
+        error "❌ Модель #{model} вернула пустое решение!"
+        error "Полный ответ модели:"
+        error raw_solution
+        return
+      end
+
+      debug "Извлеченное решение:"
+      debug "---BEGIN EXTRACTED SOLUTION---"
+      debug solution
+      debug "---END EXTRACTED SOLUTION---"
 
       File.write(output_file, solution)
       debug "Решение сохранено в #{output_file}"
@@ -150,6 +166,8 @@ module HumanEval
     end
 
     def extract_and_join_code_blocks(input)
+      return input unless input.include?('```ruby') || input.include?('```rb')
+
       # Находим все фрагменты, обрамлённые тройными обратными кавычками.
       # Регулярное выражение:
       # - Ищет "```", возможно с пробелами и указанием языка до первого переноса строки.

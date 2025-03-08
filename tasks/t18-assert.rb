@@ -5,9 +5,8 @@ assert how_many_times('abababa', 'aba') == 3
 assert how_many_times('Mississippi', 'iss') == 2
 assert how_many_times('abc', 'xyz') == 0
 assert how_many_times('a', 'a') == 1
-assert how_many_times('aa', '') == 0 # Поведение при пустой подстроке не определено, но можно предположить 0
+assert how_many_times('aa', '') == 0
 assert how_many_times('aaaaa', 'aaa') == 3
 assert how_many_times('abcabcabc', 'abc') == 3
-assert how_many_times('abababab', 'abab') == 4
+assert how_many_times('abababab', 'abab') == 3
 assert how_many_times('123123123', '123') == 3
-

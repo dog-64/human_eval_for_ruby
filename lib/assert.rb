@@ -1,5 +1,26 @@
-def assert(condition, message = "Assertion failed")
-  raise message unless condition
+class AssertionError < StandardError
+  attr_reader :expected, :actual
+  
+  def initialize(message = "Assertion failed", expected = nil, actual = nil)
+    super(message)
+    @expected = expected
+    @actual = actual
+  end
+end
+
+def assert(condition, message = nil)
+  expected = true  # assert всегда ожидает true
+  actual = !!condition  # приводим условие к boolean
+  message ||= "Expected #{expected.inspect} but got #{actual.inspect}"
+  
+  unless condition
+    raise AssertionError.new(message, expected, actual)
+  end
+end
+
+def assert_equal(expected, actual, message = nil)
+  message ||= "Expected #{expected.inspect} but got #{actual.inspect}"
+  assert(expected == actual, message)
 end
 
 def assert_valid_order(result, dependencies)
@@ -19,4 +40,21 @@ def assert_raises(exception_class)
   rescue StandardError => e
     raise "Ожидалось исключение #{exception_class}, но было получено #{e.class}: #{e.message}"
   end
+end
+
+def debug_assert(condition, message = nil)
+  puts "#{__FILE__}:#{__LINE__} [DEBUG] | debug_assert(#{condition}, #{message})"
+  assert_result = condition
+  puts "#{__FILE__}:#{__LINE__} [DEBUG] | assert_result =#{assert_result.inspect}"
+  
+  assert(condition, message)
+end
+
+def assert_in_delta(actual, expected, delta, message = nil)
+  message ||= "Expected #{actual.inspect} to be within #{delta} of #{expected.inspect}"
+  out = assert((actual - expected).abs <= delta, message)
+  unless out
+    puts "#{__FILE__}:#{__LINE__} [DEBUG] | assert_in_delta('#{actual}', '#{expected}', '#{delta}', '#{message}')"
+  end
+  out
 end 

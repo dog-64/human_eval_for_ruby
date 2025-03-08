@@ -7,5 +7,5 @@ assert below_zero?([]) == false
 assert below_zero?([0]) == false
 assert below_zero?([-1]) == true
 assert below_zero?([100, -101, 1]) == true
-assert below_zero?([1000, -500, 600, -1100]) == true
+assert below_zero?([1000, -500, 600, -1100]) == false
 
