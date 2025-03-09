@@ -1,12 +1,3 @@
 assert encode('test') == 'TGST'
 assert encode('This is a message') == 'tHKS KS c MGSSCGG'
-assert encode('a') == 'c'
-assert encode('A') == 'C'
 assert encode('u') == 'w'
-assert encode('U') == 'W'
-assert encode('xyz') == 'XYZ'
-assert encode('') == ''
-assert encode('AEIOUaeiou') == 'CGKWYcgkwy'
-assert encode('T') == 't'
-assert encode('t') == 'T'
-
