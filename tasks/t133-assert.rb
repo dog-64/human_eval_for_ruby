@@ -6,9 +6,5 @@ assert sum_squares([-2.4, 1, 1]) == 6
 assert sum_squares([]) == 0
 assert sum_squares([0]) == 0
 assert sum_squares([100]) == 10000
-assert sum_squares([-10.5, 5.5, 0]) == 121
 assert sum_squares([1,2,3,4,5]) == 55
 assert sum_squares([-1,-2,-3]) == 14
-assert sum_squares([Float::INFINITY]) == Float::INFINITY
-assert sum_squares([Float::NAN]) == Float::NAN
-

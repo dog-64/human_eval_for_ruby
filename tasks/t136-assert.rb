@@ -11,4 +11,3 @@ assert largest_smallest_integers([0,0,0]) == [nil, nil]
 assert largest_smallest_integers([-1,-2,0,1,2]) == [-1,1]
 assert largest_smallest_integers([-5,-4,-3,-2,-1]) == [-1, nil]
 assert largest_smallest_integers([1,2,3,4,5]) == [nil, 1]
-

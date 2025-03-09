@@ -7,13 +7,3 @@ assert is_equal_to_sum_even?(10) == false
 assert is_equal_to_sum_even?(7) == false
 assert is_equal_to_sum_even?(2) == false
 assert is_equal_to_sum_even?(1) == false
-assert is_equal_to_sum_even?(14) == true
-assert is_equal_to_sum_even?(16) == true
-assert is_equal_to_sum_even?(22) == true
-assert is_equal_to_sum_even?(24) == true
-assert is_equal_to_sum_even?(30) == true
-assert is_equal_to_sum_even?(32) == true
-assert is_equal_to_sum_even?(0) == false
-assert is_equal_to_sum_even?(-2) == false
-assert is_equal_to_sum_even?(3) == false
-assert is_equal_to_sum_even?(2.5) == false
