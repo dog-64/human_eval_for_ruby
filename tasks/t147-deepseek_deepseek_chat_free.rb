@@ -1,4 +1,3 @@
-```ruby
 def get_max_triples(n)
   return 0 if n < 3
 
@@ -17,4 +16,3 @@ def get_max_triples(n)
 
   count
 end
-```

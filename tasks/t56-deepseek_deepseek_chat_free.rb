@@ -1,4 +1,3 @@
-```ruby
 def correct_bracketing(brackets)
   balance = 0
   brackets.each_char do |char|
@@ -13,4 +12,3 @@ def correct_bracketing(brackets)
   end
   balance == 0
 end
-```
