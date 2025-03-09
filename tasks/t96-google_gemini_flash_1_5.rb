@@ -1,4 +1,3 @@
-```ruby
 def count_up_to(n)
   return [] if n <= 1
   primes = []
@@ -16,4 +15,3 @@ def count_up_to(n)
   end
   primes.select {|p| p < n}
 end
-```

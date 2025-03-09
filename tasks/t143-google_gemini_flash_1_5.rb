@@ -1,4 +1,3 @@
-```ruby
 def prime_length_words(sentence)
   words = sentence.split
   primes = words.select do |word|
@@ -8,4 +7,3 @@ def prime_length_words(sentence)
   end
   primes.join(" ")
 end
-```

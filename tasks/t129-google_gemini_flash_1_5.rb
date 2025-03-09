@@ -1,4 +1,3 @@
-```ruby
 def min_path(grid, k)
   n = grid.size
   best_path = nil
@@ -31,4 +30,3 @@ def min_path(grid, k)
 
   best_path
 end
-```

@@ -1,4 +1,3 @@
-```ruby
 def max_fill(grid, capacity)
   total_water = 0
   grid.each do |row|
@@ -6,4 +5,3 @@ def max_fill(grid, capacity)
   end
   (total_water + capacity - 1) / capacity
 end
-```

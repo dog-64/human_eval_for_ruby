@@ -1,4 +1,3 @@
-```ruby
 assert check_last_char_letter?("apple pie") == false
 assert check_last_char_letter?("apple pi e") == true
 assert check_last_char_letter?("apple pi e ") == false
@@ -16,5 +15,3 @@ assert check_last_char_letter?("1") == false
 assert check_last_char_letter?("1 ") == false
 assert check_last_char_letter?(" a1") == false
 assert check_last_char_letter?("a1 ") == false
-
-```

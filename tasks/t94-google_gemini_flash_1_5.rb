@@ -1,4 +1,3 @@
-```ruby
 def sum_largest_prime_digits(numbers)
   largest_prime = 0
   numbers.each do |num|
@@ -21,4 +20,3 @@ end
 def sum_digits(num)
   num.to_s.chars.map(&:to_i).sum
 end
-```

@@ -1,4 +1,3 @@
-```ruby
 def prime_fib(n)
   raise ArgumentError, "n must be a positive integer" unless n.is_a?(Integer) && n > 0
 
@@ -20,4 +19,3 @@ def is_prime?(num)
   return false if num <= 1
   (2..Math.sqrt(num)).none? { |i| num % i == 0 }
 end
-```
