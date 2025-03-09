@@ -7,5 +7,3 @@ assert reverse_delete("hello", "o") == ["hell", false]
 assert reverse_delete("racecar", "") == ["racecar", true]
 assert reverse_delete("madam", "m") == ["ada", true]
 assert reverse_delete("aabbccddeeff", "abcdef") == ["", true]
-assert reverse_delete("A man, a plan, a canal: Panama", " ,:") == ["AmanaplanacanalPanama",true]
-

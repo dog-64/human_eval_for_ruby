@@ -4,7 +4,7 @@ assert multiply(2020, 1851) == 0
 assert multiply(14, -15) == 20
 assert multiply(10, 20) == 0
 assert multiply(-1, -1) == 1
-assert multiply(12345, 67890) == 40
+assert multiply(12345, 67890) == 0
 assert multiply(-99, -11) == 9
 assert multiply(1, 1) == 1
 assert multiply(10, 1) == 0

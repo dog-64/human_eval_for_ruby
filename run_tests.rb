@@ -176,12 +176,13 @@ class TestRunner
             puts "     Получено:  #{e.actual.inspect}"
           end
           
-          # Получаем номер строки из стека вызовов
-          if e.backtrace && (failure_line = e.backtrace.find { |line| line.include?(test_file) })
-            line_number = failure_line[/\d+/].to_i
-            test_lines = test_content.lines
-            puts "     В файле #{test_file}:#{line_number}"
-            puts "     Тест: #{test_lines[line_number - 2]&.strip}"
+          if e.respond_to?(:line_info) && e.line_info
+            file, line = e.line_info.split(':')
+            puts "     В файле #{file}:#{line}"
+            if File.exist?(file)
+              test_line = File.readlines(file)[line.to_i - 2]
+              puts "     Тест: #{test_line&.strip}"
+            end
           end
         else
           puts "  ❌ Неожиданная ошибка в тесте:"

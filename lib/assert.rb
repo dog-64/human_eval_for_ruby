@@ -1,10 +1,11 @@
 class AssertionError < StandardError
-  attr_reader :expected, :actual
+  attr_reader :expected, :actual, :line_info
   
-  def initialize(message = "Assertion failed", expected = nil, actual = nil)
+  def initialize(message = "Assertion failed", expected = nil, actual = nil, line_info = nil)
     super(message)
     @expected = expected
     @actual = actual
+    @line_info = line_info
   end
 end
 
@@ -14,7 +15,9 @@ def assert(condition, message = nil)
   message ||= "Expected #{expected.inspect} but got #{actual.inspect}"
   
   unless condition
-    raise AssertionError.new(message, expected, actual)
+    # Получаем информацию о вызове из стека
+    caller_line = caller.find { |line| !line.include?('lib/assert.rb') }
+    raise AssertionError.new(message, expected, actual, caller_line)
   end
 end
 

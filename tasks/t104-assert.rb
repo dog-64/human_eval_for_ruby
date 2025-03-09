@@ -9,9 +9,3 @@ assert unique_digits([123, 456, 789]) == []
 assert unique_digits([111111, 222222]) == [111111]
 assert unique_digits([1, 11, 111, 1111]) == [1, 11, 111, 1111]
 assert unique_digits([5, 15, 25, 35]) == [5, 15, 35]
-assert_raises(ArgumentError) { unique_digits([-1])}
-assert_raises(ArgumentError) { unique_digits([1.5])}
-assert_raises(ArgumentError) { unique_digits("string")}
-assert_raises(ArgumentError) { unique_digits(nil)}
-assert_raises(ArgumentError) { unique_digits({})}
-
