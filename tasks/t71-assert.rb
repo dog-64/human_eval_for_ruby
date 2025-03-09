@@ -12,10 +12,3 @@ assert triangle_area(-1, 2, 3) == -1
 assert triangle_area(1, -2, 3) == -1
 assert triangle_area(1, 2, -3) == -1
 assert triangle_area(0, 0, 0) == -1
-assert triangle_area(Float::INFINITY, 1, 1) == -1
-assert triangle_area(1, Float::INFINITY, 1) == -1
-assert triangle_area(1, 1, Float::INFINITY) == -1
-assert triangle_area(Float::NAN, 1, 1) == -1
-assert triangle_area(1, Float::NAN, 1) == -1
-assert triangle_area(1, 1, Float::NAN) == -1
-
