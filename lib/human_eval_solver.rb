@@ -10,15 +10,16 @@ module HumanEval
   class Solver
     include HumanEval::Logger
 
-    MODELS = %w[
-      google/gemini-flash-1.5 
+    MODELS = %w[ 
+      deepseek/deepseek-chat
       deepseek/deepseek-chat:free 
-      qwen/qwen-2.5-coder-32b-instruct:free 
-      qwen/qwen-2.5-coder-32b 
       google/gemini-2.0-flash-001
-      meta-llama/llama-3.1-70b-instruct
       google/gemini-2.0-flash-lite-001
- 
+      google/gemini-flash-1.5 
+      meta-llama/llama-3.1-70b-instruct
+      qwen/qwen-2.5-coder-32b 
+      qwen/qwen-2.5-coder-32b-instruct:free 
+
       openai/gpt-4o-mini 
       openai/gpt-4o 
       anthropic/claude-3.5-sonnet

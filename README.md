@@ -145,7 +145,11 @@ bundle install
 ```bash
 ./bin/human_eval_converter convert _src/HumanEval.jsonl tasks
 ```
-2. Запустите решeние задачь при помощи llm
+2. Запустите решeние задач при помощи llm
 ```bash
  ./bin/human_eval_solver solve tasks --model "google/gemini-2.0-flash-lite-001" 
+```
+или для одной задачи чтобы оценить качество
+```bash
+./bin/human_eval_solver solve tasks --model "deepseek/deepseek-chat" --task 0 --log-level debug  
 ```
