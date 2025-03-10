@@ -12,6 +12,5 @@ assert special_filter([101, 103, 105, 107, 109]) == 5
 assert special_filter([1, 3, 5, 7, 9]) == 0
 assert special_filter([11, 101, 1001]) == 3
 assert special_filter([-101, -1001, -10001]) == 0
-assert special_filter([21, 43, 65, 87, 109]) == 4
-assert special_filter([121, 343, 565, 787, 909]) == 0
-
+assert special_filter([21, 43, 65, 87, 109]) == 1
+assert special_filter([121, 343, 565, 787, 909]) == 5

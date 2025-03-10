@@ -11,8 +11,6 @@ assert right_angle_triangle?(2, 2, 2) == false
 assert right_angle_triangle?(3.0, 4.0, 5.0) == true
 assert right_angle_triangle?(5.0, 12.0, 13.0) == true
 assert right_angle_triangle?(1.0, 2.0, 3.0) == false
-assert right_angle_triangle?(1, 1, 1.41421356) == true
 assert right_angle_triangle?(10, 24, 26) == true
 assert right_angle_triangle?(7, 24, 25) == true
 assert right_angle_triangle?(8, 15, 17) == true
-

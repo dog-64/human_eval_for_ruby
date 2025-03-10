@@ -10,7 +10,7 @@ def do_algebra(operator, operand)
       result -= num
     when '*'
       result *= num
-    when '//'
+    when '/'
       result = result / num
     when '**'
       result = result ** num

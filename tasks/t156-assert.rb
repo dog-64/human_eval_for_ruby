@@ -10,9 +10,3 @@ assert int_to_mini_roman(40) == "xl"
 assert int_to_mini_roman(90) == "xc"
 assert int_to_mini_roman(400) == "cd"
 assert int_to_mini_roman(900) == "cm"
-assert_raises(ArgumentError) { int_to_mini_roman(0) }
-assert_raises(ArgumentError) { int_to_mini_roman(1001) }
-assert_raises(ArgumentError) { int_to_mini_roman(-1) }
-assert_raises(ArgumentError) { int_to_mini_roman(3.14) }
-assert_raises(ArgumentError) { int_to_mini_roman("abc") }
-

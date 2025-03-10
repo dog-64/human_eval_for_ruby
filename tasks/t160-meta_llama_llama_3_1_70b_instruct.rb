@@ -5,7 +5,7 @@ def do_algebra(operator, operand)
     when '+' then result += num
     when '-' then result -= num
     when '*' then result *= num
-    when '//' then result /= num
+    when '/' then result /= num
     when '**' then result **= num
     end
   end

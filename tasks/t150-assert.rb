@@ -9,7 +9,6 @@ assert x_or_y(100, "x", "y") == "y"
 assert x_or_y(3, 1, 0) == 1
 assert x_or_y(97, true, false) == true
 assert x_or_y(4, [], [1,2,3]) == [1,2,3]
-assert x_or_y(5, {}, {a:1}) == {a:1}
+assert x_or_y(5, {}, {a:1}) == {}
 assert x_or_y(6, "non-empty string", "") == ""
 assert x_or_y(2, [1], []) == [1]
-

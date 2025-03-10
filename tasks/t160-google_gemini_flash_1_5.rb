@@ -8,8 +8,8 @@ def do_algebra(operator, operand)
       result -= operand[i+1]
     when '*'
       result *= operand[i+1]
-    when '//'
-      result //= operand[i+1]
+    when '/'
+      result /= operand[i+1]
     when '**'
       result **= operand[i+1]
     end

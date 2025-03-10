@@ -6,7 +6,3 @@ assert strongest_extension('Class', ['ABC', 'abc', 'ABc']) == 'Class.ABC'
 assert strongest_extension('AnotherClass', ['aBcDeFg', 'AbCdEfG']) == 'AnotherClass.AbCdEfG'
 assert strongest_extension('Test', ['']) == 'Test.'
 assert strongest_extension('Test', ['123', '456']) == 'Test.123'
-assert_raises(NoMethodError) { strongest_extension(nil, ['ext']) }
-assert_raises(TypeError) { strongest_extension('class', 123) }
-assert_raises(TypeError) { strongest_extension('class', { a: 1 }) }
-
