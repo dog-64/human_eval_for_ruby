@@ -54,7 +54,7 @@ bundle install
 ./bin/human_eval_converter convert _src/HumanEval.jsonl tasks --log-level normal
 ```
 
-### Примеры использования
+### Примеры использования конвертора
 
 ```bash
 # Базовая конвертация
@@ -144,4 +144,8 @@ bundle install
 1. Сначала конвертируйте задачи из формата human-eval:
 ```bash
 ./bin/human_eval_converter convert _src/HumanEval.jsonl tasks
+```
+2. Запустите решeние задачь при помощи llm
+```bash
+ ./bin/human_eval_solver solve tasks --model "google/gemini-2.0-flash-lite-001" 
 ```

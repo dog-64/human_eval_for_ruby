@@ -17,6 +17,7 @@ module HumanEval
       qwen/qwen-2.5-coder-32b 
       google/gemini-2.0-flash-001
       meta-llama/llama-3.1-70b-instruct
+      google/gemini-2.0-flash-lite-001
  
       openai/gpt-4o-mini 
       openai/gpt-4o 
