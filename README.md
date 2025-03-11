@@ -179,7 +179,7 @@
 ## Установка
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/dog-64/human_watch_ruby
 cd human-eval-converter
 bundle install
 ```
