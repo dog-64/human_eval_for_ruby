@@ -1,3 +1,7 @@
+require "terminal-table"
+require "pry"
+require "timeout"
+
 module HumanEval
   module Logger
     LOG_LEVELS = {

@@ -201,6 +201,42 @@ bundle install
 ./bin/human_eval_converter convert _src/HumanEval.jsonl tasks --create-rules --keep-existing
 ```
 
+### Запуск тестов
+
+Для запуска тестов используется скрипт `bin/run_tests`. Поддерживаются следующие команды:
+
+```bash
+# Запуск всех тестов
+./bin/run_tests all
+
+# Запуск тестов для конкретной задачи
+./bin/run_tests task t1
+
+# Запуск тестов для конкретной задачи и модели
+./bin/run_tests model t1 qwen
+```
+
+#### Уровни логирования для тестов
+
+Тесты поддерживают следующие уровни логирования:
+
+- `--log-level none` - без вывода логов
+- `--log-level normal` - стандартный уровень (по умолчанию)
+- `--log-level debug` - подробный вывод для отладки
+- `--log-level error` - только ошибки
+
+Примеры:
+```bash
+# Запуск всех тестов с подробным выводом
+./bin/run_tests all --log-level debug
+
+# Запуск тестов задачи t1 без логов
+./bin/run_tests task t1 --log-level none
+
+# Запуск тестов модели с выводом только ошибок
+./bin/run_tests model t1 qwen --log-level error
+```
+
 ### Опции
 
 - `--create-rules` - Создать каталог rules с файлами промптов (только при первом запуске)
