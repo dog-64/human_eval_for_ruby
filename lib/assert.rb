@@ -10,7 +10,7 @@ module HumanEval
       attr_reader :expected, :actual, :assertion_info
 
       def initialize(message, expected = nil, actual = nil, assertion_info = nil)
-        super(message)
+        super(message || "Assertion failed")
         @expected = expected
         @actual = actual
         @assertion_info = assertion_info
@@ -19,19 +19,42 @@ module HumanEval
 
     def assert(condition, message = nil)
       debug_log "assert called with condition: #{condition.inspect}, message: #{message.inspect}"
-      debug_log "condition class: #{condition.class}"
-      debug_log "condition object_id: #{condition.object_id}"
-      unless condition
-        debug_log "condition is falsey"
+      
+      begin
+        # Если condition это результат сравнения (например, a == b)
+        result = condition
+        debug_log "assert result: #{result.inspect}"
+        
+        unless result
+          raise AssertionError.new(
+            message || "Expected #{condition.inspect} to be truthy",
+            true,
+            result,
+            "assert(#{condition.inspect})"
+          )
+        end
+        
+        debug_log "assertion passed"
+        true
+      rescue NoMethodError => e
+        debug_log "NoMethodError in assert: #{e.message}"
+        debug_log "Backtrace: #{e.backtrace&.join("\n")}"
         raise AssertionError.new(
-          message || "Expected #{condition.inspect} to be truthy",
+          "NoMethodError: #{e.message}",
+          true,
           nil,
+          "assert(...) - NoMethodError"
+        )
+      rescue StandardError => e
+        debug_log "Error in assert: #{e.class} - #{e.message}"
+        debug_log "Backtrace: #{e.backtrace&.join("\n")}"
+        raise AssertionError.new(
+          "Error: #{e.message}",
+          true,
           nil,
-          "assert(#{condition.inspect})"
+          "assert(...) - #{e.class}"
         )
       end
-      debug_log "condition is truthy"
-      true
     end
 
     def assert_equal(expected, actual, message = nil)

@@ -1,5 +1,6 @@
 assert fix_spaces("Example") == "Example"
 assert fix_spaces("Example 1") == "Example_1"
+assert fix_spaces("Example 2") == "Example_2"
 assert fix_spaces(" Example 2") == "_Example_2"
 assert fix_spaces(" Example   3") == "_Example-3"
-assert fix_spaces("  Example   3  ") == "_Example-3_"
+assert fix_spaces("  Example   3  ") == "__Example-3__"

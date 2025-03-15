@@ -178,7 +178,7 @@ module TestRunner
             status: :error,
             error: {
               class: e.class.name,
-              message: e.message,
+              message: e.message || "Unknown error",
               backtrace: e.backtrace || []
             }
           }
@@ -231,7 +231,7 @@ module TestRunner
                   status: :error,
                   error: {
                     class: e.class.name,
-                    message: e.message,
+                    message: e.message || "Unknown error",
                     backtrace: e.backtrace || []
                   }
                 }
@@ -258,6 +258,10 @@ module TestRunner
                 begin
                   test_context.module_eval(line)
                 rescue HumanEval::Assert::AssertionError => e
+                  # Сохраняем информацию о непройденном тесте
+                  model = File.basename(solution_file).split('-')[1..-1].join('-').sub('.rb', '')
+                  task = File.basename(solution_file).split('-').first
+                  
                   puts "\n  ❌ Тест не пройден на строке #{line_number}:"
                   puts "     #{line.strip}"
                   
@@ -265,8 +269,19 @@ module TestRunner
                     puts "     Ожидалось: #{e.expected.inspect}"
                     puts "     Получено: #{e.actual.inspect}"
                   end
-                  result.push(test_context.handle_error(e))
-                  return
+                  
+                  result.push({
+                    status: :error,
+                    error: {
+                      class: e.class.name,
+                      message: e.message,
+                      expected: e.expected,
+                      actual: e.actual,
+                      line: line_number,
+                      test: line.strip
+                    }
+                  })
+                  return false
                 end
               end
               
@@ -274,7 +289,7 @@ module TestRunner
               result.push({status: :success})
             rescue StandardError => e
               debug_log "  ❌ Ошибка при выполнении тестов: #{e.class} - #{e.message}"
-              puts "  ❌ Ошибка: #{e.message}"
+              puts "  ❌ Ошибка: #{e.message || "Unknown error"}"
               result.push(test_context.handle_error(e))
             rescue Exception => e
               debug_log "  ❌ Критическая ошибка при выполнении тестов: #{e.class} - #{e.message}"
@@ -282,7 +297,7 @@ module TestRunner
                 status: :error,
                 error: {
                   class: e.class.name,
-                  message: e.message,
+                  message: e.message || "Unknown error",
                   backtrace: e.backtrace || []
                 }
               })
@@ -293,7 +308,7 @@ module TestRunner
               status: :error,
               error: {
                 class: e.class.name,
-                message: e.message,
+                message: e.message || "Unknown error",
                 backtrace: e.backtrace || []
               }
             })
@@ -303,7 +318,7 @@ module TestRunner
               status: :error,
               error: {
                 class: e.class.name,
-                message: e.message,
+                message: e.message || "Unknown error",
                 backtrace: e.backtrace || []
               }
             })
