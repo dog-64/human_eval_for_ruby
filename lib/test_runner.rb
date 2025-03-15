@@ -16,6 +16,7 @@ module TestRunner
       @options = options
       @results = {}
       self.log_level = @options[:log_level] || :normal
+      @timeout = @options[:timeout] || 5  # Таймаут по умолчанию 5 секунд
     end
 
     def colorize(text, percentage)
@@ -177,13 +178,71 @@ module TestRunner
         debug_log solution_content
         debug_log "  🔍 Доступные методы в контексте:"
         debug_log test_context.methods.sort.inspect
-        
-        test_context.module_eval(test_content)
-        log "  ✅ Все тесты пройдены успешно"
-        return true
-      rescue Timeout::Error
-        error "  ❌ Превышен лимит времени выполнения (10 секунд)"
-        return false
+
+        debug_log "  🧵 Используем Thread для изоляции тестов"
+        # Запускаем тест в отдельном потоке
+        result = Queue.new
+        thread = Thread.new do
+          begin
+            # Создаем новый контекст для каждого теста
+            test_context = Module.new do
+              include HumanEval::Assert
+              include HumanEval::LogLevels
+              
+              def self.log_level=(level)
+                @log_level = level
+              end
+              
+              def self.log_level
+                @log_level
+              end
+            end
+            
+            # Выполняем код решения
+            test_context.module_eval(solution_content)
+            test_context.extend(test_context)
+            test_context.log_level = :normal
+            
+            # Выполняем тесты
+            test_context.module_eval(test_content)
+            result.push({status: :success})
+          rescue StandardError, Exception => e
+            result.push({
+              status: :error,
+              error: {
+                class: e.class.name,
+                message: e.message,
+                backtrace: e.backtrace
+              }
+            })
+          end
+        end
+
+        begin
+          Timeout.timeout(@timeout) do
+            res = result.pop
+            case res[:status]
+            when :success
+              log "  ✅ Все тесты пройдены успешно"
+              return true
+            when :error
+              error = res[:error]
+              error "  ❌ Тест не пройден:"
+              error "     #{error[:class]}: #{error[:message]}"
+              debug_log "     Стек вызовов:"
+              error[:backtrace].each { |line| debug_log "       #{line}" }
+              return false
+            end
+          end
+        rescue Timeout::Error
+          thread.kill
+          thread.join(1) # Даем потоку секунду на завершение
+          error "  ❌ Превышен лимит времени выполнения (#{@timeout} секунд)"
+          error "     Возможно, в решении есть бесконечный цикл"
+          return false
+        ensure
+          thread.kill unless thread.nil? || !thread.alive?
+        end
       rescue Interrupt => e
         error "\n  ⚠️  Тест прерван пользователем (Ctrl+C)"
         debug_log "  📍 Место прерывания: #{e.backtrace.first}"

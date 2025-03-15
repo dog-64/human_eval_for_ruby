@@ -17,9 +17,6 @@ module HumanEval
     end
 
     def assert(condition, message = nil)
-      puts "assert(#{condition.inspect}, #{message.inspect})"
-      puts "  🔍 Тип condition: #{condition.class}"
-      puts "  📝 Значение condition: #{condition.inspect}"
       unless condition
         raise AssertionError.new(message || "Expected #{condition.inspect} to be truthy")
       end
