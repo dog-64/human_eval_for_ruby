@@ -12,4 +12,3 @@ assert is_happy?("adb") == true
 # не проходят
 assert is_happy?("xyy") == false
 assert is_happy?("xyz") == true
-
