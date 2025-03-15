@@ -7,19 +7,30 @@ module HumanEval
     include LogLevels
 
     class AssertionError < StandardError
-      attr_reader :expected, :actual
+      attr_reader :expected, :actual, :assertion_info
 
-      def initialize(message, expected = nil, actual = nil)
+      def initialize(message, expected = nil, actual = nil, assertion_info = nil)
         super(message)
         @expected = expected
         @actual = actual
+        @assertion_info = assertion_info
       end
     end
 
     def assert(condition, message = nil)
+      debug_log "assert called with condition: #{condition.inspect}, message: #{message.inspect}"
+      debug_log "condition class: #{condition.class}"
+      debug_log "condition object_id: #{condition.object_id}"
       unless condition
-        raise AssertionError.new(message || "Expected #{condition.inspect} to be truthy")
+        debug_log "condition is falsey"
+        raise AssertionError.new(
+          message || "Expected #{condition.inspect} to be truthy",
+          nil,
+          nil,
+          "assert(#{condition.inspect})"
+        )
       end
+      debug_log "condition is truthy"
       true
     end
 
@@ -29,7 +40,8 @@ module HumanEval
         raise AssertionError.new(
           message || "Expected #{actual.inspect} to equal #{expected.inspect}",
           expected,
-          actual
+          actual,
+          "assert_equal(#{expected.inspect}, #{actual.inspect})"
         )
       end
       true
@@ -41,7 +53,8 @@ module HumanEval
         raise AssertionError.new(
           message || "Expected #{actual.inspect} to not equal #{expected.inspect}",
           expected,
-          actual
+          actual,
+          "assert_not_equal(#{expected.inspect}, #{actual.inspect})"
         )
       end
       true
@@ -57,7 +70,8 @@ module HumanEval
         raise AssertionError.new(
           message || "Expected #{actual.inspect} to be within #{delta} of #{expected.inspect}",
           expected,
-          actual
+          actual,
+          "assert_in_delta(#{expected.inspect}, #{actual.inspect}, #{delta.inspect})"
         )
       end
       true
@@ -67,19 +81,23 @@ module HumanEval
       debug_log "assert_raises(#{exception_class.inspect})"
       begin
         yield
-      rescue exception_class => e
-        return e
-      rescue Exception => e
-        raise AssertionError.new(
-          "Expected #{exception_class.inspect} but got #{e.class.inspect}",
-          exception_class,
-          e.class
-        )
+      rescue => e
+        if e.is_a?(exception_class)
+          return e
+        else
+          raise AssertionError.new(
+            "Expected #{exception_class.inspect} but got #{e.class.inspect}",
+            exception_class,
+            e.class,
+            "assert_raises(#{exception_class.inspect})"
+          )
+        end
       end
       raise AssertionError.new(
         "Expected #{exception_class.inspect} but nothing was raised",
         exception_class,
-        nil
+        nil,
+        "assert_raises(#{exception_class.inspect})"
       )
     end
 

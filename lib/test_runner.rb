@@ -131,7 +131,7 @@ module TestRunner
         return false
       end
 
-      log "\nРешение #{File.basename(solution_file)}:"
+      log "Решение #{File.basename(solution_file)}"
       
       # Проверяем на пустой файл
       solution_content = File.read(solution_file)
@@ -163,6 +163,27 @@ module TestRunner
           @log_level
         end
         
+        def self.options=(opts)
+          @options = opts
+        end
+
+        def self.options
+          @options
+        end
+
+        def self.handle_error(e)
+          debug_log "Handling error: #{e.class} - #{e.message}"
+          debug_log "Backtrace: #{e.backtrace&.join("\n")}"
+          {
+            status: :error,
+            error: {
+              class: e.class.name,
+              message: e.message,
+              backtrace: e.backtrace || []
+            }
+          }
+        end
+        
         module_eval(solution_content)
         extend self
       end
@@ -171,7 +192,7 @@ module TestRunner
       
       begin
         test_content = File.read(test_file)
-        log "  🧪 Запуск тестов..."
+        debug_log "  🧪 Запуск тестов..."
         debug_log "  📄 Содержимое теста:"
         debug_log test_content
         debug_log "  📄 Содержимое решения:"
@@ -179,8 +200,6 @@ module TestRunner
         debug_log "  🔍 Доступные методы в контексте:"
         debug_log test_context.methods.sort.inspect
 
-        debug_log "  🧵 Используем Thread для изоляции тестов"
-        # Запускаем тест в отдельном потоке
         result = Queue.new
         thread = Thread.new do
           begin
@@ -196,23 +215,96 @@ module TestRunner
               def self.log_level
                 @log_level
               end
+
+              def self.options=(opts)
+                @options = opts
+              end
+
+              def self.options
+                @options
+              end
+
+              def self.handle_error(e)
+                debug_log "Handling error: #{e.class} - #{e.message}"
+                debug_log "Backtrace: #{e.backtrace&.join("\n")}"
+                {
+                  status: :error,
+                  error: {
+                    class: e.class.name,
+                    message: e.message,
+                    backtrace: e.backtrace || []
+                  }
+                }
+              end
             end
             
-            # Выполняем код решения
             test_context.module_eval(solution_content)
             test_context.extend(test_context)
-            test_context.log_level = :normal
+            test_context.log_level = @options[:log_level] || :normal
+            test_context.options = @options.dup  # Добавляем .dup чтобы избежать проблем с разделяемыми объектами
             
-            # Выполняем тесты
-            test_context.module_eval(test_content)
-            result.push({status: :success})
-          rescue StandardError, Exception => e
+            begin
+              debug_log "  🔄 Выполняем тесты в контексте..."
+              puts "  🔄 Выполняем тесты для #{File.basename(solution_file)}..."
+              
+              # Показываем и выполняем тесты по одному
+              puts "  📝 Тесты:"
+              test_lines = test_content.split("\n")
+              test_lines.each_with_index do |line, idx|
+                next if line.strip.empty?
+                line_number = idx + 1
+                puts "     #{line_number}: #{line.strip}"
+                
+                begin
+                  test_context.module_eval(line)
+                rescue HumanEval::Assert::AssertionError => e
+                  puts "\n  ❌ Тест не пройден на строке #{line_number}:"
+                  puts "     #{line.strip}"
+                  
+                  if e.expected && e.actual
+                    puts "     Ожидалось: #{e.expected.inspect}"
+                    puts "     Получено: #{e.actual.inspect}"
+                  end
+                  result.push(test_context.handle_error(e))
+                  return
+                end
+              end
+              
+              debug_log "  ✅ Тесты выполнены успешно"
+              result.push({status: :success})
+            rescue StandardError => e
+              debug_log "  ❌ Ошибка при выполнении тестов: #{e.class} - #{e.message}"
+              puts "  ❌ Ошибка: #{e.message}"
+              result.push(test_context.handle_error(e))
+            rescue Exception => e
+              debug_log "  ❌ Критическая ошибка при выполнении тестов: #{e.class} - #{e.message}"
+              result.push({
+                status: :error,
+                error: {
+                  class: e.class.name,
+                  message: e.message,
+                  backtrace: e.backtrace || []
+                }
+              })
+            end
+          rescue StandardError => e
+            debug_log "  ❌ Ошибка в тестовом потоке: #{e.class} - #{e.message}"
             result.push({
               status: :error,
               error: {
                 class: e.class.name,
                 message: e.message,
-                backtrace: e.backtrace
+                backtrace: e.backtrace || []
+              }
+            })
+          rescue Exception => e
+            debug_log "  ❌ Критическая ошибка в тестовом потоке: #{e.class} - #{e.message}"
+            result.push({
+              status: :error,
+              error: {
+                class: e.class.name,
+                message: e.message,
+                backtrace: e.backtrace || []
               }
             })
           end
@@ -220,17 +312,26 @@ module TestRunner
 
         begin
           Timeout.timeout(@timeout) do
+            debug_log "  ⏳ Ожидаем результат выполнения тестов..."
             res = result.pop
+            debug_log "  📝 Получен результат: #{res.inspect}"
             case res[:status]
             when :success
-              log "  ✅ Все тесты пройдены успешно"
+              debug_log "  ✅ Все тесты пройдены успешно"
               return true
             when :error
               error = res[:error]
-              error "  ❌ Тест не пройден:"
-              error "     #{error[:class]}: #{error[:message]}"
+              debug_log "  ❌ Тест не пройден:"
+              debug_log "     #{error[:class]}: #{error[:message]}"
               debug_log "     Стек вызовов:"
-              error[:backtrace].each { |line| debug_log "       #{line}" }
+              if error[:backtrace]&.any?
+                error[:backtrace].each { |line| debug_log "       #{line}" }
+              else
+                debug_log "       Стек вызовов недоступен"
+              end
+              return false
+            else
+              error "  ❌ Неизвестный статус результата: #{res[:status]}"
               return false
             end
           end
@@ -257,17 +358,6 @@ module TestRunner
       rescue NameError => e
         error "  ❌ Ошибка в тесте: неопределенная переменная или метод"
         error "     #{e.message}"
-        debug_log "     Место ошибки: #{e.backtrace.first}"
-        debug_log "     Полный стек вызовов:"
-        e.backtrace.each { |line| debug_log "       #{line}" }
-        return false
-      rescue HumanEval::Assert::AssertionError => e
-        error "  ❌ Тест не пройден:"
-        error "     #{e.message}"
-        if e.expected && e.actual
-          error "     Ожидалось: #{e.expected.inspect}"
-          error "     Получено: #{e.actual.inspect}"
-        end
         debug_log "     Место ошибки: #{e.backtrace.first}"
         debug_log "     Полный стек вызовов:"
         e.backtrace.each { |line| debug_log "       #{line}" }
