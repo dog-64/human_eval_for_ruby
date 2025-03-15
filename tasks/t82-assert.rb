@@ -1,6 +1,6 @@
 assert prime_length?("") == false
 assert prime_length?("Hello") == true
-assert prime_length?("a") == true
+assert prime_length?("a") == false
 assert prime_length?("aa") == true
 assert prime_length?("aaa") == true
 assert prime_length?("aaaa") == false
