@@ -20,6 +20,7 @@ module HumanEval
       qwen/qwen-2.5-coder-32b 
       qwen/qwen-2.5-coder-32b-instruct:free 
       mistralai/codestral-2501
+      openai/gpt-4o-mini
 
       openai/gpt-4o-mini 
       openai/gpt-4o 
