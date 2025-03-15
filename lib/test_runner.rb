@@ -245,29 +245,29 @@ module TestRunner
             
             begin
               debug_log "  🔄 Выполняем тесты в контексте..."
-              puts "  🔄 Выполняем тесты для #{File.basename(solution_file)}..."
+              debug_log "  🔄 Выполняем тесты для #{File.basename(solution_file)}..."
               
               # Показываем и выполняем тесты по одному
-              puts "  📝 Тесты:"
+              debug_log "  📝 Тесты:"
               test_lines = test_content.split("\n")
               test_lines.each_with_index do |line, idx|
                 next if line.strip.empty?
                 line_number = idx + 1
-                puts "     #{line_number}: #{line.strip}"
+                debug_log "     #{line_number}: #{line.strip}"
                 
                 begin
                   test_context.module_eval(line)
                 rescue HumanEval::Assert::AssertionError => e
-                  # Сохраняем информацию о непройденном тесте
+                  # Сохраняем информацию о не пройденном тесте
                   model = File.basename(solution_file).split('-')[1..-1].join('-').sub('.rb', '')
                   task = File.basename(solution_file).split('-').first
                   
-                  puts "\n  ❌ Тест не пройден на строке #{line_number}:"
-                  puts "     #{line.strip}"
+                  debug_log "\n  ❌ Тест не пройден на строке #{line_number}:"
+                  debug_log "     #{line.strip}"
                   
                   if e.expected && e.actual
-                    puts "     Ожидалось: #{e.expected.inspect}"
-                    puts "     Получено: #{e.actual.inspect}"
+                    debug_log "     Ожидалось: #{e.expected.inspect}"
+                    debug_log "     Получено: #{e.actual.inspect}"
                   end
                   
                   result.push({
@@ -289,7 +289,7 @@ module TestRunner
               result.push({status: :success})
             rescue StandardError => e
               debug_log "  ❌ Ошибка при выполнении тестов: #{e.class} - #{e.message}"
-              puts "  ❌ Ошибка: #{e.message || "Unknown error"}"
+              debug_log "  ❌ Ошибка: #{e.message || "Unknown error"}"
               result.push(test_context.handle_error(e))
             rescue Exception => e
               debug_log "  ❌ Критическая ошибка при выполнении тестов: #{e.class} - #{e.message}"
