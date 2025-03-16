@@ -33,6 +33,16 @@ cd human_watch_ruby
 bundle install
 ```
 
+### Зависимости
+
+Проект использует следующие гемы:
+- `thor` - для создания интерфейса командной строки
+- `terminal-table` - для форматирования таблиц в консоли
+- `dotenv` - для загрузки переменных окружения из файла .env
+- `pry` и `pry-byebug` - для отладки
+
+Все зависимости указаны в `Gemfile` и устанавливаются автоматически при выполнении `bundle install`.
+
 ## Рейтинг
 
 - google_gemini_2_0_flash_001: 86%
@@ -102,6 +112,9 @@ OPENROUTER_API_KEY=your_api_key_here
 
 # С подробным логированием
 ./bin/run_tests all --log-level debug
+
+# Генерация отчета с общей статистикой
+./bin/run_tests all --report-total
 ```
 
 Уровни логирования:
@@ -109,6 +122,23 @@ OPENROUTER_API_KEY=your_api_key_here
 - `none` - без логов
 - `normal` - стандартный уровень (по умолчанию)
 - `debug` - подробное логирование
+
+### Генерация отчетов
+
+```bash
+# Генерация полных отчетов по всем моделям и задачам
+./bin/generate_report
+```
+
+Скрипт создает два отчета в каталоге `reports/`:
+- `human_watch_ruby_report_total.md` - общая статистика успешности моделей
+- `human_watch_ruby_report_full.md` - подробный отчет с результатами по каждой задаче
+
+Для запуска скрипта необходимо использовать `bundle exec`:
+
+```bash
+bundle exec ./bin/generate_report
+```
 
 ## Структура проекта
 
@@ -122,10 +152,9 @@ OPENROUTER_API_KEY=your_api_key_here
     - `assert.rb` - модуль для тестовых утверждений
 - `rules/` - правила и промпты для моделей
 - `bin/` - исполняемые скрипты
-
-## Текущий рейтинг моделей
-
-[Таблица с результатами]
+- `reports/` - сгенерированные отчеты
+    - `human_watch_ruby_report_total.md` - общая статистика
+    - `human_watch_ruby_report_full.md` - подробный отчет
 
 ## Лицензия
 
