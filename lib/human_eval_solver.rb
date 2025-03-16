@@ -10,21 +10,20 @@ module HumanEval
   class Solver
     include HumanEval::Logger
 
-    MODELS = %w[ 
-      deepseek/deepseek-chat
-      deepseek/deepseek-chat:free 
-      google/gemini-2.0-flash-001
-      google/gemini-2.0-flash-lite-001
-      google/gemini-flash-1.5 
-      meta-llama/llama-3.1-70b-instruct
-      qwen/qwen-2.5-coder-32b 
-      qwen/qwen-2.5-coder-32b-instruct:free 
-      mistralai/codestral-2501
-      openai/gpt-4o-mini
-      openai/o3-mini-high
-
-      anthropic/claude-3.5-sonnet
-    ]
+    MODELS = {
+      'deepseek_deepseek_chat' => { name: 'deepseek/deepseek-chat', provider: 'openrouter.ai' },
+      'deepseek_deepseek_chat_free' => { name: 'deepseek/deepseek-chat:free', provider: 'openrouter.ai' },
+      'google_gemini_2_0_flash_001' => { name: 'google/gemini-2.0-flash-001', provider: 'openrouter.ai' },
+      'google_gemini_2_0_flash_lite_001' => { name: 'google/gemini-2.0-flash-lite-001', provider: 'openrouter.ai' },
+      'google_gemini_flash_1_5' => { name: 'google/gemini-flash-1.5', provider: 'openrouter.ai' },
+      'meta_llama_llama_3_1_70b_instruct' => { name: 'meta-llama/llama-3.1-70b-instruct', provider: 'openrouter.ai' },
+      'qwen_qwen_2_5_coder_32b' => { name: 'qwen/qwen-2.5-coder-32b', provider: 'openrouter.ai' },
+      'qwen_qwen_2_5_coder_32b_instruct' => { name: 'qwen/qwen-2.5-coder-32b-instruct:free', provider: 'openrouter.ai' },
+      'mistralai_codestral_2501' => { name: 'mistralai/codestral-2501', provider: 'openrouter.ai' },
+      'openai_gpt_4o_mini' => { name: 'openai/gpt-4o-mini', provider: 'openrouter.ai' },
+      'openai_o3_mini_high' => { name: 'openai/o3-mini-high', provider: 'openrouter.ai' },
+      'anthropic_claude_3_5_sonnet' => { name: 'anthropic/claude-3.5-sonnet', provider: 'openrouter.ai' }
+    }
 
     Dotenv.load
     OPENROUTER_API_KEY = ENV['OPENROUTER_API_KEY']
@@ -65,17 +64,20 @@ module HumanEval
       debug "Детали задачи #{task_number}:"
 
       content = File.read(file)
-      models = @model ? [@model] : MODELS
+      models = @model ? [@model] : MODELS.keys
 
-      models.each_with_index do |model, index|
-        log "  Модель #{index + 1}/#{models.size}: #{model}"
-        solve_with_model(task_number, content, model)
+      models.each_with_index do |model_key, index|
+        model_info = MODELS[model_key] || { name: model_key, provider: 'openrouter.ai' }
+        log "  Модель #{index + 1}/#{models.size}: #{model_key} (#{model_info[:name]})"
+        solve_with_model(task_number, content, model_key)
       end
     end
 
-    def solve_with_model(task_number, content, model)
-      model_file_name = model.gsub(/[^A-Za-z0-9\/]/, '_')
-      model_file_name = model_file_name.gsub('/', '_')
+    def solve_with_model(task_number, content, model_key)
+      model_info = MODELS[model_key] || { name: model_key, provider: 'openrouter.ai' }
+      model_name = model_info[:name]
+      
+      model_file_name = model_key.gsub(/[^A-Za-z0-9\/]/, '_')
       output_file = File.join(@tasks_dir, "t#{task_number}-#{model_file_name}.rb")
 
       if @keep_existing && File.exist?(output_file)
@@ -83,7 +85,7 @@ module HumanEval
         return
       end
 
-      debug "Решаем задачу #{task_number} с моделью #{model}"
+      debug "Решаем задачу #{task_number} с моделью #{model_name} (провайдер: #{model_info[:provider]})"
 
       debug "Исходное содержимое файла:"
       debug "---BEGIN ORIGINAL CONTENT---"
@@ -107,15 +109,15 @@ module HumanEval
       debug prompt
       debug "---END FULL PROMPT---"
 
-      raw_solution = call_openrouter(prompt, model)
-      debug "Получено решение от модели #{model}"
+      raw_solution = call_openrouter(prompt, model_key)
+      debug "Получено решение от модели #{model_name}"
       debug "---BEGIN MODEL RESPONSE---"
       debug raw_solution
       debug "---END MODEL RESPONSE---"
 
       solution = extract_and_join_code_blocks(raw_solution)
       if solution.strip.empty?
-        error "❌ Модель #{model} вернула пустое решение!"
+        error "❌ Модель #{model_name} вернула пустое решение!"
         error "Полный ответ модели:"
         error raw_solution
         return
@@ -130,8 +132,11 @@ module HumanEval
       debug "Решение сохранено в #{output_file}"
     end
 
-    def call_openrouter(prompt, model)
-      debug "Вызов OpenRouter API с моделью #{model}"
+    def call_openrouter(prompt, model_key)
+      model_info = MODELS[model_key] || { name: model_key, provider: 'openrouter.ai' }
+      model_name = model_info[:name]
+      
+      debug "Вызов OpenRouter API с моделью #{model_name}"
       uri = URI('https://openrouter.ai/api/v1/chat/completions')
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
@@ -143,7 +148,7 @@ module HumanEval
       request['X-Title'] = 'Human Eval Solver'
 
       request.body = {
-        model: model,
+        model: model_name,
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.1,
         max_tokens: 32000, # 1000 - для всех, 32000 - для o3-mini-high 
@@ -155,7 +160,7 @@ module HumanEval
 
       unless response.is_a?(Net::HTTPSuccess)
         error "Ошибка API: #{response.code} - #{response.body}"
-        raise "Ошибка API при вызове модели #{model}"
+        raise "Ошибка API при вызове модели #{model_name}"
       end
 
       begin
@@ -163,7 +168,7 @@ module HumanEval
         content = parsed_response.dig('choices', 0, 'message', 'content')
 
         if content.nil? || content.empty?
-          error "Пустой ответ от API для модели #{model}"
+          error "Пустой ответ от API для модели #{model_name}"
           error "Ответ API: #{parsed_response.inspect}"
           raise "Пустой ответ от API"
         end
