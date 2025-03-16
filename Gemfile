@@ -1,9 +1,9 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-gem "thor"
-gem "dotenv", "~> 2.8"
+gem 'thor', '~> 1.3'
+gem 'terminal-table', '~> 3.0'
+gem 'dotenv', '~> 2.8'
 gem "pry"
 gem "pry-byebug"
 gem "ostruct"
-gem "terminal-table"
 gem "numo-narray"

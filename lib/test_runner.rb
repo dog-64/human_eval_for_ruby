@@ -114,6 +114,32 @@ module TestRunner
       display_results([task], [model])
     end
 
+    def get_model_stats
+      # Находим все файлы с решениями в директории tasks
+      solutions = Dir.glob('tasks/t*-*.rb').reject { |f| f.end_with?('-assert.rb') }
+      tasks = solutions.map { |f| File.basename(f) }.map { |f| f.gsub(/-.*$/, '') }.uniq.sort
+      
+      models = solutions.map do |f|
+        filename = File.basename(f)
+        next if filename.end_with?('_asserts.rb')
+        filename.split('-')[1..-1].join('-').sub('.rb', '')
+      end.compact.uniq.sort
+      
+      # Подсчитываем статистику для каждой модели
+      model_stats = models.map do |model|
+        total_tasks = tasks.size
+        passed_tasks = tasks.count { |task| @results[task][model] }
+        percentage = (passed_tasks * 100.0 / total_tasks).round
+        [model, percentage]
+      end
+
+      # Сортируем по убыванию процента успешных тестов
+      model_stats.sort_by! { |_, percentage| -percentage }
+      
+      # Возвращаем результат
+      model_stats
+    end
+
     private
 
     def test_solution(task, solution_file)
@@ -403,10 +429,27 @@ module TestRunner
       end
     end
 
-    def display_results(tasks, models)
-      debug_log "Display results called with tasks: #{tasks.inspect} and models: #{models.inspect}"
-      debug_log "Current results: #{@results.inspect}"
-      
+    def display_total_console(tasks, models)
+      # Подсчитываем статистику для каждой модели
+      model_stats = models.map do |model|
+        total_tasks = tasks.size
+        passed_tasks = tasks.count { |task| @results[task][model] }
+        percentage = (passed_tasks * 100.0 / total_tasks).round
+        [model, percentage]
+      end
+
+      # Сортируем по убыванию процента успешных тестов
+      model_stats.sort_by! { |_, percentage| -percentage }
+
+      # Выводим в консоль в простом формате
+      puts "\nРезультаты тестирования:"
+      model_stats.each do |model, percentage|
+        puts "- #{model}: #{percentage}%"
+      end
+    end
+
+    def display_detailed_console(tasks, models)
+      # Существующий код для детального отчета
       rows = []
       model_scores = Hash.new(0)
       total_tasks = tasks.size
@@ -415,14 +458,12 @@ module TestRunner
         row = [task]
         models.each do |model|
           status = @results[task][model]
-          debug_log "Status for task #{task}, model #{model}: #{status.inspect}"
           row << (status ? DONE_MARK : FAIL_MARK)
           model_scores[model] += 1 if status
         end
         rows << row
       end
 
-      debug_log "Model scores: #{model_scores.inspect}"
       # Добавляем строку с итоговыми оценками
       score_row = ['Score']
       models.each do |model|
@@ -443,6 +484,85 @@ module TestRunner
       end
 
       puts table
+    end
+
+    def display_results(tasks, models)
+      # Всегда создаем оба отчета
+      create_reports(tasks, models)
+      
+      # Выводим total отчет в консоль
+      display_total_console(tasks, models)
+      
+      # Если не запрошен только total отчет, выводим также детальный отчет в консоль
+      unless @options[:report_total]
+        display_detailed_console(tasks, models)
+      end
+    end
+
+    def create_reports(tasks, models)
+      # Подсчитываем статистику для каждой модели
+      model_stats = models.map do |model|
+        total_tasks = tasks.size
+        passed_tasks = tasks.count { |task| @results[task][model] }
+        percentage = (passed_tasks * 100.0 / total_tasks).round
+        [model, percentage]
+      end
+
+      # Сортируем по убыванию процента успешных тестов
+      model_stats.sort_by! { |_, percentage| -percentage }
+      
+      # Создаем каталог reports, если он не существует
+      Dir.mkdir('reports') unless Dir.exist?('reports')
+      
+      # Сохраняем total отчет
+      total_report_file = File.join('reports', "human_watch_ruby_report_total.md")
+      File.open(total_report_file, 'w') do |file|
+        model_stats.each do |model, percentage|
+          file.puts "#{model}: #{percentage}%"
+        end
+      end
+      
+      # Сохраняем подробный отчет
+      full_report_file = File.join('reports', "human_watch_ruby_report_full.md")
+      File.open(full_report_file, 'w') do |file|
+        file.puts "# Отчет о тестировании моделей"
+        file.puts
+        file.puts "Дата: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}"
+        file.puts
+        file.puts "## Результаты"
+        file.puts
+        file.puts "| Модель | Успешность |"
+        file.puts "|--------|------------|"
+        
+        model_stats.each do |model, percentage|
+          file.puts "| #{model} | #{percentage}% |"
+        end
+        
+        file.puts
+        file.puts "## Детальная информация"
+        file.puts
+        file.puts "Всего задач: #{tasks.size}"
+        file.puts
+        
+        # Добавляем детальную информацию по каждой задаче
+        file.puts "### Результаты по задачам"
+        file.puts
+        file.puts "| Задача | " + models.join(" | ") + " |"
+        file.puts "|--------|" + models.map { |_| "----------" }.join("|") + "|"
+        
+        tasks.each do |task|
+          row = "| #{task} |"
+          models.each do |model|
+            status = @results[task][model]
+            row += " #{status ? '✓' : '✗'} |"
+          end
+          file.puts row
+        end
+      end
+      
+      puts "\nОтчеты сохранены в файлах:"
+      puts "- Total отчет: #{total_report_file}"
+      puts "- Подробный отчет: #{full_report_file}"
     end
   end
 end 
