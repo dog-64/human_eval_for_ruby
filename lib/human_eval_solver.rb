@@ -21,9 +21,8 @@ module HumanEval
       qwen/qwen-2.5-coder-32b-instruct:free 
       mistralai/codestral-2501
       openai/gpt-4o-mini
+      openai/o3-mini-high
 
-      openai/gpt-4o-mini 
-      openai/gpt-4o 
       anthropic/claude-3.5-sonnet
     ]
 
@@ -34,6 +33,7 @@ module HumanEval
       @tasks_dir = tasks_dir
       @model = options[:model]
       @task_number = options[:task]
+      @keep_existing = options[:keep_existing]
       self.log_level = options[:log_level] || :normal
       validate_environment
     end
@@ -77,6 +77,11 @@ module HumanEval
       model_file_name = model.gsub(/[^A-Za-z0-9\/]/, '_')
       model_file_name = model_file_name.gsub('/', '_')
       output_file = File.join(@tasks_dir, "t#{task_number}-#{model_file_name}.rb")
+
+      if @keep_existing && File.exist?(output_file)
+        debug "Пропускаем существующее решение: #{output_file}"
+        return
+      end
 
       debug "Решаем задачу #{task_number} с моделью #{model}"
 
@@ -140,8 +145,8 @@ module HumanEval
       request.body = {
         model: model,
         messages: [{ role: 'user', content: prompt }],
-        temperature: 0.7,
-        max_tokens: 1000,
+        temperature: 0.1,
+        max_tokens: 32000, # 1000 - для всех, 32000 - для o3-mini-high 
         stream: false
       }.to_json
 
@@ -159,6 +164,7 @@ module HumanEval
 
         if content.nil? || content.empty?
           error "Пустой ответ от API для модели #{model}"
+          error "Ответ API: #{parsed_response.inspect}"
           raise "Пустой ответ от API"
         end
 

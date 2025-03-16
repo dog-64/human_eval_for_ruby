@@ -14,15 +14,20 @@ module HumanEval
                  desc: "Solve specific task number"
     method_option :log_level,
                  type: :string,
-                 enum: ["none", "normal", "debug"],
+                 enum: %w[none normal debug],
                  default: "normal",
                  desc: "Logging level"
+    method_option :keep_existing,
+                 type: :boolean,
+                 default: false,
+                 desc: "Keep existing solutions"
 
     def solve(tasks_dir)
       options_hash = {
         model: options[:model],
         task: options[:task],
-        log_level: options[:log_level]
+        log_level: options[:log_level],
+        keep_existing: options[:keep_existing]
       }
 
       solver = Solver.new(tasks_dir, options_hash)
