@@ -175,6 +175,12 @@ module TestRunner
         error "  ❌ Ошибка синтаксиса в решении:"
         error "     #{e.message}"
         return false
+      rescue => e
+        # Если в решении есть посторонний код, который вызывает ошибку,
+        # логируем ошибку, но продолжаем выполнение
+        warn "  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при проверке синтаксиса:"
+        warn "     #{e.class}: #{e.message}"
+        warn "     Тесты могут не пройти из-за отсутствия необходимых методов"
       end
 
       test_context = Module.new do
@@ -210,7 +216,16 @@ module TestRunner
           }
         end
         
-        module_eval(solution_content)
+        begin
+          module_eval(solution_content)
+        rescue => e
+          # Если в решении есть посторонний код, который вызывает ошибку,
+          # логируем ошибку, но продолжаем выполнение тестов
+          warn "  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при загрузке в контекст тестов:"
+          warn "     #{e.class}: #{e.message}"
+          warn "     Тесты могут не пройти из-за отсутствия необходимых методов"
+        end
+        
         extend self
       end
       
@@ -561,7 +576,7 @@ module TestRunner
       end
       
       puts "\nОтчеты сохранены в файлах:"
-      puts "- Total отчет: #{total_report_file}"
+      puts "- Суммарный отчет: #{total_report_file}"
       puts "- Подробный отчет: #{full_report_file}"
     end
   end

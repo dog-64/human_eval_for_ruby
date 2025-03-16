@@ -1,5 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env bash
 
-require_relative '../lib/test_runner_cli'
-
-TestRunner::CLI.start(ARGV) 
+# Инициализируем rbenv и запускаем через bundle exec
+eval "$(rbenv init -)" && bundle exec ruby "$(dirname "$0")/run_tests_helper.rb" "$@" 

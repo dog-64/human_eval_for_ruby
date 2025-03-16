@@ -1,6 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env bash
 
-require 'bundler/setup'
-require_relative '../lib/human_eval_solver_cli'
-
-HumanEval::SolverCLI.start(ARGV) 
+# Инициализируем rbenv и запускаем через bundle exec
+eval "$(rbenv init -)" && bundle exec ruby "$(dirname "$0")/human_eval_solver_helper.rb" "$@" 

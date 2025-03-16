@@ -1,11 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env bash
 
-require_relative '../lib/test_runner'
-
-# Запускаем тесты и получаем результаты
-options = { report_total: true }
-runner = TestRunner::Runner.new(options)
-results = runner.run_all_tests
-
-puts "\nОтчеты успешно созданы в каталоге reports/"
-puts "Используйте их для анализа результатов тестирования моделей." 
+# Инициализируем rbenv и запускаем через bundle exec
+eval "$(rbenv init -)" && bundle exec ruby "$(dirname "$0")/generate_report_helper.rb" "$@" 
