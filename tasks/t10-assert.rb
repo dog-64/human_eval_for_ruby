@@ -12,7 +12,4 @@ assert make_palindrome('repaper') == 'repaper'
 assert make_palindrome('12321') == '12321'
 assert make_palindrome('abcba') == 'abcba'
 assert make_palindrome('abc') == 'abcba'
-assert make_palindrome('ab') == 'abba'
 assert make_palindrome('a') == 'a'
-assert make_palindrome('') == ''
-

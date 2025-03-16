@@ -1,35 +1,28 @@
-def find_zero(xs)
-  def poly(x, coeffs)
-    result = 0.0
-    coeffs.each_with_index do |coeff, index|
-      result += coeff * (x ** index)
+def find_zero(coefficients)
+  def poly(coeffs, x)
+    result = 0
+    coeffs.each_with_index do |coeff, i|
+      result += coeff * (x ** i)
     end
     result
   end
 
-  # Используем метод Ньютона
   x = 0.0
-  epsilon = 1e-6
-  max_iterations = 100
-
-  (0..max_iterations).each do |_|
-    fx = poly(x, xs)
-    f_prime_x = 0.0
-    (1...xs.length).each do |index|
-      f_prime_x += index * xs[index] * (x ** (index - 1))
-    end
-
-    if f_prime_x.abs < epsilon
-      break
-    end
-
-    delta_x = fx / f_prime_x
-    x -= delta_x
-
-    if delta_x.abs < epsilon
-      break
-    end
+  delta = 0.01  # Уменьшаем шаг для более точного вычисления производной
+  
+  1000.times do
+    y = poly(coefficients, x)
+    return x if y.abs < 1e-10  # Увеличиваем точность
+    
+    # Вычисляем производную численно
+    derivative = (poly(coefficients, x + delta) - y) / delta
+    
+    # Защита от деления на ноль
+    return x if derivative.abs < 1e-10
+    
+    # Метод Ньютона
+    x -= y / derivative
   end
-
-  x
+  
+  x  # Возвращаем последнее значение, если не достигли нужной точности
 end
