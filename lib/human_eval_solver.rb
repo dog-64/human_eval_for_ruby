@@ -32,7 +32,7 @@ module HumanEval
       'ollama_llama3_2' => { name: 'llama3.2', provider: 'ollama' },
       'ollama_codellama' => { name: 'codellama', provider: 'ollama',
                               note: 'CodeLlama 7B https://ollama.com/library/codellama' },
-      'ollama_codellama:13b' => { name: 'codellama', provider: 'ollama',
+      'ollama_codellama:13b' => { name: 'codellama:13b', provider: 'ollama',
                               note: 'CodeLlama 13bB https://ollama.com/library/codellama:13b' }
     }.freeze
 
