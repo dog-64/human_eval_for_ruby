@@ -8,3 +8,6 @@ google_gemini_flash_1_5: 75%
 mistralai_codestral_2501: 75%
 qwen_qwen_2_5_coder_32b_instruct: 74%
 meta_llama_llama_3_1_70b_instruct: 69%
+ollama_codellama: 30%
+ollama_codellama_13b: 26%
+ollama_llama3_2: 25%
