@@ -1,30 +1,35 @@
+# frozen_string_literal: true
+
 require "terminal-table"
 require "timeout"
 require_relative "logger"
 require_relative "assert"
 require_relative "log_levels"
+require 'shellwords'
+require 'fileutils'
+require_relative 'human_eval_solver'
 
 module TestRunner
   class Runner
     include HumanEval::Logger
     include HumanEval::LogLevels
 
-    DONE_MARK = "\e[32m✓\e[0m"  # Зеленый цвет
-    FAIL_MARK = "\e[31m✗\e[0m"  # Красный цвет
+    DONE_MARK = "\e[32m✓\e[0m" # Зеленый цвет
+    FAIL_MARK = "\e[31m✗\e[0m" # Красный цвет
 
     def initialize(options = {})
       @options = options
       @results = {}
       self.log_level = @options[:log_level] || :normal
-      @timeout = @options[:timeout] || 5  # Таймаут по умолчанию 5 секунд
+      @timeout = @options[:timeout] || 5 # Таймаут по умолчанию 5 секунд
     end
 
     def colorize(text, percentage)
       color = case percentage
-              when 0..33 then "\e[31m"    # Красный
-              when 34..66 then "\e[33m"   # Желтый
-              else "\e[32m"                # Зеленый
-              end
+      when 0..33 then "\e[31m" # Красный
+      when 34..66 then "\e[33m" # Желтый
+      else "\e[32m" # Зеленый
+      end
       "#{color}#{text}\e[0m"
     end
 
@@ -50,7 +55,7 @@ module TestRunner
       tasks.each do |task|
         task_solutions = Dir.glob("tasks/#{task}-*.rb").reject { |f| f.end_with?('-assert.rb') }
         debug_log "Processing task #{task} with solutions: #{task_solutions.inspect}"
-        
+
         task_solutions.each do |solution|
           model = File.basename(solution).split('-')[1..-1].join('-').sub('.rb', '')
           debug_log "Testing solution #{solution} for model #{model}"
@@ -118,13 +123,13 @@ module TestRunner
       # Находим все файлы с решениями в директории tasks
       solutions = Dir.glob('tasks/t*-*.rb').reject { |f| f.end_with?('-assert.rb') }
       tasks = solutions.map { |f| File.basename(f) }.map { |f| f.gsub(/-.*$/, '') }.uniq.sort
-      
+
       models = solutions.map do |f|
         filename = File.basename(f)
         next if filename.end_with?('_asserts.rb')
         filename.split('-')[1..-1].join('-').sub('.rb', '')
       end.compact.uniq.sort
-      
+
       # Подсчитываем статистику для каждой модели
       model_stats = models.map do |model|
         total_tasks = tasks.size
@@ -135,7 +140,7 @@ module TestRunner
 
       # Сортируем по убыванию процента успешных тестов
       model_stats.sort_by! { |_, percentage| -percentage }
-      
+
       # Возвращаем результат
       model_stats
     end
@@ -144,13 +149,13 @@ module TestRunner
 
     def test_solution(task, solution_file)
       test_file = "tasks/#{task}-assert.rb"
-      
+
       unless File.exist?(solution_file)
         error "\nРешение #{File.basename(solution_file)}:"
         error "  ❌ Файл решения не найден: #{solution_file}"
         return false
       end
-      
+
       unless File.exist?(test_file)
         error "\nРешение #{File.basename(solution_file)}:"
         error "  ❌ Файл тестов не найден: #{test_file}"
@@ -158,14 +163,14 @@ module TestRunner
       end
 
       log "Решение #{File.basename(solution_file)}"
-      
+
       # Проверяем на пустой файл
       solution_content = File.read(solution_file)
       if solution_content.strip.empty?
         error "  ❌ Файл решения пуст"
         return false
       end
-      
+
       begin
         debug_log "  📝 Анализ синтаксиса решения..."
         temp_context = Module.new
@@ -186,15 +191,15 @@ module TestRunner
       test_context = Module.new do
         include HumanEval::Assert
         include HumanEval::LogLevels
-        
+
         def self.log_level=(level)
           @log_level = level
         end
-        
+
         def self.log_level
           @log_level
         end
-        
+
         def self.options=(opts)
           @options = opts
         end
@@ -215,7 +220,7 @@ module TestRunner
             }
           }
         end
-        
+
         begin
           module_eval(solution_content)
         rescue => e
@@ -225,12 +230,12 @@ module TestRunner
           warn "     #{e.class}: #{e.message}"
           warn "     Тесты могут не пройти из-за отсутствия необходимых методов"
         end
-        
+
         extend self
       end
-      
+
       test_context.log_level = @options[:log_level] || :normal
-      
+
       begin
         test_content = File.read(test_file)
         debug_log "  🧪 Запуск тестов..."
@@ -248,11 +253,11 @@ module TestRunner
             test_context = Module.new do
               include HumanEval::Assert
               include HumanEval::LogLevels
-              
+
               def self.log_level=(level)
                 @log_level = level
               end
-              
+
               def self.log_level
                 @log_level
               end
@@ -278,16 +283,16 @@ module TestRunner
                 }
               end
             end
-            
+
             test_context.module_eval(solution_content)
             test_context.extend(test_context)
             test_context.log_level = @options[:log_level] || :normal
-            test_context.options = @options.dup  # Добавляем .dup чтобы избежать проблем с разделяемыми объектами
-            
+            test_context.options = @options.dup # Добавляем .dup чтобы избежать проблем с разделяемыми объектами
+
             begin
               debug_log "  🔄 Выполняем тесты в контексте..."
               debug_log "  🔄 Выполняем тесты для #{File.basename(solution_file)}..."
-              
+
               # Показываем и выполняем тесты по одному
               debug_log "  📝 Тесты:"
               test_lines = test_content.split("\n")
@@ -295,39 +300,39 @@ module TestRunner
                 next if line.strip.empty?
                 line_number = idx + 1
                 debug_log "     #{line_number}: #{line.strip}"
-                
+
                 begin
                   test_context.module_eval(line)
                 rescue HumanEval::Assert::AssertionError => e
                   # Сохраняем информацию о не пройденном тесте
                   model = File.basename(solution_file).split('-')[1..-1].join('-').sub('.rb', '')
                   task = File.basename(solution_file).split('-').first
-                  
+
                   debug_log "\n  ❌ Тест не пройден на строке #{line_number}:"
                   debug_log "     #{line.strip}"
-                  
+
                   if e.expected && e.actual
                     debug_log "     Ожидалось: #{e.expected.inspect}"
                     debug_log "     Получено: #{e.actual.inspect}"
                   end
-                  
+
                   result.push({
-                    status: :error,
-                    error: {
-                      class: e.class.name,
-                      message: e.message,
-                      expected: e.expected,
-                      actual: e.actual,
-                      line: line_number,
-                      test: line.strip
-                    }
-                  })
+                                status: :error,
+                                error: {
+                                  class: e.class.name,
+                                  message: e.message,
+                                  expected: e.expected,
+                                  actual: e.actual,
+                                  line: line_number,
+                                  test: line.strip
+                                }
+                              })
                   return false
                 end
               end
-              
+
               debug_log "  ✅ Тесты выполнены успешно"
-              result.push({status: :success})
+              result.push({ status: :success })
             rescue StandardError => e
               debug_log "  ❌ Ошибка при выполнении тестов: #{e.class} - #{e.message}"
               debug_log "  ❌ Ошибка: #{e.message || "Unknown error"}"
@@ -335,34 +340,34 @@ module TestRunner
             rescue Exception => e
               debug_log "  ❌ Критическая ошибка при выполнении тестов: #{e.class} - #{e.message}"
               result.push({
-                status: :error,
-                error: {
-                  class: e.class.name,
-                  message: e.message || "Unknown error",
-                  backtrace: e.backtrace || []
-                }
-              })
+                            status: :error,
+                            error: {
+                              class: e.class.name,
+                              message: e.message || "Unknown error",
+                              backtrace: e.backtrace || []
+                            }
+                          })
             end
           rescue StandardError => e
             debug_log "  ❌ Ошибка в тестовом потоке: #{e.class} - #{e.message}"
             result.push({
-              status: :error,
-              error: {
-                class: e.class.name,
-                message: e.message || "Unknown error",
-                backtrace: e.backtrace || []
-              }
-            })
+                          status: :error,
+                          error: {
+                            class: e.class.name,
+                            message: e.message || "Unknown error",
+                            backtrace: e.backtrace || []
+                          }
+                        })
           rescue Exception => e
             debug_log "  ❌ Критическая ошибка в тестовом потоке: #{e.class} - #{e.message}"
             result.push({
-              status: :error,
-              error: {
-                class: e.class.name,
-                message: e.message || "Unknown error",
-                backtrace: e.backtrace || []
-              }
-            })
+                          status: :error,
+                          error: {
+                            class: e.class.name,
+                            message: e.message || "Unknown error",
+                            backtrace: e.backtrace || []
+                          }
+                        })
           end
         end
 
@@ -491,7 +496,7 @@ module TestRunner
       table = Terminal::Table.new do |t|
         t.headings = ['Task'] + models
         t.rows = rows
-        t.style = { 
+        t.style = {
           alignment: :center,
           padding_left: 1,
           padding_right: 1
@@ -504,13 +509,41 @@ module TestRunner
     def display_results(tasks, models)
       # Всегда создаем оба отчета
       create_reports(tasks, models)
-      
+
       # Выводим total отчет в консоль
       display_total_console(tasks, models)
-      
+
       # Если не запрошен только total отчет, выводим также детальный отчет в консоль
       unless @options[:report_total]
         display_detailed_console(tasks, models)
+      end
+    end
+
+    # Получает информацию о модели из константы MODELS
+    # @param model_key [String] ключ модели
+    # @return [Hash] информация о модели или хеш с именем модели, если модель не найдена
+    def get_model_info(model_key)
+      # Проверяем доступность константы MODELS
+      if defined?(HumanEval::SolverClass::MODELS)
+        model_info = HumanEval::SolverClass::MODELS[model_key]
+        return model_info if model_info
+      end
+      # Если модель не найдена, возвращаем хеш с именем модели
+      { name: model_key, provider: 'unknown' }
+    end
+
+    # Получает отображаемое имя модели
+    # @param model_key [String] ключ модели
+    # @return [String] отображаемое имя модели
+    def get_display_model_name(model_key)
+      model_info = get_model_info(model_key)
+      name = model_info[:name]
+      provider = model_info[:provider]
+
+      if provider && provider != 'unknown'
+        "#{name} (#{provider})"
+      else
+        model_key # Используем ключ как имя, если не удалось получить информацию
       end
     end
 
@@ -525,59 +558,217 @@ module TestRunner
 
       # Сортируем по убыванию процента успешных тестов
       model_stats.sort_by! { |_, percentage| -percentage }
-      
+
       # Создаем каталог reports, если он не существует
       Dir.mkdir('reports') unless Dir.exist?('reports')
-      
-      # Сохраняем total отчет
-      total_report_file = File.join('reports', "human_watch_ruby_report_total.md")
-      File.open(total_report_file, 'w') do |file|
+
+      # Путь к отчетам
+      total_report_file = File.join('reports', "human_watch_ruby_report_total.html")
+      full_report_file = File.join('reports', "human_watch_ruby_report_full.html")
+
+      # Также создаем markdown версию общего отчета для совместимости
+      total_md_report_file = File.join('reports', "human_watch_ruby_report_total.md")
+      File.open(total_md_report_file, 'w') do |file|
         model_stats.each do |model, percentage|
-          file.puts "#{model}: #{percentage}%"
+          display_name = get_display_model_name(model)
+          file.puts "#{display_name}: #{percentage}%"
         end
       end
-      
-      # Сохраняем подробный отчет
-      full_report_file = File.join('reports', "human_watch_ruby_report_full.md")
-      File.open(full_report_file, 'w') do |file|
-        file.puts "# Отчет о тестировании моделей"
-        file.puts
-        file.puts "Дата: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}"
-        file.puts
-        file.puts "## Результаты"
-        file.puts
-        file.puts "| Модель | Успешность |"
-        file.puts "|--------|------------|"
-        
+
+      # Общий HTML заголовок и стили для обоих отчетов
+      html_header = generate_html_header
+
+      # Генерируем суммарный отчет в HTML
+      File.open(total_report_file, 'w') do |file|
+        file.puts html_header
+        file.puts "<h1>Суммарный отчет о тестировании моделей</h1>"
+        file.puts "<p>Дата: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}</p>"
+
+        file.puts "<div class='model-results'>"
+        file.puts "<table>"
+        file.puts "<tr><th>Модель</th><th>Успешность</th></tr>"
+
         model_stats.each do |model, percentage|
-          file.puts "| #{model} | #{percentage}% |"
+          display_name = get_display_model_name(model)
+          file.puts "<tr><td>#{add_soft_hyphens(display_name)}</td><td>#{percentage}%</td></tr>"
         end
-        
-        file.puts
-        file.puts "## Детальная информация"
-        file.puts
-        file.puts "Всего задач: #{tasks.size}"
-        file.puts
-        
-        # Добавляем детальную информацию по каждой задаче
-        file.puts "### Результаты по задачам"
-        file.puts
-        file.puts "| Задача | " + models.join(" | ") + " |"
-        file.puts "|--------|" + models.map { |_| "----------" }.join("|") + "|"
-        
+
+        file.puts "</table>"
+        file.puts "</div>"
+        file.puts "</body></html>"
+      end
+
+      # Подсчитываем статистику для каждой задачи
+      task_stats = tasks.map do |task|
+        total_models = models.size
+        passed_models = models.count { |model| @results[task][model] }
+        percentage = (passed_models * 100.0 / total_models).round
+        [task, percentage]
+      end
+
+      # Генерируем детальный отчет в HTML
+      File.open(full_report_file, 'w') do |file|
+        file.puts html_header
+        file.puts "<h1>Отчет о тестировании моделей</h1>"
+        file.puts "<p>Дата: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}</p>"
+
+        file.puts "<h2>Результаты</h2>"
+
+        # Таблица результатов моделей
+        file.puts "<h3>Результаты по моделям</h3>"
+        file.puts "<div class='model-results'>"
+        file.puts "<table>"
+        file.puts "<tr><th>Модель</th><th>Успешность</th></tr>"
+
+        model_stats.each do |model, percentage|
+          display_name = get_display_model_name(model)
+          file.puts "<tr><td>#{add_soft_hyphens(display_name)}</td><td>#{percentage}%</td></tr>"
+        end
+
+        file.puts "</table>"
+        file.puts "</div>"
+
+        # Удаляю секцию "Результаты по задачам", но оставляю детальную информацию
+
+        file.puts "<h2>Детальная информация</h2>"
+        file.puts "<p>Всего задач: #{tasks.size}</p>"
+        file.puts "<p>Всего моделей: #{models.size}</p>"
+
+        # Детальная таблица по задачам и моделям
+        file.puts "<h3>Результаты по задачам и моделям</h3>"
+        file.puts "<div class='task-results'>"
+        file.puts "<table>"
+
+        # Заголовок таблицы
+        file.puts "<tr><th>Задача</th>"
+        file.puts "<th>Успешность</th>"
+        models.each do |model|
+          display_name = get_display_model_name(model)
+          file.puts "<th>#{add_soft_hyphens(display_name)}</th>"
+        end
+        file.puts "</tr>"
+
+        # Строки таблицы с данными
         tasks.each do |task|
-          row = "| #{task} |"
+          file.puts "<tr><td><a href='../tasks/#{task}.md'>#{task}</a></td>"
+
+          # Добавляем процент успешности для задачи сразу после названия задачи
+          task_percentage = task_stats.find { |t, _| t == task }[1]
+          color_class = if task_percentage == 100
+            'success'
+          elsif task_percentage == 0
+            'failure'
+          else
+            ''
+          end
+          file.puts "<td class='#{color_class}'>#{task_percentage}%</td>"
+
           models.each do |model|
             status = @results[task][model]
-            row += " #{status ? '✓' : '✗'} |"
+            css_class = status ? 'success' : 'failure'
+            symbol = status ? '✓' : '✗'
+            file.puts "<td class='#{css_class}'>#{symbol}</td>"
           end
-          file.puts row
+
+          file.puts "</tr>"
         end
+
+        file.puts "</table>"
+        file.puts "</div>"
+        file.puts "</body></html>"
       end
-      
+
       puts "\nОтчеты сохранены в файлах:"
-      puts "- Суммарный отчет: #{total_report_file}"
-      puts "- Подробный отчет: #{full_report_file}"
+      puts "- Суммарный отчет (HTML): #{total_report_file}"
+      puts "- Подробный отчет (HTML): #{full_report_file}"
+    end
+
+    # Генерирует HTML-заголовок с CSS-стилями
+    # @return [String] HTML-заголовок с CSS
+    def generate_html_header
+      <<~HTML
+        <!DOCTYPE html>
+        <html lang="ru">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Отчет о тестировании моделей</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                           Helvetica, Arial, sans-serif;
+              line-height: 1.6;
+              max-width: 1200px;
+              margin: 0 auto;
+              padding: 20px;
+              color: #333;
+              hyphens: auto;
+              word-wrap: break-word;
+              overflow-wrap: break-word;
+            }
+            h1, h2, h3 {
+              color: #2c3e50;
+            }
+            table {
+              border-collapse: collapse;
+              width: 100%;
+              margin-bottom: 20px;
+              font-size: 14px;
+            }
+            th, td {
+              hyphens: auto;
+              word-wrap: break-word;
+              overflow-wrap: break-word;
+              border: 1px solid #ddd;
+              padding: 8px;
+              text-align: center;
+            }
+            th {
+              background-color: #f2f2f2;
+              position: sticky;
+              top: 0;
+              vertical-align: top;
+            }
+            tr:nth-child(even) {
+              background-color: #f9f9f9;
+            }
+            .success {
+              color: #27ae60;
+              font-weight: bold;
+            }
+            .failure {
+              color: #e74c3c;
+              font-weight: bold;
+            }
+            .model-results td:first-child {
+              text-align: left;
+              font-weight: bold;
+            }
+            .task-results td:first-child {
+              text-align: left;
+              font-weight: bold;
+            }
+            .task-results th {
+              vertical-align: top;
+            }
+            @media (max-width: 768px) {
+              table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+              }
+            }
+          </style>
+        </head>
+        <body>
+      HTML
+    end
+
+    # Форматирует название модели с мягкими переносами
+    # @param model [String] название модели
+    # @return [String] отформатированное название с мягкими переносами
+    def add_soft_hyphens(model)
+      model.gsub('_', '_&shy;')
     end
   end
 end 

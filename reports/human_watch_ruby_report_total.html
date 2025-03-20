@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Отчет о тестировании моделей</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      color: #333;
+      hyphens: auto;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    h1, h2, h3 {
+      color: #2c3e50;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    th, td {
+      hyphens: auto;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+      position: sticky;
+      top: 0;
+      vertical-align: top;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .success {
+      color: #27ae60;
+      font-weight: bold;
+    }
+    .failure {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+    .model-results td:first-child {
+      text-align: left;
+      font-weight: bold;
+    }
+    .task-results td:first-child {
+      text-align: left;
+      font-weight: bold;
+    }
+    .task-results th {
+      vertical-align: top;
+    }
+    @media (max-width: 768px) {
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+<body>
+<h1>Суммарный отчет о тестировании моделей</h1>
+<p>Дата: 2025-03-19 22:59:10</p>
+<div class='model-results'>
+<table>
+<tr><th>Модель</th><th>Успешность</th></tr>
+<tr><td>google/gemini-2.0-flash-001 (openrouter.ai)</td><td>86%</td></tr>
+<tr><td>openai/o3-mini-high (openrouter.ai)</td><td>84%</td></tr>
+<tr><td>deepseek/deepseek-chat:free (openrouter.ai)</td><td>79%</td></tr>
+<tr><td>google/gemini-2.0-flash-lite-001 (openrouter.ai)</td><td>79%</td></tr>
+<tr><td>deepseek/deepseek-chat (openrouter.ai)</td><td>77%</td></tr>
+<tr><td>openai/gpt-4o-mini (openrouter.ai)</td><td>76%</td></tr>
+<tr><td>google/gemini-flash-1.5 (openrouter.ai)</td><td>75%</td></tr>
+<tr><td>mistralai/codestral-2501 (openrouter.ai)</td><td>75%</td></tr>
+<tr><td>qwen/qwen-2.5-coder-32b-instruct:free (openrouter.ai)</td><td>74%</td></tr>
+<tr><td>meta-llama/llama-3.1-70b-instruct (openrouter.ai)</td><td>69%</td></tr>
+<tr><td>codellama (ollama)</td><td>30%</td></tr>
+<tr><td>ollama_&shy;codellama_&shy;13b</td><td>26%</td></tr>
+<tr><td>llama3.2 (ollama)</td><td>25%</td></tr>
+</table>
+</div>
+</body></html>

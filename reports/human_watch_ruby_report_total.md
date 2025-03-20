@@ -1,13 +1,13 @@
-google_gemini_2_0_flash_001: 86%
-openai_o3_mini_high: 84%
-deepseek_deepseek_chat_free: 79%
-google_gemini_2_0_flash_lite_001: 79%
-deepseek_deepseek_chat: 77%
-openai_gpt_4o_mini: 76%
-google_gemini_flash_1_5: 75%
-mistralai_codestral_2501: 75%
-qwen_qwen_2_5_coder_32b_instruct: 74%
-meta_llama_llama_3_1_70b_instruct: 69%
-ollama_codellama: 30%
+google/gemini-2.0-flash-001 (openrouter.ai): 86%
+openai/o3-mini-high (openrouter.ai): 84%
+deepseek/deepseek-chat:free (openrouter.ai): 79%
+google/gemini-2.0-flash-lite-001 (openrouter.ai): 79%
+deepseek/deepseek-chat (openrouter.ai): 77%
+openai/gpt-4o-mini (openrouter.ai): 76%
+google/gemini-flash-1.5 (openrouter.ai): 75%
+mistralai/codestral-2501 (openrouter.ai): 75%
+qwen/qwen-2.5-coder-32b-instruct:free (openrouter.ai): 74%
+meta-llama/llama-3.1-70b-instruct (openrouter.ai): 69%
+codellama (ollama): 30%
 ollama_codellama_13b: 26%
-ollama_llama3_2: 25%
+llama3.2 (ollama): 25%
