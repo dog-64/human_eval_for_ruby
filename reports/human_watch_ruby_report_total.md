@@ -11,3 +11,4 @@ meta-llama/llama-3.1-70b-instruct (openrouter.ai): 69%
 codellama (ollama): 30%
 ollama_codellama_13b: 26%
 llama3.2 (ollama): 25%
+default: 1%
