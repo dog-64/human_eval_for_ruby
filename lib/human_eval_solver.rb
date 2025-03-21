@@ -33,7 +33,9 @@ module HumanEval
       'ollama_codellama' => { name: 'codellama', provider: 'ollama',
                               note: 'CodeLlama 7B https://ollama.com/library/codellama' },
       'ollama_codellama:13b' => { name: 'codellama:13b', provider: 'ollama',
-                              note: 'CodeLlama 13bB https://ollama.com/library/codellama:13b' }
+                              note: 'CodeLlama 13bB https://ollama.com/library/codellama:13b' },
+      'ollama_codellama:34b' => { name: 'codellama:34b', provider: 'ollama',
+                              note: 'CodeLlama 13bB https://ollama.com/library/codellama:34b' }
     }.freeze
 
     Dotenv.load
@@ -331,6 +333,7 @@ module HumanEval
 
       request = prepare_ollama_request(uri, model_name, prompt)
       debug 'Ожидаем ответ от Ollama API'
+      http.read_timeout = 180 # Таймаут 120 секунд
       response = http.request(request)
 
       process_ollama_response(response, model_name, uri)
