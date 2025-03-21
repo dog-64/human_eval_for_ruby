@@ -10,3 +10,15 @@ gem "numo-narray"
 gem "rubocop"
 gem "standard", ">= 1.35.1"
 gem "bundle-audit"
+
+group :test do
+  gem 'rspec', '~> 3.12'
+  gem 'webmock', '~> 3.19'
+  gem 'rspec-its', '~> 1.3'
+  gem "rspec-collection_matchers" 
+  gem "rspec-expectations"
+  gem "rspec-mocks"
+  gem "rspec-support"
+  gem "rspec-core"
+end
+

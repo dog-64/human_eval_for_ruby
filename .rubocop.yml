@@ -1,0 +1,29 @@
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.4
+  Include:
+    - 'lib/**/*.rb'
+    - 'spec/**/*.rb'
+    - 'Gemfile'
+    - 'Rakefile'
+  Exclude:
+    - 'vendor/**/*'
+    - 'tmp/**/*'
+    - 'bin/**/*'
+
+Style/Documentation:
+  Enabled: true
+
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+
+Metrics/MethodLength:
+  Max: 30
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+
+Metrics/ClassLength:
+  Exclude:
+    - 'lib/human_eval_solver.rb' 

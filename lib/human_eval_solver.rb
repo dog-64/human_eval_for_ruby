@@ -27,6 +27,7 @@ module HumanEval
       'mistralai_codestral_2501' => { name: 'mistralai/codestral-2501', provider: 'openrouter.ai' },
       'openai_gpt_4o_mini' => { name: 'openai/gpt-4o-mini', provider: 'openrouter.ai' },
       'openai_o3_mini_high' => { name: 'openai/o3-mini-high', provider: 'openrouter.ai', note: 'дорогой, медленный' },
+
       'anthropic_claude_3_5_sonnet' => { name: 'anthropic/claude-3.5-sonnet', provider: 'openrouter.ai' },
       'mistralai_mistral-small-3_1-24b-instruct' => { name: 'mistralai/mistral-small-3.1-24b-instruct', provider: 'openrouter.ai', note: '32b https://openrouter.ai/mistralai/mistral-small-3.1-24b-instruct-2503' },
 
@@ -34,13 +35,12 @@ module HumanEval
       'ollama_codellama' => { name: 'codellama', provider: 'ollama',
                               note: 'CodeLlama 7B https://ollama.com/library/codellama' },
       'ollama_codellama:13b' => { name: 'codellama:13b', provider: 'ollama',
-                              note: 'CodeLlama 13bB https://ollama.com/library/codellama:13b' },
+                                  note: 'CodeLlama 13bB https://ollama.com/library/codellama:13b' },
       'ollama_codellama:34b' => { name: 'codellama:34b', provider: 'ollama',
-                              note: 'CodeLlama 13bB https://ollama.com/library/codellama:34b' }
+                                  note: 'CodeLlama 13bB https://ollama.com/library/codellama:34b' }
     }.freeze
 
     Dotenv.load
-    OPENROUTER_API_KEY = ENV['OPENROUTER_API_KEY']
     OLLAMA_BASE_URL = ENV['OLLAMA_BASE_URL'] || 'http://localhost:11434'
 
     # Инициализирует решатель задач
@@ -73,6 +73,12 @@ module HumanEval
 
     private
 
+    # Возвращает API ключ для OpenRouter.ai
+    # @return [String] API ключ
+    def openrouter_api_key
+      ENV.fetch('OPENROUTER_API_KEY', nil)
+    end
+
     # Находит файлы задач для обработки
     # @return [Array<String>] список файлов задач
     def find_task_files
@@ -80,7 +86,7 @@ module HumanEval
         task_name = @task_number.start_with?('t') ? @task_number : "t#{@task_number}"
         [File.join(@tasks_dir, "#{task_name}.md")]
       else
-        Dir[File.join(@tasks_dir, 't*.md')].sort
+        Dir[File.join(@tasks_dir, 't*.md')]
       end
     end
 
@@ -116,7 +122,7 @@ module HumanEval
     def select_models_for_task
       if @model
         [@model]
-      elsif ENV['OPENROUTER_API_KEY']
+      elsif openrouter_api_key
         MODELS.keys
       else
         models = MODELS.select { |_, info| info[:provider] == 'ollama' }.keys
@@ -201,7 +207,8 @@ module HumanEval
       case provider
       when 'ollama'
         call_ollama(prompt, model_key)
-      else # по умолчанию используем openrouter.ai
+      else
+        # по умолчанию используем openrouter.ai
         call_openrouter(prompt, model_key)
       end
     end
@@ -269,7 +276,7 @@ module HumanEval
       request = Net::HTTP::Post.new(uri)
 
       # Устанавливаем заголовки
-      request['Authorization'] = "Bearer #{OPENROUTER_API_KEY}"
+      request['Authorization'] = "Bearer #{openrouter_api_key}"
       request['Content-Type'] = 'application/json'
       request['HTTP-Referer'] = ENV['HTTP_REFERER'] || 'https://github.com/yourusername/human-eval-solver'
       request['X-Title'] = 'Human Eval Solver'
@@ -474,7 +481,7 @@ module HumanEval
       model_info = MODELS[@model] || { name: @model, provider: 'openrouter.ai' }
       provider = model_info[:provider]
 
-      return unless provider == 'openrouter.ai' && !ENV['OPENROUTER_API_KEY']
+      return unless provider == 'openrouter.ai' && !openrouter_api_key
 
       raise 'Установите переменную OPENROUTER_API_KEY в файле .env для использования моделей OpenRouter.ai'
     end
@@ -483,7 +490,7 @@ module HumanEval
     def validate_default_models
       # Если модель не указана, проверяем наличие ключа OpenRouter.ai,
       # так как по умолчанию будут использоваться все модели, включая OpenRouter.ai
-      return if ENV['OPENROUTER_API_KEY']
+      return if openrouter_api_key
 
       log 'ВНИМАНИЕ: Переменная OPENROUTER_API_KEY не установлена в файле .env'
       log 'Будут использоваться только локальные модели Ollama'
