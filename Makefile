@@ -10,8 +10,11 @@ ARGS = $(filter-out $@,$(MAKECMDGOALS))
 	@:
 .PHONY: spec test
 
+test:
+	bundle exec rspec --require spec_helper --format documentation --color
+
 rubocop:
-	bundle exec  rubocop -A -F ./app ./lib ./spec ./config Gemfile
+	bundle exec rubocop -A -F ./lib ./spec Gemfile
 
 standard:
 	bundle exec standardrb --format progress
@@ -20,4 +23,4 @@ critic:
 	rubycritic -no-browser --mode-ci
 
 audit:
-		bundle exec bundle-audit --update
+	bundle exec bundle-audit --update
