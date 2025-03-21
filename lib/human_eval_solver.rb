@@ -28,6 +28,7 @@ module HumanEval
       'openai_gpt_4o_mini' => { name: 'openai/gpt-4o-mini', provider: 'openrouter.ai' },
       'openai_o3_mini_high' => { name: 'openai/o3-mini-high', provider: 'openrouter.ai', note: 'дорогой, медленный' },
       'anthropic_claude_3_5_sonnet' => { name: 'anthropic/claude-3.5-sonnet', provider: 'openrouter.ai' },
+      'mistralai_mistral-small-3_1-24b-instruct' => { name: 'mistralai/mistral-small-3.1-24b-instruct', provider: 'openrouter.ai', note: '32b https://openrouter.ai/mistralai/mistral-small-3.1-24b-instruct-2503' },
 
       'ollama_llama3_2' => { name: 'llama3.2', provider: 'ollama' },
       'ollama_codellama' => { name: 'codellama', provider: 'ollama',
@@ -333,7 +334,7 @@ module HumanEval
 
       request = prepare_ollama_request(uri, model_name, prompt)
       debug 'Ожидаем ответ от Ollama API'
-      http.read_timeout = 180 # Таймаут 120 секунд
+      http.read_timeout = 300 # Таймаут 120 секунд
       response = http.request(request)
 
       process_ollama_response(response, model_name, uri)
