@@ -162,8 +162,6 @@ module TestRunner
         return false
       end
 
-      log "Решение #{File.basename(solution_file)}"
-
       # Проверяем на пустой файл
       solution_content = File.read(solution_file)
       if solution_content.strip.empty?
@@ -462,9 +460,9 @@ module TestRunner
       model_stats.sort_by! { |_, percentage| -percentage }
 
       # Выводим в консоль в простом формате
-      puts "\nРезультаты тестирования:"
+      puts "Результат прогона тестов:"
       model_stats.each do |model, percentage|
-        puts "- #{model}: #{percentage}%"
+        puts "- #{model} - #{percentage}%"
       end
     end
 
@@ -510,13 +508,8 @@ module TestRunner
       # Всегда создаем оба отчета
       create_reports(tasks, models)
 
-      # Выводим total отчет в консоль
+      # Выводим только суммарный отчет в консоль
       display_total_console(tasks, models)
-
-      # Если не запрошен только total отчет, выводим также детальный отчет в консоль
-      unless @options[:report_total]
-        display_detailed_console(tasks, models)
-      end
     end
 
     # Получает информацию о модели из константы MODELS
@@ -565,15 +558,6 @@ module TestRunner
       # Путь к отчетам
       total_report_file = File.join('reports', "human_watch_ruby_report_total.html")
       full_report_file = File.join('reports', "human_watch_ruby_report_full.html")
-
-      # Также создаем markdown версию общего отчета для совместимости
-      total_md_report_file = File.join('reports', "human_watch_ruby_report_total.md")
-      File.open(total_md_report_file, 'w') do |file|
-        model_stats.each do |model, percentage|
-          display_name = get_display_model_name(model)
-          file.puts "#{display_name}: #{percentage}%"
-        end
-      end
 
       # Общий HTML заголовок и стили для обоих отчетов
       html_header = generate_html_header
@@ -628,8 +612,6 @@ module TestRunner
         file.puts "</table>"
         file.puts "</div>"
 
-        # Удаляю секцию "Результаты по задачам", но оставляю детальную информацию
-
         file.puts "<h2>Детальная информация</h2>"
         file.puts "<p>Всего задач: #{tasks.size}</p>"
         file.puts "<p>Всего моделей: #{models.size}</p>"
@@ -677,10 +659,6 @@ module TestRunner
         file.puts "</div>"
         file.puts "</body></html>"
       end
-
-      puts "\nОтчеты сохранены в файлах:"
-      puts "- Суммарный отчет (HTML): #{total_report_file}"
-      puts "- Подробный отчет (HTML): #{full_report_file}"
     end
 
     # Генерирует HTML-заголовок с CSS-стилями
@@ -767,8 +745,8 @@ module TestRunner
     # Форматирует название модели с мягкими переносами
     # @param model [String] название модели
     # @return [String] отформатированное название с мягкими переносами
-    def add_soft_hyphens(model)
-      model.gsub('_', '_&shy;')
+    def add_soft_hyphens(text)
+      text.gsub('_', '_&shy;')
     end
   end
 end 
