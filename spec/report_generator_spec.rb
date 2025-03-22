@@ -4,37 +4,36 @@ require 'spec_helper'
 require_relative '../lib/human_eval/report_generator'
 
 RSpec.describe HumanEval::ReportGenerator do
+  let(:test_reports_dir) { Dir.mktmpdir('test_reports_') }
   let(:model_stats) { { 'model1' => 100, 'model2' => 50 } }
   let(:task_results) { { 't1' => { 'model1' => true, 'model2' => false } } }
   let(:results) { { model_stats: model_stats, task_results: task_results } }
-  let(:generator) { described_class.new(results) }
+  let(:generator) { described_class.new(results, reports_dir: test_reports_dir) }
 
   before(:each) do
-    # Создаем временную директорию для отчетов
-    FileUtils.mkdir_p('reports')
+    FileUtils.mkdir_p(test_reports_dir)
     
     # Мокаем методы работы с README.md
     allow_any_instance_of(HumanEval::ReportGenerator).to receive(:update_readme)
   end
 
   after(:each) do
-    # Удаляем временные файлы после тестов
-    FileUtils.rm_rf('reports')
+    FileUtils.remove_entry(test_reports_dir) if Dir.exist?(test_reports_dir)
   end
 
   describe '#generate_all' do
     it 'creates all report files' do
       generator.generate_all
 
-      expect(File).to exist('reports/test_results.json')
-      expect(File).to exist('reports/human_eval_for_ruby_report_total.html')
-      expect(File).to exist('reports/human_eval_for_ruby_report_full.html')
-      expect(File).to exist('reports/total.md')
+      expect(File).to exist(File.join(test_reports_dir, 'test_results.json'))
+      expect(File).to exist(File.join(test_reports_dir, 'human_eval_for_ruby_report_total.html'))
+      expect(File).to exist(File.join(test_reports_dir, 'human_eval_for_ruby_report_full.html'))
+      expect(File).to exist(File.join(test_reports_dir, 'total.md'))
     end
 
     it 'generates correct JSON report' do
       generator.generate_all
-      json_content = JSON.parse(File.read('reports/test_results.json'))
+      json_content = JSON.parse(File.read(File.join(test_reports_dir, 'test_results.json')))
 
       expect(json_content['models']).to eq(model_stats)
       expect(json_content['tasks']).to eq(task_results)
@@ -43,7 +42,7 @@ RSpec.describe HumanEval::ReportGenerator do
 
     it 'generates correct markdown report' do
       generator.generate_all
-      md_content = File.read('reports/total.md')
+      md_content = File.read(File.join(test_reports_dir, 'total.md'))
 
       expect(md_content).to include('## Рейтинг')
       expect(md_content).to include('model1: 100%')
@@ -52,8 +51,8 @@ RSpec.describe HumanEval::ReportGenerator do
 
     it 'generates HTML reports with correct content' do
       generator.generate_all
-      total_html = File.read('reports/human_eval_for_ruby_report_total.html')
-      full_html = File.read('reports/human_eval_for_ruby_report_full.html')
+      total_html = File.read(File.join(test_reports_dir, 'human_eval_for_ruby_report_total.html'))
+      full_html = File.read(File.join(test_reports_dir, 'human_eval_for_ruby_report_full.html'))
 
       # Проверяем общие элементы
       [total_html, full_html].each do |html|
