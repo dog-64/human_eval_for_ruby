@@ -32,10 +32,26 @@ jobs:
           COVERAGE: true
           MIN_COVERAGE: 90
 
+      - name: Display coverage report
+        run: |
+          echo "=== Coverage Summary ==="
+          echo "Total Coverage: $(cat coverage/.last_run.json | jq -r '.result.line')%"
+          echo
+          echo "=== Detailed Coverage ==="
+          cat coverage/.resultset.json | jq -r '.RSpec.coverage | to_entries[] | select(.value != null) | "\(.key): \(.value[0])%"'
+
       - name: Check coverage threshold
         run: |
           COVERAGE=$(cat coverage/.last_run.json | jq '.result.line')
           if (( $(echo "$COVERAGE < 90" | bc -l) )); then
-            echo "Test coverage is below 90% (Current: $COVERAGE%)"
+            echo "❌ Test coverage is below 90% (Current: $COVERAGE%)"
             exit 1
-          fi 
+          else
+            echo "✅ Test coverage is above 90% (Current: $COVERAGE%)"
+          fi
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage 
