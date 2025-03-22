@@ -23,8 +23,7 @@ module HumanEval
       debug_log "assert called with condition: #{condition.inspect}, message: #{message.inspect}"
 
       begin
-        # Если condition это результат сравнения (например, a == b)
-        result = condition
+        result = condition.is_a?(Proc) ? condition.call : condition
         debug_log "assert result: #{result.inspect}"
 
         unless result
@@ -39,13 +38,22 @@ module HumanEval
         debug_log 'assertion passed'
         true
       rescue NoMethodError => e
-        debug_log "NoMethodError in assert: #{e.message}"
+        debug_log "Error in assert: #{e.class} - #{e.message}"
         debug_log "Backtrace: #{e.backtrace&.join("\n")}"
         raise AssertionError.new(
           "NoMethodError: #{e.message}",
           true,
           nil,
-          'assert(...) - NoMethodError'
+          "assert(...) - #{e.class}"
+        )
+      rescue ZeroDivisionError => e
+        debug_log "Error in assert: #{e.class} - #{e.message}"
+        debug_log "Backtrace: #{e.backtrace&.join("\n")}"
+        raise AssertionError.new(
+          "Error: divided by 0",
+          true,
+          nil,
+          "assert(...) - #{e.class}"
         )
       rescue StandardError => e
         debug_log "Error in assert: #{e.class} - #{e.message}"
@@ -87,19 +95,28 @@ module HumanEval
 
     def assert_in_delta(expected, actual, delta, message = nil)
       debug_log "assert_in_delta(#{expected.inspect}, #{actual.inspect}, #{delta.inspect}, #{message.inspect})"
-      expected_float = Float(expected)
-      actual_float = Float(actual)
-      delta_float = Float(delta)
+      begin
+        expected_float = Float(expected)
+        actual_float = Float(actual)
+        delta_float = Float(delta)
 
-      unless (expected_float - actual_float).abs <= delta_float
+        unless (expected_float - actual_float).abs <= delta_float
+          raise AssertionError.new(
+            message || "Expected #{actual.inspect} to be within #{delta} of #{expected.inspect}",
+            expected,
+            actual,
+            "assert_in_delta(#{expected.inspect}, #{actual.inspect}, #{delta.inspect})"
+          )
+        end
+        true
+      rescue ArgumentError => e
         raise AssertionError.new(
-          message || "Expected #{actual.inspect} to be within #{delta} of #{expected.inspect}",
+          "Error: invalid value for Float",
           expected,
           actual,
           "assert_in_delta(#{expected.inspect}, #{actual.inspect}, #{delta.inspect})"
         )
       end
-      true
     end
 
     def assert_raises(exception_class = StandardError)
@@ -133,9 +150,14 @@ module HumanEval
     end
 
     def debug_assert(condition, message = nil)
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | debug_assert(#{condition}, #{message})"
-      assert_result = condition
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | assert_result =#{assert_result.inspect}"
+      message_str = message.nil? ? "nil" : message
+      puts "debug_assert(#{condition}, #{message_str})"
+      assert_result = begin
+        condition
+      rescue NoMethodError, ZeroDivisionError, StandardError => e
+        e
+      end
+      puts "assert_result = #{assert_result.inspect}"
 
       assert(condition, message)
     end
