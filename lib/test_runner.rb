@@ -2,14 +2,13 @@
 
 require 'terminal-table'
 require 'timeout'
-require_relative 'logger'
-require_relative 'assert'
-require_relative 'log_levels'
+require_relative 'human_eval/logger'
+require_relative 'human_eval/assert'
+require_relative 'human_eval/log_levels'
 require 'shellwords'
 require 'fileutils'
-require_relative 'human_eval_solver'
+require_relative 'human_eval/solver'
 require_relative 'human_eval/report_generator'
-require_relative 'human_eval/assert'
 
 module TestRunner
   class Runner
@@ -34,7 +33,6 @@ module TestRunner
               end
       "#{color}#{text}\e[0m"
     end
-
     def run_all_tests
       tasks = find_solution_files.map { |f| File.basename(f) }.map { |f| f.gsub(/-.*$/, '') }.uniq.sort
       if tasks.empty?
@@ -666,72 +664,7 @@ module TestRunner
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Отчет о тестировании моделей</title>
-          <style>
-            body {
-              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                           Helvetica, Arial, sans-serif;
-              line-height: 1.6;
-              max-width: 1200px;
-              margin: 0 auto;
-              padding: 20px;
-              color: #333;
-              hyphens: auto;
-              word-wrap: break-word;
-              overflow-wrap: break-word;
-            }
-            h1, h2, h3 {
-              color: #2c3e50;
-            }
-            table {
-              border-collapse: collapse;
-              width: 100%;
-              margin-bottom: 20px;
-              font-size: 14px;
-            }
-            th, td {
-              hyphens: auto;
-              word-wrap: break-word;
-              overflow-wrap: break-word;
-              border: 1px solid #ddd;
-              padding: 8px;
-              text-align: center;
-            }
-            th {
-              background-color: #f2f2f2;
-              position: sticky;
-              top: 0;
-              vertical-align: top;
-            }
-            tr:nth-child(even) {
-              background-color: #f9f9f9;
-            }
-            .success {
-              color: #27ae60;
-              font-weight: bold;
-            }
-            .failure {
-              color: #e74c3c;
-              font-weight: bold;
-            }
-            .model-results td:first-child {
-              text-align: left;
-              font-weight: bold;
-            }
-            .task-results td:first-child {
-              text-align: left;
-              font-weight: bold;
-            }
-            .task-results th {
-              vertical-align: top;
-            }
-            @media (max-width: 768px) {
-              table {
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
-              }
-            }
-          </style>
+          <link rel="stylesheet" href="style.css">
         </head>
         <body>
       HTML

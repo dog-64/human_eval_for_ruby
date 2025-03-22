@@ -5,14 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="34ab27e5-df89-4365-9f7c-834a57db50b5" name="Changes" comment="разное">
+      <change beforePath="$PROJECT_DIR$/.cursor/rules/common.mdc" beforeDir="false" afterPath="$PROJECT_DIR$/.cursor/rules/common.mdc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/human_eval/report_generator.rb" beforeDir="false" afterPath="$PROJECT_DIR$/lib/human_eval/report_generator.rb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/test_runner.rb" beforeDir="false" afterPath="$PROJECT_DIR$/lib/test_runner.rb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/test_runner/runner.rb" beforeDir="false" afterPath="$PROJECT_DIR$/lib/test_runner/runner.rb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reports/test_results.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/reports/total.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/spec/test_runner_spec.rb" beforeDir="false" afterPath="$PROJECT_DIR$/spec/test_runner_spec.rb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,7 +52,7 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "orig-repo",
+    "git-widget-placeholder": "drop-excepts",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",

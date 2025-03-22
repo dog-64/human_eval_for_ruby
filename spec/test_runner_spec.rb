@@ -58,6 +58,27 @@ RSpec.describe TestRunner::Runner do
     end
   end
 
+  describe '#colorize' do
+    it 'возвращает красный цвет для низкого процента' do
+      expect(runner.colorize('text', 20)).to eq("\e[31mtext\e[0m")
+    end
+
+    it 'возвращает желтый цвет для среднего процента' do
+      expect(runner.colorize('text', 50)).to eq("\e[33mtext\e[0m")
+    end
+
+    it 'возвращает зеленый цвет для высокого процента' do
+      expect(runner.colorize('text', 80)).to eq("\e[32mtext\e[0m")
+    end
+
+    it 'корректно обрабатывает граничные значения' do
+      expect(runner.colorize('text', 33)).to eq("\e[31mtext\e[0m")
+      expect(runner.colorize('text', 34)).to eq("\e[33mtext\e[0m")
+      expect(runner.colorize('text', 66)).to eq("\e[33mtext\e[0m")
+      expect(runner.colorize('text', 67)).to eq("\e[32mtext\e[0m")
+    end
+  end
+
   describe '#run_task_tests' do
     it 'runs tests only for mock solutions of specific task' do
       results = runner.run_task_tests('t1')
