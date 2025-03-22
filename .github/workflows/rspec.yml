@@ -26,5 +26,16 @@ jobs:
       # - name: Run RuboCop
         # run: bundle exec rubocop
 
-      - name: Run RSpec
-        run: bundle exec rspec 
+      - name: Run RSpec with coverage
+        run: bundle exec rspec
+        env:
+          COVERAGE: true
+          MIN_COVERAGE: 90
+
+      - name: Check coverage threshold
+        run: |
+          COVERAGE=$(cat coverage/.last_run.json | jq '.result.line')
+          if (( $(echo "$COVERAGE < 90" | bc -l) )); then
+            echo "Test coverage is below 90% (Current: $COVERAGE%)"
+            exit 1
+          fi 

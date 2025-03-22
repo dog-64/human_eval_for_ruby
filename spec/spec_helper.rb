@@ -1,15 +1,18 @@
 # frozen_string_literal: true
 
 require 'simplecov'
-SimpleCov.start do
-  add_filter '/spec/' # исключаем тесты из отчета
-  add_filter '/vendor/'
-  enable_coverage :branch # включаем анализ покрытия веток
+if ENV['COVERAGE']
+  SimpleCov.start do
+    add_filter '/spec/' # исключаем тесты из отчета
+    add_filter '/vendor/'
+    enable_coverage :branch # включаем анализ покрытия веток
+    minimum_coverage ENV.fetch('MIN_COVERAGE', 90).to_i
 
-  # Добавляем группы файлов
-  add_group 'Library', 'lib'
-  add_group 'CLI', 'lib/test_runner_cli.rb'
-  add_group 'Runner', 'lib/test_runner.rb'
+    # Добавляем группы файлов
+    add_group 'Library', 'lib'
+    add_group 'CLI', 'lib/test_runner_cli.rb'
+    add_group 'Runner', 'lib/test_runner.rb'
+  end
 end
 
 require 'rspec'
