@@ -26,5 +26,44 @@ jobs:
       # - name: Run RuboCop
         # run: bundle exec rubocop
 
-      - name: Run RSpec
-        run: bundle exec rspec 
+      - name: Run RSpec with coverage
+        run: bundle exec rspec
+        env:
+          COVERAGE: true
+          MIN_COVERAGE: 90
+
+      - name: Display coverage report
+        run: |
+          echo "=== Coverage Summary ==="
+          echo "Total Coverage: $(cat coverage/.last_run.json | jq -r '.result.line')%"
+          echo
+          echo "=== Detailed Coverage ==="
+          echo "Files with less than 100% coverage:"
+          cat coverage/.resultset.json | jq -r '
+            .RSpec.coverage | to_entries[] | 
+            select(.value.lines != null) | 
+            . as $file |
+            ($file.value.lines | map(select(. == 0)) | length) as $missed |
+            ($file.value.lines | length) as $total |
+            if $missed > 0 then
+              "\($file.key): \(($total - $missed) * 100 / $total | floor)% (\($missed) lines uncovered)"
+            else
+              empty
+            end
+          '
+
+      - name: Check coverage threshold
+        run: |
+          COVERAGE=$(cat coverage/.last_run.json | jq '.result.line')
+          if (( $(echo "$COVERAGE < 90" | bc -l) )); then
+            echo "❌ Test coverage is below 90% (Current: $COVERAGE%)"
+            exit 1
+          else
+            echo "✅ Test coverage is above 90% (Current: $COVERAGE%)"
+          fi
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage 

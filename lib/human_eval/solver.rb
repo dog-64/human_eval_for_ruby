@@ -419,17 +419,12 @@ module HumanEval
     # @param model_name [String] имя модели
     # @return [String] извлеченное содержимое
     def extract_ollama_content(parsed_response, model_name)
-      content = parsed_response.dig('message', 'content')
-
+      content = parsed_response.dig('message', 'content') || parsed_response['response']
+      
       if content.nil? || content.empty?
         error "Пустой ответ от Ollama API для модели #{model_name}"
         error "Ответ API: #{parsed_response.inspect}"
-
-        if parsed_response.key?('response')
-          debug "Найдено поле 'response' в ответе API"
-          content = parsed_response['response']
-        end
-        raise 'Пустой ответ от Ollama API' if content.nil? || content.empty?
+        raise 'Пустой ответ от Ollama API'
       end
 
       content

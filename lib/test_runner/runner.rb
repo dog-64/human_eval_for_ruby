@@ -124,11 +124,26 @@ module TestRunner
         return {}
       end
 
-      @results = Hash.new { |h, k| h[k] = {} }
-      success = test_solution(task, solution)
-      @results[task][model] = success
+      unless File.exist?(solution)
+        error "Решение для задачи #{task} модели #{model} не найдено"
+        return {}
+      end
 
-      display_results([task], [model])
+      @results = Hash.new { |h, k| h[k] = {} }
+      begin
+        success = test_solution(task, solution)
+        @results[task][model] = success || false
+      rescue Interrupt => e
+        error "Тест прерван для задачи #{task} модели #{model}"
+        @results[task][model] = false
+      end
+
+      begin
+        display_results([task], [model])
+      rescue Interrupt
+        error "Отображение результатов прервано для задачи #{task} модели #{model}"
+      end
+
       @results
     end
 
@@ -157,6 +172,17 @@ module TestRunner
 
       # Возвращаем результат
       model_stats
+    end
+
+    def log_error_details(error)
+      debug_log '  ❌ Тест не пройден:'
+      debug_log "     #{error[:class]}: #{error[:message]}"
+      debug_log '     Стек вызовов:'
+      if error[:backtrace]&.any?
+        error[:backtrace].each { |line| debug_log "       #{line}" }
+      else
+        debug_log '       Стек вызовов недоступен'
+      end
     end
 
     private
@@ -360,26 +386,6 @@ module TestRunner
                           }
                         })
           end
-        rescue StandardError => e
-          debug_log "  ❌ Ошибка в тестовом потоке: #{e.class} - #{e.message}"
-          result.push({
-                        status: :error,
-                        error: {
-                          class: e.class.name,
-                          message: e.message || 'Unknown error',
-                          backtrace: e.backtrace || []
-                        }
-                      })
-        rescue Exception => e
-          debug_log "  ❌ Критическая ошибка в тестовом потоке: #{e.class} - #{e.message}"
-          result.push({
-                        status: :error,
-                        error: {
-                          class: e.class.name,
-                          message: e.message || 'Unknown error',
-                          backtrace: e.backtrace || []
-                        }
-                      })
         end
 
         begin
@@ -393,14 +399,7 @@ module TestRunner
               return true
             when :error
               error = res[:error]
-              debug_log '  ❌ Тест не пройден:'
-              debug_log "     #{error[:class]}: #{error[:message]}"
-              debug_log '     Стек вызовов:'
-              if error[:backtrace]&.any?
-                error[:backtrace].each { |line| debug_log "       #{line}" }
-              else
-                debug_log '       Стек вызовов недоступен'
-              end
+              log_error_details(error)
               return false
             else
               error "  ❌ Неизвестный статус результата: #{res[:status]}"
@@ -437,6 +436,14 @@ module TestRunner
         e.backtrace.each { |line| debug_log "       #{line}" }
         false
       end
+    end
+
+    def handle_timeout(thread)
+      thread.kill
+      thread.join(1) # Даем потоку секунду на завершение
+      error "  ❌ Превышен лимит времени выполнения (#{@timeout} секунд)"
+      error '     Возможно, в решении есть бесконечный цикл'
+      false
     end
 
     def display_total_console(tasks, models)

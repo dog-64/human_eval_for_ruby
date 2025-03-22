@@ -2,14 +2,13 @@
 
 require 'terminal-table'
 require 'timeout'
-require_relative 'logger'
-require_relative 'assert'
-require_relative 'log_levels'
+require_relative 'human_eval/logger'
+require_relative 'human_eval/assert'
+require_relative 'human_eval/log_levels'
 require 'shellwords'
 require 'fileutils'
-require_relative 'human_eval_solver'
+require_relative 'human_eval/solver'
 require_relative 'human_eval/report_generator'
-require_relative 'human_eval/assert'
 
 module TestRunner
   class Runner
@@ -34,7 +33,6 @@ module TestRunner
               end
       "#{color}#{text}\e[0m"
     end
-
     def run_all_tests
       tasks = find_solution_files.map { |f| File.basename(f) }.map { |f| f.gsub(/-.*$/, '') }.uniq.sort
       if tasks.empty?
@@ -165,6 +163,16 @@ module TestRunner
     def test_solution(task, solution_file)
       test_file = "tasks/#{task}-assert.rb"
 
+      return false unless validate_files(solution_file, test_file)
+      return false unless validate_solution_content(solution_file)
+      return false unless validate_solution_syntax(solution_file)
+
+      run_tests(task, solution_file, test_file)
+    end
+
+    private
+
+    def validate_files(solution_file, test_file)
       unless File.exist?(solution_file)
         error "\nРешение #{File.basename(solution_file)}:"
         error "  ❌ Файл решения не найден: #{solution_file}"
@@ -177,288 +185,258 @@ module TestRunner
         return false
       end
 
-      # Проверяем на пустой файл
+      true
+    end
+
+    def validate_solution_content(solution_file)
       solution_content = File.read(solution_file)
       if solution_content.strip.empty?
         error '  ❌ Файл решения пуст'
         return false
       end
+      true
+    end
 
+    def validate_solution_syntax(solution_file)
+      solution_content = File.read(solution_file)
       begin
         debug_log '  📝 Анализ синтаксиса решения...'
         temp_context = Module.new
         temp_context.module_eval(solution_content)
         debug_log '  ✅ Синтаксис решения корректен'
+        true
       rescue SyntaxError => e
-        error '  ❌ Ошибка синтаксиса в решении:'
-        error "     #{e.message}"
-        return false
+        handle_syntax_error(e)
       rescue StandardError => e
-        # Если в решении есть посторонний код, который вызывает ошибку,
-        # логируем ошибку, но продолжаем выполнение
-        warn '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при проверке синтаксиса:'
-        warn "     #{e.class}: #{e.message}"
-        warn '     Тесты могут не пройти из-за отсутствия необходимых методов'
+        handle_validation_error(e)
       end
+    end
 
-      test_context = Module.new do
+    def handle_syntax_error(e)
+      error '  ❌ Ошибка синтаксиса в решении:'
+      error "     #{e.message}"
+      false
+    end
+
+    def handle_validation_error(e)
+      warn '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при проверке синтаксиса:'
+      warn "     #{e.class}: #{e.message}"
+      warn '     Тесты могут не пройти из-за отсутствия необходимых методов'
+      true
+    end
+
+    def create_test_context
+      Module.new do
         include HumanEval::Assert
         include HumanEval::LogLevels
 
         class << self
-          attr_writer :log_level
-        end
+          attr_accessor :log_level, :options
 
-        class << self
-          attr_reader :log_level
-        end
-
-        class << self
-          attr_writer :options
-        end
-
-        class << self
-          attr_reader :options
-        end
-
-        def self.handle_error(e)
-          debug_log "Handling error: #{e.class} - #{e.message}"
-          debug_log "Backtrace: #{e.backtrace&.join("\n")}"
-          {
-            status: :error,
-            error: {
-              class: e.class.name,
-              message: e.message || 'Unknown error',
-              backtrace: e.backtrace || []
+          def handle_error(e)
+            debug_log "Handling error: #{e.class} - #{e.message}"
+            debug_log "Backtrace: #{e.backtrace&.join("\n")}"
+            {
+              status: :error,
+              error: {
+                class: e.class.name,
+                message: e.message || 'Unknown error',
+                backtrace: e.backtrace || []
+              }
             }
-          }
-        end
-
-        begin
-          module_eval(solution_content)
-        rescue StandardError => e
-          # Если в решении есть посторонний код, который вызывает ошибку,
-          # логируем ошибку, но продолжаем выполнение тестов
-          warn '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при загрузке в контекст тестов:'
-          warn "     #{e.class}: #{e.message}"
-          warn '     Тесты могут не пройти из-за отсутствия необходимых методов'
+          end
         end
 
         extend self
       end
+    end
 
+    def run_tests(task, solution_file, test_file)
+      test_context = create_test_context
       test_context.log_level = @options[:log_level] || :normal
 
       begin
         test_content = File.read(test_file)
-        debug_log '  🧪 Запуск тестов...'
-        debug_log '  📄 Содержимое теста:'
-        debug_log test_content
-        debug_log '  📄 Содержимое решения:'
-        debug_log solution_content
-        debug_log '  🔍 Доступные методы в контексте:'
-        debug_log test_context.methods.sort.inspect
+        solution_content = File.read(solution_file)
+        log_test_info(test_content, solution_content, test_context)
 
         result = Queue.new
-        thread = Thread.new do
-          # Создаем новый контекст для каждого теста
-          test_context = Module.new do
-            include HumanEval::Assert
-            include HumanEval::LogLevels
+        thread = Thread.new { execute_tests(result, solution_content, test_content) }
 
-            class << self
-              attr_writer :log_level
-            end
-
-            class << self
-              attr_reader :log_level
-            end
-
-            class << self
-              attr_writer :options
-            end
-
-            class << self
-              attr_reader :options
-            end
-
-            def self.handle_error(e)
-              debug_log "Handling error: #{e.class} - #{e.message}"
-              debug_log "Backtrace: #{e.backtrace&.join("\n")}"
-              {
-                status: :error,
-                error: {
-                  class: e.class.name,
-                  message: e.message || 'Unknown error',
-                  backtrace: e.backtrace || []
-                }
-              }
-            end
-          end
-
-          test_context.module_eval(solution_content)
-          test_context.extend(test_context)
-          test_context.log_level = @options[:log_level] || :normal
-          test_context.options = @options.dup # Добавляем .dup чтобы избежать проблем с разделяемыми объектами
-
-          begin
-            debug_log '  🔄 Выполняем тесты в контексте...'
-            debug_log "  🔄 Выполняем тесты для #{File.basename(solution_file)}..."
-
-            # Показываем и выполняем тесты по одному
-            debug_log '  📝 Тесты:'
-            test_lines = test_content.split("\n")
-            test_lines.each_with_index do |line, idx|
-              next if line.strip.empty?
-
-              line_number = idx + 1
-              debug_log "     #{line_number}: #{line.strip}"
-
-              begin
-                test_context.module_eval(line)
-              rescue HumanEval::Assert::AssertionError => e
-                # Сохраняем информацию о не пройденном тесте
-                File.basename(solution_file).split('-')[1..].join('-').sub('.rb', '')
-                task = File.basename(solution_file).split('-').first
-
-                debug_log "\n  ❌ Тест не пройден на строке #{line_number}:"
-                debug_log "     #{line.strip}"
-
-                if e.expected && e.actual
-                  debug_log "     Ожидалось: #{e.expected.inspect}"
-                  debug_log "     Получено: #{e.actual.inspect}"
-                end
-
-                result.push({
-                              status: :error,
-                              error: {
-                                class: e.class.name,
-                                message: e.message,
-                                expected: e.expected,
-                                actual: e.actual,
-                                line: line_number,
-                                test: line.strip
-                              }
-                            })
-                return false
-              end
-            end
-
-            debug_log '  ✅ Тесты выполнены успешно'
-            result.push({ status: :success })
-          rescue StandardError => e
-            debug_log "  ❌ Ошибка при выполнении тестов: #{e.class} - #{e.message}"
-            debug_log "  ❌ Ошибка: #{e.message || 'Unknown error'}"
-            result.push(test_context.handle_error(e))
-          rescue Exception => e
-            debug_log "  ❌ Критическая ошибка при выполнении тестов: #{e.class} - #{e.message}"
-            result.push({
-                          status: :error,
-                          error: {
-                            class: e.class.name,
-                            message: e.message || 'Unknown error',
-                            backtrace: e.backtrace || []
-                          }
-                        })
-          end
-        rescue StandardError => e
-          debug_log "  ❌ Ошибка в тестовом потоке: #{e.class} - #{e.message}"
-          result.push({
-                        status: :error,
-                        error: {
-                          class: e.class.name,
-                          message: e.message || 'Unknown error',
-                          backtrace: e.backtrace || []
-                        }
-                      })
-        rescue Exception => e
-          debug_log "  ❌ Критическая ошибка в тестовом потоке: #{e.class} - #{e.message}"
-          result.push({
-                        status: :error,
-                        error: {
-                          class: e.class.name,
-                          message: e.message || 'Unknown error',
-                          backtrace: e.backtrace || []
-                        }
-                      })
-        end
-
-        begin
-          Timeout.timeout(@timeout) do
-            debug_log '  ⏳ Ожидаем результат выполнения тестов...'
-            res = result.pop
-            debug_log "   Получен результат: #{res.inspect}"
-            case res[:status]
-            when :success
-              debug_log '  ✅ Все тесты пройдены успешно'
-              return true
-            when :error
-              error = res[:error]
-              debug_log '  ❌ Тест не пройден:'
-              debug_log "     #{error[:class]}: #{error[:message]}"
-              debug_log '     Стек вызовов:'
-              if error[:backtrace]&.any?
-                error[:backtrace].each { |line| debug_log "       #{line}" }
-              else
-                debug_log '       Стек вызовов недоступен'
-              end
-              return false
-            else
-              error "  ❌ Неизвестный статус результата: #{res[:status]}"
-              return false
-            end
-          end
-        rescue Timeout::Error
-          thread.kill
-          thread.join(1) # Даем потоку секунду на завершение
-          error "  ❌ Превышен лимит времени выполнения (#{@timeout} секунд)"
-          error '     Возможно, в решении есть бесконечный цикл'
-          false
-        ensure
-          thread.kill unless thread.nil? || !thread.alive?
-        end
+        handle_test_execution(thread, result)
       rescue Interrupt => e
-        error "\n  ⚠️  Тест прерван пользователем (Ctrl+C)"
-        debug_log "  📍 Место прерывания: #{e.backtrace.first}"
-        false
+        handle_interrupt(e)
       rescue NoMethodError => e
-        error '  ❌ Ошибка в тесте: попытка вызвать метод у nil'
-        error "     #{e.message}"
-        debug_log "     Место ошибки: #{e.backtrace.first}"
-        debug_log '     Полный стек вызовов:'
-        e.backtrace.each { |line| debug_log "       #{line}" }
-        false
+        handle_no_method_error(e)
       rescue NameError => e
-        error '  ❌ Ошибка в тесте: неопределенная переменная или метод'
-        error "     #{e.message}"
-        debug_log "     Место ошибки: #{e.backtrace.first}"
-        debug_log '     Полный стек вызовов:'
-        e.backtrace.each { |line| debug_log "       #{line}" }
-        false
+        handle_name_error(e)
       rescue RegexpError => e
-        error '  ❌ Ошибка в регулярном выражении:'
-        error "     #{e.message}"
-        debug_log "     Место ошибки: #{e.backtrace.first}"
-        debug_log '     Полный стек вызовов:'
-        e.backtrace.each { |line| debug_log "       #{line}" }
-        false
+        handle_regexp_error(e)
       rescue StandardError => e
-        error '  ❌ Неожиданная ошибка:'
-        error "     Тип: #{e.class}"
-        error "     Сообщение: #{e.message}"
-        debug_log "     Место ошибки: #{e.backtrace.first}"
-        debug_log '     Полный стек вызовов:'
-        e.backtrace.each { |line| debug_log "       #{line}" }
-        false
+        handle_standard_error(e)
       rescue Exception => e
-        error '  ❌ Критическая ошибка:'
-        error "     Тип: #{e.class}"
-        error "     Сообщение: #{e.message}"
-        debug_log "     Место ошибки: #{e.backtrace.first}"
-        debug_log '     Полный стек вызовов:'
-        e.backtrace.each { |line| debug_log "       #{line}" }
+        handle_critical_error(e)
+      end
+    end
+
+    def handle_no_method_error(e)
+      error '  ❌ Ошибка в тесте: попытка вызвать метод у nil'
+      error "     #{e.message}"
+      log_error_backtrace(e)
+      false
+    end
+
+    def handle_name_error(e)
+      error '  ❌ Ошибка в тесте: неопределенная переменная или метод'
+      error "     #{e.message}"
+      log_error_backtrace(e)
+      false
+    end
+
+    def handle_regexp_error(e)
+      error '  ❌ Ошибка в регулярном выражении:'
+      error "     #{e.message}"
+      log_error_backtrace(e)
+      false
+    end
+
+    def log_error_backtrace(e)
+      debug_log "     Место ошибки: #{e.backtrace.first}"
+      debug_log '     Полный стек вызовов:'
+      e.backtrace.each { |line| debug_log "       #{line}" }
+    end
+
+    def handle_assertion_error(e, line_number, line)
+      debug_log "\n  ❌ Тест не пройден на строке #{line_number}:"
+      debug_log "     #{line.strip}"
+
+      if e.expected && e.actual
+        debug_log "     Ожидалось: #{e.expected.inspect}"
+        debug_log "     Получено: #{e.actual.inspect}"
+      end
+
+      {
+        status: :error,
+        error: {
+          class: e.class.name,
+          message: e.message,
+          expected: e.expected,
+          actual: e.actual,
+          line: line_number,
+          test: line.strip
+        }
+      }
+    end
+
+    def log_test_info(test_content, solution_content, test_context)
+      debug_log '  🧪 Запуск тестов...'
+      debug_log '  📄 Содержимое теста:'
+      debug_log test_content
+      debug_log '  📄 Содержимое решения:'
+      debug_log solution_content
+      debug_log '  🔍 Доступные методы в контексте:'
+      debug_log test_context.methods.sort.inspect
+    end
+
+    def execute_tests(result, solution_content, test_content)
+      test_context = create_test_context
+      test_context.module_eval(solution_content)
+      test_context.extend(test_context)
+      test_context.log_level = @options[:log_level] || :normal
+      test_context.options = @options.dup
+
+      run_test_lines(test_content, test_context, result)
+    end
+
+    def run_test_lines(test_content, test_context, result)
+      debug_log '  📝 Тесты:'
+      test_lines = test_content.split("\n")
+      
+      test_lines.each_with_index do |line, idx|
+        next if line.strip.empty?
+        
+        begin
+          test_context.module_eval(line)
+        rescue HumanEval::Assert::AssertionError => e
+          result.push(handle_assertion_error(e, idx + 1, line))
+          return false
+        end
+      end
+
+      debug_log '  ✅ Тесты выполнены успешно'
+      result.push({ status: :success })
+    rescue StandardError => e
+      result.push(test_context.handle_error(e))
+    end
+
+    def handle_test_execution(thread, result)
+      Timeout.timeout(@timeout) do
+        debug_log '  ⏳ Ожидаем результат выполнения тестов...'
+        res = result.pop
+        process_test_result(res)
+      end
+    rescue Timeout::Error
+      handle_timeout(thread)
+    ensure
+      thread.kill if thread&.alive?
+    end
+
+    def process_test_result(res)
+      debug_log "   Получен результат: #{res.inspect}"
+      case res[:status]
+      when :success
+        debug_log '  ✅ Все тесты пройдены успешно'
+        true
+      when :error
+        log_error_details(res[:error])
+        false
+      else
+        error "  ❌ Неизвестный статус результата: #{res[:status]}"
         false
       end
+    end
+
+    def log_error_details(error)
+      debug_log '  ❌ Тест не пройден:'
+      debug_log "     #{error[:class]}: #{error[:message]}"
+      debug_log '     Стек вызовов:'
+      if error[:backtrace]&.any?
+        error[:backtrace].each { |line| debug_log "       #{line}" }
+      else
+        debug_log '       Стек вызовов недоступен'
+      end
+    end
+
+    end
+
+    def handle_timeout(thread)
+      thread.kill
+      thread.join(1)
+      error "  ❌ Превышен лимит времени выполнения (#{@timeout} секунд)"
+      error '     Возможно, в решении есть бесконечный цикл'
+      false
+    end
+
+    def handle_interrupt(e)
+      error "\n  ⚠️  Тест прерван пользователем (Ctrl+C)"
+      debug_log "  📍 Место прерывания: #{e.backtrace.first}"
+      false
+    end
+
+    def handle_standard_error(e)
+      error '  ❌ Неожиданная ошибка:'
+      error "     Тип: #{e.class}"
+      error "     Сообщение: #{e.message}"
+      log_error_backtrace(e)
+      false
+    end
+
+    def handle_critical_error(e)
+      error '  ❌ Критическая ошибка:'
+      error "     Тип: #{e.class}"
+      error "     Сообщение: #{e.message}"
+      log_error_backtrace(e)
+      false
     end
 
     def display_total_console(tasks, models)
@@ -686,72 +664,7 @@ module TestRunner
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Отчет о тестировании моделей</title>
-          <style>
-            body {
-              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                           Helvetica, Arial, sans-serif;
-              line-height: 1.6;
-              max-width: 1200px;
-              margin: 0 auto;
-              padding: 20px;
-              color: #333;
-              hyphens: auto;
-              word-wrap: break-word;
-              overflow-wrap: break-word;
-            }
-            h1, h2, h3 {
-              color: #2c3e50;
-            }
-            table {
-              border-collapse: collapse;
-              width: 100%;
-              margin-bottom: 20px;
-              font-size: 14px;
-            }
-            th, td {
-              hyphens: auto;
-              word-wrap: break-word;
-              overflow-wrap: break-word;
-              border: 1px solid #ddd;
-              padding: 8px;
-              text-align: center;
-            }
-            th {
-              background-color: #f2f2f2;
-              position: sticky;
-              top: 0;
-              vertical-align: top;
-            }
-            tr:nth-child(even) {
-              background-color: #f9f9f9;
-            }
-            .success {
-              color: #27ae60;
-              font-weight: bold;
-            }
-            .failure {
-              color: #e74c3c;
-              font-weight: bold;
-            }
-            .model-results td:first-child {
-              text-align: left;
-              font-weight: bold;
-            }
-            .task-results td:first-child {
-              text-align: left;
-              font-weight: bold;
-            }
-            .task-results th {
-              vertical-align: top;
-            }
-            @media (max-width: 768px) {
-              table {
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
-              }
-            }
-          </style>
+          <link rel="stylesheet" href="style.css">
         </head>
         <body>
       HTML
