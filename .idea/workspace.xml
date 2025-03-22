@@ -4,16 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="34ab27e5-df89-4365-9f7c-834a57db50b5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.cursor/rules/common.mdc" beforeDir="false" afterPath="$PROJECT_DIR$/.cursor/rules/common.mdc" afterDir="false" />
+    <list default="true" id="34ab27e5-df89-4365-9f7c-834a57db50b5" name="Changes" comment="разное">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/assert.rb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/human_eval/assert.rb" beforeDir="false" afterPath="$PROJECT_DIR$/lib/human_eval/assert.rb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/run_tests.rb" beforeDir="false" afterPath="$PROJECT_DIR$/lib/run_tests.rb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/human_eval/report_generator.rb" beforeDir="false" afterPath="$PROJECT_DIR$/lib/human_eval/report_generator.rb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/test_runner.rb" beforeDir="false" afterPath="$PROJECT_DIR$/lib/test_runner.rb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reports/human_watch_ruby_report_full.html" beforeDir="false" afterPath="$PROJECT_DIR$/reports/human_watch_ruby_report_full.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reports/human_watch_ruby_report_total.html" beforeDir="false" afterPath="$PROJECT_DIR$/reports/human_watch_ruby_report_total.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spec/assert_spec.rb" beforeDir="false" afterPath="$PROJECT_DIR$/spec/assert_spec.rb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/test_runner/runner.rb" beforeDir="false" afterPath="$PROJECT_DIR$/lib/test_runner/runner.rb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reports/test_results.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/reports/total.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/spec/test_runner_spec.rb" beforeDir="false" afterPath="$PROJECT_DIR$/spec/test_runner_spec.rb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,7 +57,7 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "json-reports",
+    "git-widget-placeholder": "orig-repo",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -86,9 +85,22 @@
       <updated>1742642062657</updated>
       <workItem from="1742642064255" duration="2044000" />
     </task>
+    <task id="LOCAL-00001" summary="разное">
+      <option name="closed" value="true" />
+      <created>1742659980059</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1742659980059</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="разное" />
+    <option name="LAST_COMMIT_MESSAGE" value="разное" />
   </component>
 </project>
