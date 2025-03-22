@@ -2,9 +2,10 @@
 
 require 'spec_helper'
 require 'webmock/rspec'
+require 'tmpdir'
 
 RSpec.describe HumanEval::SolverClass do
-  let(:tasks_dir) { 'spec/fixtures/tasks' }
+  let(:tasks_dir) { File.join(Dir.tmpdir, "test_tasks_#{Time.now.to_i}") }
   let(:task_content) do
     <<~TASK
       # Напишите функцию, которая складывает два числа
@@ -34,18 +35,23 @@ RSpec.describe HumanEval::SolverClass do
   end
 
   before(:all) do
-    FileUtils.mkdir_p('spec/fixtures/tasks')
+    # Ничего не делаем в before(:all), так как каждый тест будет использовать свою временную директорию
   end
 
   after(:all) do
-    FileUtils.rm_rf('spec/fixtures/tasks')
+    # Ничего не делаем в after(:all), так как каждый тест сам очистит свою временную директорию
   end
 
   before(:each) do
+    FileUtils.mkdir_p(tasks_dir)
     File.write(File.join(tasks_dir, 't1.md'), task_content)
     ENV['OPENROUTER_API_KEY'] = 'test_key'
     WebMock.reset!
     WebMock.disable_net_connect!
+  end
+
+  after(:each) do
+    FileUtils.rm_rf(tasks_dir) if Dir.exist?(tasks_dir)
   end
 
   describe 'initialization' do
