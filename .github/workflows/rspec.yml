@@ -38,7 +38,19 @@ jobs:
           echo "Total Coverage: $(cat coverage/.last_run.json | jq -r '.result.line')%"
           echo
           echo "=== Detailed Coverage ==="
-          cat coverage/.resultset.json | jq -r '.RSpec.coverage | to_entries[] | select(.value != null) | "\(.key): \(.value[0])%"'
+          echo "Files with less than 100% coverage:"
+          cat coverage/.resultset.json | jq -r '
+            .RSpec.coverage | to_entries[] | 
+            select(.value.lines != null) | 
+            . as $file |
+            ($file.value.lines | map(select(. == 0)) | length) as $missed |
+            ($file.value.lines | length) as $total |
+            if $missed > 0 then
+              "\($file.key): \(($total - $missed) * 100 / $total | floor)% (\($missed) lines uncovered)"
+            else
+              empty
+            end
+          '
 
       - name: Check coverage threshold
         run: |
