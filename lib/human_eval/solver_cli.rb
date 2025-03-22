@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
-require_relative 'human_eval/solver/help'
 require 'thor'
-require_relative 'human_eval_solver'
+require 'fileutils'
+require_relative 'solver/help'
+require_relative 'solver'
 
 module HumanEval
   # обработка командной строки решателя заданий

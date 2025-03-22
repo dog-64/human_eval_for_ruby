@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require_relative '../lib/human_eval_cli'
-require_relative '../lib/human_eval_converter'
+require_relative '../lib/human_eval/cli'
+require_relative '../lib/human_eval/converter'
 
 RSpec.describe HumanEval::CLI do
   let(:cli) { described_class.new }

@@ -3,7 +3,7 @@
 
 require 'terminal-table'
 require 'pry'
-require_relative 'lib/assert'
+require_relative 'human_eval/assert'
 
 class TestRunner
   DONE_MARK = '✓'

@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
-
-require 'bundler/setup'
-require_relative '../lib/human_eval_cli'
+# frozen_string_literal: true
+require_relative '../lib/human_eval/cli'
 
 HumanEval::CLI.start(ARGV) 
