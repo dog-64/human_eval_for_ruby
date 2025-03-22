@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'simplecov'
 SimpleCov.start do
-  add_filter '/spec/'  # исключаем тесты из отчета
-  enable_coverage :branch  # включаем анализ покрытия веток
-  
+  add_filter '/spec/' # исключаем тесты из отчета
+  enable_coverage :branch # включаем анализ покрытия веток
+
   # Добавляем группы файлов
   add_group 'Library', 'lib'
   add_group 'CLI', 'lib/test_runner_cli.rb'
@@ -37,4 +39,4 @@ RSpec.configure do |config|
   config.before(:each) do
     WebMock.reset!
   end
-end 
+end

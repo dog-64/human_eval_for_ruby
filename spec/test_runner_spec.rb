@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'fileutils'
 require_relative '../lib/test_runner'
@@ -23,16 +25,16 @@ RSpec.describe TestRunner::Runner do
     File.write(File.join(tasks_dir, 't1-model1.rb'), solution1_content)
     File.write(File.join(tasks_dir, 't1-model2.rb'), solution2_content)
     File.write(File.join(tasks_dir, 't1-assert.rb'), test_content)
-    
+
     # Подменяем метод find_solution_files для тестов
     allow(runner).to receive(:find_solution_files).with(no_args).and_return([
-      'tasks/t1-model1.rb',
-      'tasks/t1-model2.rb'
-    ])
+                                                                              'tasks/t1-model1.rb',
+                                                                              'tasks/t1-model2.rb'
+                                                                            ])
     allow(runner).to receive(:find_solution_files).with('t1').and_return([
-      'tasks/t1-model1.rb',
-      'tasks/t1-model2.rb'
-    ])
+                                                                           'tasks/t1-model1.rb',
+                                                                           'tasks/t1-model2.rb'
+                                                                         ])
   end
 
   after(:each) do
@@ -78,7 +80,7 @@ RSpec.describe TestRunner::Runner do
   describe '#run_model_tests' do
     it 'runs test only for specified model' do
       results = runner.run_model_tests('t1', 'model1')
-      
+
       expect(results).to be_a(Hash)
       expect(results['t1'].keys).to contain_exactly('model1')
       expect(results['t1']['model1']).to be true
@@ -86,7 +88,7 @@ RSpec.describe TestRunner::Runner do
 
     it 'runs tests for model2 and detects failure' do
       results = runner.run_model_tests('t1', 'model2')
-      
+
       expect(results).to be_a(Hash)
       expect(results['t1'].keys).to contain_exactly('model2')
       expect(results['t1']['model2']).to be false
@@ -111,7 +113,7 @@ RSpec.describe TestRunner::Runner do
 
       it 'handles syntax errors gracefully' do
         results = runner.run_model_tests('t1', 'model1')
-        
+
         expect(results).to be_a(Hash)
         expect(results['t1']['model1']).to be false
       end
@@ -134,10 +136,10 @@ RSpec.describe TestRunner::Runner do
 
       it 'handles timeouts gracefully' do
         results = runner.run_model_tests('t1', 'model1')
-        
+
         expect(results).to be_a(Hash)
         expect(results['t1']['model1']).to be false
       end
     end
   end
-end 
+end
