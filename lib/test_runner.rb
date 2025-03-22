@@ -361,26 +361,6 @@ module TestRunner
                           }
                         })
           end
-        rescue StandardError => e
-          debug_log "  ❌ Ошибка в тестовом потоке: #{e.class} - #{e.message}"
-          result.push({
-                        status: :error,
-                        error: {
-                          class: e.class.name,
-                          message: e.message || 'Unknown error',
-                          backtrace: e.backtrace || []
-                        }
-                      })
-        rescue Exception => e
-          debug_log "  ❌ Критическая ошибка в тестовом потоке: #{e.class} - #{e.message}"
-          result.push({
-                        status: :error,
-                        error: {
-                          class: e.class.name,
-                          message: e.message || 'Unknown error',
-                          backtrace: e.backtrace || []
-                        }
-                      })
         end
 
         begin
