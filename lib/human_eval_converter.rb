@@ -93,15 +93,13 @@ class HumanEvalConverter
 
   def validate_environment
     raise "Файл #{@input_file} не найден" unless File.exist?(@input_file)
-
-    return if ENV['OPENROUTER_API_KEY']
-
-    raise 'Установите переменную OPENROUTER_API_KEY в файле .env'
+    raise 'Установите переменную OPENROUTER_API_KEY в файле .env' unless OPENROUTER_API_KEY
   end
 
   def read_tasks
     debug "Читаем файл #{@input_file}"
-    File.readlines(@input_file).map { |line| JSON.parse(line) }
+    content = File.read(@input_file)
+    content.split("\n").map { |line| JSON.parse(line) }
   end
 
   def create_task_markdown(task)
