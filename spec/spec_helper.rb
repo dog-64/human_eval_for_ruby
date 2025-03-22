@@ -1,6 +1,8 @@
 require 'webmock/rspec'
 require 'fileutils'
 require_relative '../lib/human_eval_solver'
+require_relative '../lib/test_runner'
+require_relative '../lib/assert'
 
 WebMock.enable!
 WebMock.disable_net_connect!
