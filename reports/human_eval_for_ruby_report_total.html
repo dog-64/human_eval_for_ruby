@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Отчет о тестировании моделей</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      color: #333;
+      hyphens: auto;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    h1, h2, h3 { color: #2c3e50; }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    th, td {
+      hyphens: auto;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+      position: sticky;
+      top: 0;
+      vertical-align: top;
+    }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+    .success {
+      color: #27ae60;
+      font-weight: bold;
+    }
+    .failure {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+    .model-results td:first-child,
+    .task-results td:first-child {
+      text-align: left;
+      font-weight: bold;
+    }
+    .task-results th { vertical-align: top; }
+    @media (max-width: 768px) {
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+<body>
+<h1>Суммарный отчет о тестировании моделей</h1>
+<p>Дата: 2025-03-22 19:10:20</p>
+<div class='model-results'>
+<table>
+<tr><th>Модель</th><th>Успешность</th></tr>
+<tr><td>google_gemini_2_0_flash_001</td><td>86%</td></tr>
+<tr><td>openai_o3_mini_high</td><td>84%</td></tr>
+<tr><td>deepseek_deepseek_chat_free</td><td>79%</td></tr>
+<tr><td>google_gemini_2_0_flash_lite_001</td><td>79%</td></tr>
+<tr><td>deepseek_deepseek_chat</td><td>77%</td></tr>
+<tr><td>openai_gpt_4o_mini</td><td>76%</td></tr>
+<tr><td>google_gemini_flash_1_5</td><td>75%</td></tr>
+<tr><td>mistralai_codestral_2501</td><td>75%</td></tr>
+<tr><td>qwen_qwen_2_5_coder_32b_instruct</td><td>74%</td></tr>
+<tr><td>meta_llama_llama_3_1_70b_instruct</td><td>69%</td></tr>
+<tr><td>mistralai_mistral_small_3_1_24b_instruct</td><td>67%</td></tr>
+<tr><td>ollama_codellama</td><td>30%</td></tr>
+<tr><td>ollama_codellama_13b</td><td>26%</td></tr>
+<tr><td>ollama_llama3_2</td><td>25%</td></tr>
+<tr><td>ollama_codellama_34b</td><td>17%</td></tr>
+</table></div></body></html>
