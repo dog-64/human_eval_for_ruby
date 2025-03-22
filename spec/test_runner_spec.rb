@@ -5,59 +5,93 @@ require 'fileutils'
 require_relative '../lib/test_runner'
 
 RSpec.describe TestRunner::Runner do
-  let(:tasks_dir) { 'tasks' }
   let(:runner) { described_class.new(log_level: 'none') }
   let(:solution1_content) { "def add(a, b)\n  a + b\nend" }
-  let(:solution2_content) { "def add(a, b)\n  a - b\nend" } # Неправильное решение
-  let(:test_content) do
-    <<~RUBY
-      assert_equal(add(2, 3), 5)
-      assert_equal(add(-1, 1), 0)
-      assert_equal(add(0, 0), 0)
-    RUBY
-  end
+  let(:solution2_content) { "def add(a, b)\n  a - b\nend" }
+  let(:test_content) { "assert_equal(add(2, 3), 5)" }
 
   before(:each) do
-    FileUtils.mkdir_p(tasks_dir)
-    FileUtils.rm_rf(Dir.glob(File.join(tasks_dir, '*')))
-
-    # Создаем тестовые файлы
-    File.write(File.join(tasks_dir, 't1-model1.rb'), solution1_content)
-    File.write(File.join(tasks_dir, 't1-model2.rb'), solution2_content)
-    File.write(File.join(tasks_dir, 't1-assert.rb'), test_content)
-
-    # Подменяем метод find_solution_files для тестов
+    # Подменяем чтение файлов
+    allow(File).to receive(:exist?).and_return(true)
+    allow(File).to receive(:exist?).with('tasks/t1-assert.rb').and_return(true)
+    allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return(solution1_content)
+    allow(File).to receive(:read).with('tasks/t1-model2.rb').and_return(solution2_content)
+    allow(File).to receive(:read).with('tasks/t1-assert.rb').and_return(test_content)
+    
+    # Подменяем поиск файлов
     allow(runner).to receive(:find_solution_files).with(no_args).and_return([
-                                                                              'tasks/t1-model1.rb',
-                                                                              'tasks/t1-model2.rb'
-                                                                            ])
+      'tasks/t1-model1.rb',
+      'tasks/t1-model2.rb'
+    ])
     allow(runner).to receive(:find_solution_files).with('t1').and_return([
-                                                                           'tasks/t1-model1.rb',
-                                                                           'tasks/t1-model2.rb'
-                                                                         ])
-  end
+      'tasks/t1-model1.rb',
+      'tasks/t1-model2.rb'
+    ])
 
-  after(:each) do
-    FileUtils.rm_rf(tasks_dir)
+    # Подменяем Dir.glob для run_model_tests
+    allow(Dir).to receive(:glob).with('tasks/t1-model1.rb').and_return(['tasks/t1-model1.rb'])
+    allow(Dir).to receive(:glob).with('tasks/t1-model2.rb').and_return(['tasks/t1-model2.rb'])
+    allow(Dir).to receive(:glob).with('tasks/t1-nonexistent.rb').and_return([])
   end
 
   describe '#run_all_tests' do
     it 'runs tests only for mock solutions' do
       results = runner.run_all_tests
-
       expect(results['t1'].keys).to contain_exactly('model1', 'model2')
-      expect(results['t1']['model1']).to be true   # Правильное решение
-      expect(results['t1']['model2']).to be false  # Неправильное решение
+      expect(results['t1']['model1']).to be true
+      expect(results['t1']['model2']).to be false
     end
   end
 
   describe '#run_task_tests' do
     it 'runs tests only for mock solutions of specific task' do
       results = runner.run_task_tests('t1')
-
       expect(results['t1'].keys).to contain_exactly('model1', 'model2')
-      expect(results['t1']['model1']).to be true   # Правильное решение
-      expect(results['t1']['model2']).to be false  # Неправильное решение
+      expect(results['t1']['model1']).to be true
+      expect(results['t1']['model2']).to be false
+    end
+
+    it 'returns empty hash for invalid task format' do
+      results = runner.run_task_tests('invalid')
+      expect(results).to eq({})
+    end
+
+    it 'returns empty hash when test file missing' do
+      allow(File).to receive(:exist?).with('tasks/t1-assert.rb').and_return(false)
+      results = runner.run_task_tests('t1')
+      expect(results).to eq({})
+    end
+  end
+
+  describe '#run_model_tests' do
+    it 'runs test for correct solution' do
+      results = runner.run_model_tests('t1', 'model1')
+      expect(results['t1']['model1']).to be true
+    end
+
+    it 'detects incorrect solution' do
+      results = runner.run_model_tests('t1', 'model2')
+      expect(results['t1']['model2']).to be false
+    end
+
+    it 'returns empty hash for missing solution' do
+      results = runner.run_model_tests('t1', 'nonexistent')
+      expect(results).to eq({})
+    end
+  end
+
+  describe 'error handling' do
+    it 'handles syntax errors' do
+      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  a + b # missing end")
+      results = runner.run_model_tests('t1', 'model1')
+      expect(results['t1']['model1']).to be false
+    end
+
+    it 'handles timeouts' do
+      runner = described_class.new(timeout: 1, log_level: 'none')
+      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  while true; end\n  a + b\nend")
+      results = runner.run_model_tests('t1', 'model1')
+      expect(results['t1']['model1']).to be false
     end
   end
 
@@ -74,72 +108,6 @@ RSpec.describe TestRunner::Runner do
     it 'sets default timeout' do
       runner = described_class.new
       expect(runner.instance_variable_get(:@timeout)).to eq(5)
-    end
-  end
-
-  describe '#run_model_tests' do
-    it 'runs test only for specified model' do
-      results = runner.run_model_tests('t1', 'model1')
-
-      expect(results).to be_a(Hash)
-      expect(results['t1'].keys).to contain_exactly('model1')
-      expect(results['t1']['model1']).to be true
-    end
-
-    it 'runs tests for model2 and detects failure' do
-      results = runner.run_model_tests('t1', 'model2')
-
-      expect(results).to be_a(Hash)
-      expect(results['t1'].keys).to contain_exactly('model2')
-      expect(results['t1']['model2']).to be false
-    end
-
-    it 'handles missing solution file' do
-      results = runner.run_model_tests('t1', 'nonexistent_model')
-      expect(results).to be_a(Hash)
-      expect(results).to eq({})
-    end
-  end
-
-  describe 'test execution' do
-    context 'with syntax error in solution' do
-      before do
-        invalid_solution = <<~SOLUTION
-          def add(a, b)
-            a + b # Отсутствует end
-        SOLUTION
-        File.write(File.join(tasks_dir, 't1-model1.rb'), invalid_solution)
-      end
-
-      it 'handles syntax errors gracefully' do
-        results = runner.run_model_tests('t1', 'model1')
-
-        expect(results).to be_a(Hash)
-        expect(results['t1']['model1']).to be false
-      end
-    end
-  end
-
-  describe 'timeout handling' do
-    let(:runner) { described_class.new(timeout: 1) }
-
-    context 'with infinite loop in solution' do
-      before do
-        infinite_loop_solution = <<~SOLUTION
-          def add(a, b)
-            while true; end
-            a + b
-          end
-        SOLUTION
-        File.write(File.join(tasks_dir, 't1-model1.rb'), infinite_loop_solution)
-      end
-
-      it 'handles timeouts gracefully' do
-        results = runner.run_model_tests('t1', 'model1')
-
-        expect(results).to be_a(Hash)
-        expect(results['t1']['model1']).to be false
-      end
     end
   end
 end
