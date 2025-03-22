@@ -29,7 +29,8 @@ module HumanEval
       'openai_o3_mini_high' => { name: 'openai/o3-mini-high', provider: 'openrouter.ai', note: 'дорогой, медленный' },
 
       'anthropic_claude_3_5_sonnet' => { name: 'anthropic/claude-3.5-sonnet', provider: 'openrouter.ai' },
-      'mistralai_mistral-small-3_1-24b-instruct' => { name: 'mistralai/mistral-small-3.1-24b-instruct', provider: 'openrouter.ai', note: '32b https://openrouter.ai/mistralai/mistral-small-3.1-24b-instruct-2503' },
+      'mistralai_mistral-small-3_1-24b-instruct' => { name: 'mistralai/mistral-small-3.1-24b-instruct',
+                                                      provider: 'openrouter.ai', note: '32b https://openrouter.ai/mistralai/mistral-small-3.1-24b-instruct-2503' },
 
       'ollama_llama3_2' => { name: 'llama3.2', provider: 'ollama' },
       'ollama_codellama' => { name: 'codellama', provider: 'ollama',

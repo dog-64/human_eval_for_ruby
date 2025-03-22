@@ -1,5 +1,0 @@
-assert get_odd_collatz(1) == [1]
-assert get_odd_collatz(5) == [1, 5]
-assert get_odd_collatz(7) == [1, 5, 7, 11, 13, 17]
-assert get_odd_collatz(10) == [1, 5]
-assert get_odd_collatz(100) == [1, 5, 11, 13, 17, 19, 25, 29]

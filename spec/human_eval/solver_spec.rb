@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'webmock/rspec'
 
@@ -19,7 +21,7 @@ RSpec.describe HumanEval::SolverClass do
       - в ответе давай только ruby код, без markdown разметки
       - не повторяй код, если он уже был в ответе
       - не нужно никаких примеров использования кроме текста самой функции
-       
+      #{' '}
 
     PROMPT
   end
@@ -100,10 +102,10 @@ RSpec.describe HumanEval::SolverClass do
 
     it 'processes task with OpenRouter model successfully' do
       solver.process
-      
+
       solution_file = File.join(tasks_dir, 't1-anthropic_claude_3_5_sonnet.rb')
       expect(File.exist?(solution_file)).to be true
-      
+
       solution_content = File.read(solution_file)
       expect(solution_content).to include('def add(a, b)')
       expect(solution_content).to include('a + b')
@@ -155,10 +157,10 @@ RSpec.describe HumanEval::SolverClass do
 
     it 'processes task with Ollama model successfully' do
       solver.process
-      
+
       solution_file = File.join(tasks_dir, 't1-ollama_codellama.rb')
       expect(File.exist?(solution_file)).to be true
-      
+
       solution_content = File.read(solution_file)
       expect(solution_content).to include('def add(a, b)')
       expect(solution_content).to include('return a + b')
@@ -194,7 +196,9 @@ RSpec.describe HumanEval::SolverClass do
       end
 
       it 'handles API errors gracefully' do
-        expect { solver.process }.to raise_error(RuntimeError, /Ошибка API при вызове модели anthropic\/claude-3\.5-sonnet/)
+        expect do
+          solver.process
+        end.to raise_error(RuntimeError, %r{Ошибка API при вызове модели anthropic/claude-3\.5-sonnet})
       end
     end
 
@@ -231,4 +235,4 @@ RSpec.describe HumanEval::SolverClass do
       end
     end
   end
-end 
+end

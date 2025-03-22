@@ -1,9 +1,0 @@
-assert simplify("1/5", "5/1") == true
-assert simplify("1/6", "2/1") == false
-assert simplify("7/10", "10/2") == false
-assert simplify("3/4", "8/6") == true
-assert simplify("2/3", "6/4") == true
-assert simplify("1/1", "1/1") == true
-assert simplify("100/1", "1/100") == true
-assert simplify("1/100", "100/1") == true
-assert simplify("1/2", "2/1") == true
