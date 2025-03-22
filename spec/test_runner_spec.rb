@@ -12,8 +12,9 @@ RSpec.describe TestRunner::Runner do
   let(:total_md_content) { "## Рейтинг\n\n- model1: 100%\n- model2: 0%\n" }
 
   before(:each) do
-    # Создаем временную директорию для отчетов
-    FileUtils.mkdir_p('reports')
+    # Подменяем все операции с файлами
+    allow(FileUtils).to receive(:mkdir_p).with(any_args).and_return(true)
+    allow(FileUtils).to receive(:rm_rf).with(any_args).and_return(true)
 
     # Подменяем чтение файлов
     allow(File).to receive(:exist?).and_return(true)
@@ -23,6 +24,11 @@ RSpec.describe TestRunner::Runner do
     allow(File).to receive(:read).with('tasks/t1-assert.rb').and_return(test_content)
     allow(File).to receive(:read).with('reports/total.md').and_return(total_md_content)
     allow(File).to receive(:write).with(any_args).and_return(true)
+
+    # Мокаем создание файлов отчетов
+    report_file = double('report_file')
+    allow(report_file).to receive(:puts).with(any_args)
+    allow(File).to receive(:open).and_yield(report_file)
 
     # Подменяем поиск файлов
     allow(Dir).to receive(:glob).with('tasks/t*-*.rb').and_return([
@@ -37,16 +43,8 @@ RSpec.describe TestRunner::Runner do
     allow(Dir).to receive(:glob).with('tasks/t1-model2.rb').and_return(['tasks/t1-model2.rb'])
     allow(Dir).to receive(:glob).with('tasks/t1-nonexistent.rb').and_return([])
 
-    # Подменяем создание каталогов
-    allow(FileUtils).to receive(:mkdir_p).with(any_args).and_return(true)
-
     # Мокаем методы работы с README.md
     allow_any_instance_of(HumanEval::ReportGenerator).to receive(:update_readme)
-  end
-
-  after(:each) do
-    # Удаляем временные файлы после тестов
-    FileUtils.rm_rf('reports')
   end
 
   describe '#run_all_tests' do

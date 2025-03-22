@@ -3,9 +3,10 @@ require 'fileutils'
 
 module HumanEval
   class ReportGenerator
-    def initialize(results)
+    def initialize(results, reports_dir: 'reports')
       @results = results
-      FileUtils.mkdir_p('reports')
+      @reports_dir = reports_dir
+      FileUtils.mkdir_p(@reports_dir)
     end
 
     def generate_all
@@ -18,7 +19,7 @@ module HumanEval
     private
 
     def save_json
-      File.write('reports/test_results.json', JSON.pretty_generate({
+      File.write(File.join(@reports_dir, 'test_results.json'), JSON.pretty_generate({
         timestamp: Time.now.strftime('%Y-%m-%d %H:%M:%S'),
         models: @results[:model_stats],
         tasks: @results[:task_results]
@@ -36,19 +37,28 @@ module HumanEval
       @results[:model_stats].each do |model, percentage|
         content += "- #{model}: #{percentage}%\n"
       end
-      File.write('reports/total.md', content)
+      File.write(File.join(@reports_dir, 'total.md'), content)
     end
 
     def update_readme
-      readme = File.read('README.md')
+      readme_path = File.join(@reports_dir, 'README.md')
+      return unless File.exist?(readme_path)
+      readme = File.read(readme_path)
       new_content = readme.sub(
         /## Рейтинг.*?(?=##|\z)/m,
-        File.read('reports/total.md') + "\n"
+        File.read(File.join(@reports_dir, 'total.md')) + "\n"
       )
-      File.write('README.md', new_content)
+      File.write(readme_path, new_content)
     end
 
-    private
+    def add_soft_hyphens(text)
+      text.gsub('_', '_&shy;')
+    end
+
+    def find_solution_files(task = nil)
+      pattern = task ? "#{task}_solution.rb" : "*_solution.rb"
+      Dir.glob(File.join(@reports_dir, 'solutions', "**", pattern)).sort
+    end
 
     def generate_html_header
       <<~HTML
@@ -121,7 +131,7 @@ module HumanEval
     end
 
     def create_total_html(html_header)
-      File.open('reports/human_eval_for_ruby_report_total.html', 'w') do |file|
+      File.open(File.join(@reports_dir, 'human_eval_for_ruby_report_total.html'), 'w') do |file|
         file.puts html_header
         file.puts '<h1>Суммарный отчет о тестировании моделей</h1>'
         file.puts "<p>Дата: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}</p>"
@@ -136,7 +146,7 @@ module HumanEval
     end
 
     def create_full_html(html_header)
-      File.open('reports/human_eval_for_ruby_report_full.html', 'w') do |file|
+      File.open(File.join(@reports_dir, 'human_eval_for_ruby_report_full.html'), 'w') do |file|
         file.puts html_header
         file.puts '<h1>Отчет о тестировании моделей</h1>'
         file.puts "<p>Дата: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}</p>"

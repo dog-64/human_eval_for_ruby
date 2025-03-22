@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="34ab27e5-df89-4365-9f7c-834a57db50b5" name="Changes" comment="разное" />
+    <list default="true" id="34ab27e5-df89-4365-9f7c-834a57db50b5" name="Changes" comment="разное">
+      <change afterPath="$PROJECT_DIR$/reports/human_eval_for_ruby_report_full.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/reports/human_eval_for_ruby_report_total.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/reports/test_results.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/reports/total.md" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -48,7 +53,7 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "drop-excepts",
+    "git-widget-placeholder": "main",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",

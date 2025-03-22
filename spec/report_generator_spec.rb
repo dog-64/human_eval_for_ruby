@@ -72,4 +72,44 @@ RSpec.describe HumanEval::ReportGenerator do
       expect(full_html).to include('✗') # для неуспешного теста
     end
   end
+
+  describe '#update_readme' do
+    let(:test_reports_dir) { Dir.mktmpdir('test_reports_') }
+    let(:test_results) { { model_stats: { 'model1' => 100, 'model2' => 50 }, task_results: {} } }
+    let(:generator) { described_class.new(test_results, reports_dir: test_reports_dir) }
+    let(:readme_path) { File.join(test_reports_dir, 'README.md') }
+    let(:total_path) { File.join(test_reports_dir, 'total.md') }
+
+    before do
+      FileUtils.mkdir_p(test_reports_dir)
+      File.write(readme_path, "# Test\n\n## Рейтинг\nold_model: 0%\n\n## Other section\nsome content")
+      File.write(total_path, "model1: 100%\nmodel2: 50%")
+      
+      allow(File).to receive(:exist?).with(readme_path).and_return(true)
+      allow(File).to receive(:exist?).with(total_path).and_return(true)
+      allow(File).to receive(:read).with(any_args) do |path|
+        if path == readme_path
+          File.read(readme_path)
+        elsif path == total_path
+          File.read(total_path)
+        end
+      end
+      allow(File).to receive(:write).with(any_args) do |path, content|
+        if path == readme_path
+          expect(content).to include("model1: 100%")
+          expect(content).to include("model2: 50%")
+          expect(content).not_to include("old_model: 0%")
+          expect(content).to include("## Рейтинг")
+        end
+      end
+    end
+
+    after do
+      FileUtils.remove_entry(test_reports_dir)
+    end
+
+    it 'updates rating section in README.md' do
+      generator.generate_all
+    end
+  end
 end 
