@@ -3,6 +3,7 @@
 require 'simplecov'
 SimpleCov.start do
   add_filter '/spec/' # исключаем тесты из отчета
+  add_filter '/vendor/'
   enable_coverage :branch # включаем анализ покрытия веток
 
   # Добавляем группы файлов
@@ -11,12 +12,17 @@ SimpleCov.start do
   add_group 'Runner', 'lib/test_runner.rb'
 end
 
+require 'rspec'
 require 'webmock/rspec'
+require 'vcr'
+require 'pry'
+require 'pry-byebug'
 require 'fileutils'
-require_relative '../lib/human_eval_solver'
-require_relative '../lib/test_runner'
-require_relative '../lib/assert'
-require_relative '../lib/human_eval_converter'
+
+require_relative '../lib/human_eval/solver'
+require_relative '../lib/test_runner/runner'
+require_relative '../lib/human_eval/assert'
+require_relative '../lib/human_eval/converter'
 
 WebMock.enable!
 WebMock.disable_net_connect!

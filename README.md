@@ -14,9 +14,11 @@
 - mistralai_codestral_2501: 75%
 - qwen_qwen_2_5_coder_32b_instruct: 74%
 - meta_llama_llama_3_1_70b_instruct: 69%
-
-[Этот рейтинг](reports/human_watch_ruby_report_total.md).
-[Подробный отчет](reports/human_watch_ruby_report_full.md).
+- mistralai_mistral_small_3_1_24b_instruct: 67%
+- ollama_codellama: 30%
+- ollama_codellama_13b: 26%
+- ollama_llama3_2: 25%
+- ollama_codellama_34b: 17%
 
 ## Возможности
 

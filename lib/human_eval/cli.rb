@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 require 'thor'
-require_relative 'human_eval_converter'
+require 'fileutils'
+require_relative 'converter'
 
 module HumanEval
   class CLI < Thor

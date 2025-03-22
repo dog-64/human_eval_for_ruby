@@ -2,13 +2,13 @@
 
 require 'terminal-table'
 require 'timeout'
-require_relative 'logger'
-require_relative 'assert'
-require_relative 'log_levels'
+require_relative '../human_eval/logger'
+require_relative '../human_eval/assert'
+require_relative '../human_eval/log_levels'
 require 'shellwords'
 require 'fileutils'
-require_relative 'human_eval_solver'
-require_relative 'human_eval/report_generator'
+require_relative '../human_eval/solver'
+require_relative '../human_eval/report_generator'
 
 module TestRunner
   class Runner
@@ -477,45 +477,6 @@ module TestRunner
       model_stats.each do |model, percentage|
         puts "- #{model} - #{percentage}%"
       end
-    end
-
-    # Метод не используется, можно удалить
-    def display_detailed_console(tasks, models)
-      # Существующий код для детального отчета
-      rows = []
-      model_scores = Hash.new(0)
-      total_tasks = tasks.size
-
-      tasks.each do |task|
-        row = [task]
-        models.each do |model|
-          status = @results[task][model]
-          row << (status ? DONE_MARK : FAIL_MARK)
-          model_scores[model] += 1 if status
-        end
-        rows << row
-      end
-
-      # Добавляем строку с итоговыми оценками
-      score_row = ['Score']
-      models.each do |model|
-        percentage = (model_scores[model] * 100.0 / total_tasks).round
-        score_row << colorize("#{percentage}%", percentage)
-      end
-      rows << :separator
-      rows << score_row
-
-      table = Terminal::Table.new do |t|
-        t.headings = ['Task'] + models
-        t.rows = rows
-        t.style = {
-          alignment: :center,
-          padding_left: 1,
-          padding_right: 1
-        }
-      end
-
-      puts table
     end
 
     def display_results(tasks, models)

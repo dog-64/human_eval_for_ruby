@@ -2,6 +2,7 @@
 
 require 'json'
 require 'fileutils'
+require 'timeout'
 require 'net/http'
 require 'uri'
 require 'dotenv'

@@ -1,12 +1,5 @@
 #!/usr/bin/env ruby
 
-require_relative '../lib/human_eval_converter'
+require_relative '../lib/human_eval/cli'
 
-begin
-  converter = HumanEvalConverter.new
-  converter.process
-  puts "Конвертация успешно завершена"
-rescue StandardError => e
-  puts "Ошибка: #{e.message}"
-  exit 1
-end 
+HumanEval::CLI.start(ARGV) 
