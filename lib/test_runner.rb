@@ -571,8 +571,8 @@ module TestRunner
       FileUtils.mkdir_p('reports')
 
       # Путь к отчетам
-      total_report_file = File.join('reports', 'human_watch_ruby_report_total.html')
-      full_report_file = File.join('reports', 'human_watch_ruby_report_full.html')
+      total_report_file = File.join('reports', 'human_eval_for_ruby_report_total.html')
+      full_report_file = File.join('reports', 'human_eval_for_ruby_report_full.html')
 
       # Общий HTML заголовок и стили для обоих отчетов
       html_header = generate_html_header

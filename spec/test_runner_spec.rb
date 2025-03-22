@@ -9,17 +9,18 @@ RSpec.describe TestRunner::Runner do
   let(:solution1_content) { "def add(a, b)\n  a + b\nend" }
   let(:solution2_content) { "def add(a, b)\n  a - b\nend" }
   let(:test_content) { "assert_equal(add(2, 3), 5)" }
-  let(:readme_content) { "## Рейтинг\n\nСтарый рейтинг\n\n## Другой раздел" }
   let(:total_md_content) { "## Рейтинг\n\n- model1: 100%\n- model2: 0%\n" }
 
   before(:each) do
+    # Создаем временную директорию для отчетов
+    FileUtils.mkdir_p('reports')
+    
     # Подменяем чтение файлов
     allow(File).to receive(:exist?).and_return(true)
     allow(File).to receive(:exist?).with('tasks/t1-assert.rb').and_return(true)
     allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return(solution1_content)
     allow(File).to receive(:read).with('tasks/t1-model2.rb').and_return(solution2_content)
     allow(File).to receive(:read).with('tasks/t1-assert.rb').and_return(test_content)
-    allow(File).to receive(:read).with('README.md').and_return(readme_content)
     allow(File).to receive(:read).with('reports/total.md').and_return(total_md_content)
     allow(File).to receive(:write).with(any_args).and_return(true)
     
@@ -38,6 +39,14 @@ RSpec.describe TestRunner::Runner do
 
     # Подменяем создание каталогов
     allow(FileUtils).to receive(:mkdir_p).with(any_args).and_return(true)
+    
+    # Мокаем методы работы с README.md
+    allow_any_instance_of(HumanEval::ReportGenerator).to receive(:update_readme)
+  end
+
+  after(:each) do
+    # Удаляем временные файлы после тестов
+    FileUtils.rm_rf('reports')
   end
 
   describe '#run_all_tests' do

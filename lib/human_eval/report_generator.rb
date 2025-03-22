@@ -121,7 +121,7 @@ module HumanEval
     end
 
     def create_total_html(html_header)
-      File.open('reports/human_watch_ruby_report_total.html', 'w') do |file|
+      File.open('reports/human_eval_for_ruby_report_total.html', 'w') do |file|
         file.puts html_header
         file.puts '<h1>Суммарный отчет о тестировании моделей</h1>'
         file.puts "<p>Дата: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}</p>"
@@ -136,7 +136,7 @@ module HumanEval
     end
 
     def create_full_html(html_header)
-      File.open('reports/human_watch_ruby_report_full.html', 'w') do |file|
+      File.open('reports/human_eval_for_ruby_report_full.html', 'w') do |file|
         file.puts html_header
         file.puts '<h1>Отчет о тестировании моделей</h1>'
         file.puts "<p>Дата: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}</p>"

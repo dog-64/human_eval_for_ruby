@@ -420,27 +420,6 @@ module TestRunner
         error "\n  ⚠️  Тест прерван пользователем (Ctrl+C)"
         debug_log "  📍 Место прерывания: #{e.backtrace.first}"
         false
-      rescue NoMethodError => e
-        error '  ❌ Ошибка в тесте: попытка вызвать метод у nil'
-        error "     #{e.message}"
-        debug_log "     Место ошибки: #{e.backtrace.first}"
-        debug_log '     Полный стек вызовов:'
-        e.backtrace.each { |line| debug_log "       #{line}" }
-        false
-      rescue NameError => e
-        error '  ❌ Ошибка в тесте: неопределенная переменная или метод'
-        error "     #{e.message}"
-        debug_log "     Место ошибки: #{e.backtrace.first}"
-        debug_log '     Полный стек вызовов:'
-        e.backtrace.each { |line| debug_log "       #{line}" }
-        false
-      rescue RegexpError => e
-        error '  ❌ Ошибка в регулярном выражении:'
-        error "     #{e.message}"
-        debug_log "     Место ошибки: #{e.backtrace.first}"
-        debug_log '     Полный стек вызовов:'
-        e.backtrace.each { |line| debug_log "       #{line}" }
-        false
       rescue StandardError => e
         error '  ❌ Неожиданная ошибка:'
         error "     Тип: #{e.class}"
@@ -531,8 +510,8 @@ module TestRunner
       FileUtils.mkdir_p('reports')
 
       # Путь к отчетам
-      total_report_file = File.join('reports', 'human_watch_ruby_report_total.html')
-      full_report_file = File.join('reports', 'human_watch_ruby_report_full.html')
+      total_report_file = File.join('reports', 'human_eval_for_ruby_report_total.html')
+      full_report_file = File.join('reports', 'human_eval_for_ruby_report_full.html')
 
       # Общий HTML заголовок и стили для обоих отчетов
       html_header = generate_html_header
