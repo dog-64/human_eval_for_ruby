@@ -14,7 +14,7 @@ RSpec.describe TestRunner::Runner do
   before(:each) do
     # Создаем временную директорию для отчетов
     FileUtils.mkdir_p('reports')
-    
+
     # Подменяем чтение файлов
     allow(File).to receive(:exist?).and_return(true)
     allow(File).to receive(:exist?).with('tasks/t1-assert.rb').and_return(true)
@@ -23,23 +23,23 @@ RSpec.describe TestRunner::Runner do
     allow(File).to receive(:read).with('tasks/t1-assert.rb').and_return(test_content)
     allow(File).to receive(:read).with('reports/total.md').and_return(total_md_content)
     allow(File).to receive(:write).with(any_args).and_return(true)
-    
+
     # Подменяем поиск файлов
     allow(Dir).to receive(:glob).with('tasks/t*-*.rb').and_return([
-      'tasks/t1-model1.rb',
-      'tasks/t1-model2.rb'
-    ])
+                                                                    'tasks/t1-model1.rb',
+                                                                    'tasks/t1-model2.rb'
+                                                                  ])
     allow(Dir).to receive(:glob).with('tasks/t1-*.rb').and_return([
-      'tasks/t1-model1.rb',
-      'tasks/t1-model2.rb'
-    ])
+                                                                    'tasks/t1-model1.rb',
+                                                                    'tasks/t1-model2.rb'
+                                                                  ])
     allow(Dir).to receive(:glob).with('tasks/t1-model1.rb').and_return(['tasks/t1-model1.rb'])
     allow(Dir).to receive(:glob).with('tasks/t1-model2.rb').and_return(['tasks/t1-model2.rb'])
     allow(Dir).to receive(:glob).with('tasks/t1-nonexistent.rb').and_return([])
 
     # Подменяем создание каталогов
     allow(FileUtils).to receive(:mkdir_p).with(any_args).and_return(true)
-    
+
     # Мокаем методы работы с README.md
     allow_any_instance_of(HumanEval::ReportGenerator).to receive(:update_readme)
   end
@@ -114,9 +114,7 @@ RSpec.describe TestRunner::Runner do
       results = runner.run_model_tests('t1', 'nonexistent')
       expect(results).to eq({})
     end
-  end
 
-  describe 'error handling' do
     it 'handles syntax errors' do
       allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  a + b # missing end")
       results = runner.run_model_tests('t1', 'model1')
@@ -126,6 +124,41 @@ RSpec.describe TestRunner::Runner do
     it 'handles timeouts' do
       runner = described_class.new(timeout: 1, log_level: 'none')
       allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  while true; end\n  a + b\nend")
+      results = runner.run_model_tests('t1', 'model1')
+      expect(results['t1']['model1']).to be false
+    end
+
+    it 'handles empty solution files' do
+      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("   \n  \n  ")
+      results = runner.run_model_tests('t1', 'model1')
+      expect(results['t1']['model1']).to be false
+    end
+
+    it 'handles missing solution files' do
+      allow(File).to receive(:exist?).with('tasks/t1-model1.rb').and_return(false)
+      results = runner.run_model_tests('t1', 'model1')
+      expect(results).to eq({})
+    end
+
+    it 'handles runtime errors in solution' do
+      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  raise 'Runtime error'\nend")
+      results = runner.run_model_tests('t1', 'model1')
+      expect(results['t1']['model1']).to be false
+    end
+
+    it 'handles invalid task format' do
+      results = runner.run_model_tests('invalid', 'model1')
+      expect(results).to eq({})
+    end
+
+    it 'handles invalid model name format' do
+      results = runner.run_model_tests('t1', 'invalid/model')
+      expect(results).to eq({})
+    end
+
+    it 'handles interrupts gracefully' do
+      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  a + b\nend")
+      allow(runner).to receive(:test_solution).and_raise(Interrupt)
       results = runner.run_model_tests('t1', 'model1')
       expect(results['t1']['model1']).to be false
     end
@@ -144,6 +177,42 @@ RSpec.describe TestRunner::Runner do
     it 'sets default timeout' do
       runner = described_class.new
       expect(runner.instance_variable_get(:@timeout)).to eq(5)
+    end
+  end
+
+  # Тесты для метода log_error_details
+  describe '#log_error_details' do
+    let(:runner) { described_class.new(log_level: :debug) }
+
+    it 'логирует детали ошибки с полным стеком' do
+      error = {
+        class: 'RuntimeError',
+        message: 'test error',
+        backtrace: ['line1', 'line2']
+      }
+
+      expect(runner).to receive(:debug_log).with('  ❌ Тест не пройден:')
+      expect(runner).to receive(:debug_log).with('     RuntimeError: test error')
+      expect(runner).to receive(:debug_log).with('     Стек вызовов:')
+      expect(runner).to receive(:debug_log).with('       line1')
+      expect(runner).to receive(:debug_log).with('       line2')
+
+      runner.log_error_details(error)
+    end
+
+    it 'корректно обрабатывает отсутствие стека вызовов' do
+      error = {
+        class: 'RuntimeError',
+        message: 'test error',
+        backtrace: nil
+      }
+
+      expect(runner).to receive(:debug_log).with('  ❌ Тест не пройден:')
+      expect(runner).to receive(:debug_log).with('     RuntimeError: test error')
+      expect(runner).to receive(:debug_log).with('     Стек вызовов:')
+      expect(runner).to receive(:debug_log).with('       Стек вызовов недоступен')
+
+      runner.log_error_details(error)
     end
   end
 end
