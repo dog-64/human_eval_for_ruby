@@ -1,3 +1,14 @@
+require 'simplecov'
+SimpleCov.start do
+  add_filter '/spec/'  # исключаем тесты из отчета
+  enable_coverage :branch  # включаем анализ покрытия веток
+  
+  # Добавляем группы файлов
+  add_group 'Library', 'lib'
+  add_group 'CLI', 'lib/test_runner_cli.rb'
+  add_group 'Runner', 'lib/test_runner.rb'
+end
+
 require 'webmock/rspec'
 require 'fileutils'
 require_relative '../lib/human_eval_solver'

@@ -20,5 +20,6 @@ group :test do
   gem "rspec-mocks"
   gem "rspec-support"
   gem "rspec-core"
+  gem 'simplecov', '~> 0.22.0', require: false
 end
 
