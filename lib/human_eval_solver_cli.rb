@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'human_eval/solver/help.rb'
+require_relative 'human_eval/solver/help'
 require 'thor'
 require_relative 'human_eval_solver'
 
@@ -13,7 +13,7 @@ module HumanEval
     # Показывать справку, если команда не указана
     def self.start(given_args = ARGV, config = {})
       given_args = ['commands'] if given_args.empty?
-      super(given_args, config)
+      super
     end
 
     desc 'solve TASKS_DIR', 'Solve tasks from TASKS_DIR using AI models'

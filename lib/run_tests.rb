@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
-require "terminal-table"
-require "pry"
-require_relative "lib/assert"
+require 'terminal-table'
+require 'pry'
+require_relative 'lib/assert'
 
 class TestRunner
   DONE_MARK = '✓'
@@ -20,16 +21,17 @@ class TestRunner
     models = solutions.map do |f|
       filename = File.basename(f)
       next if filename.end_with?('_asserts.rb')
-      filename.split('-')[1..-1].join('-').sub('.rb', '')
+
+      filename.split('-')[1..].join('-').sub('.rb', '')
     end.compact.uniq.sort
 
     @results = Hash.new { |h, k| h[k] = {} }
 
     tasks.each do |task|
       task_solutions = Dir.glob("tasks/#{task}-*.rb").reject { |f| f.end_with?('-asserts.rb') }
-      
+
       task_solutions.each do |solution|
-        model = File.basename(solution).split('-')[1..-1].join('-').sub('.rb', '')
+        model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
         success = test_solution(task, solution)
         @results[task][model] = success
       end
@@ -46,12 +48,12 @@ class TestRunner
     end
 
     solutions = Dir.glob("tasks/#{task}-*.rb").reject { |f| f.end_with?('-asserts.rb') }.sort
-    models = solutions.map { |s| File.basename(s).split('-')[1..-1].join('-').sub('.rb', '') }
+    models = solutions.map { |s| File.basename(s).split('-')[1..].join('-').sub('.rb', '') }
 
     @results[task] = {}
 
     solutions.each do |solution|
-      model = File.basename(solution).split('-')[1..-1].join('-').sub('.rb', '')
+      model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
       success = test_solution(task, solution)
       @results[task][model] = success
     end
@@ -77,33 +79,31 @@ class TestRunner
   private
 
   def test_solution(task, solution_file)
-    begin
-      test_file = "tasks/#{task}-asserts.rb"
-      
-      unless File.exist?(solution_file)
-        debug "Файл решения не найден: #{solution_file}" if defined?(debug)
-        return false
-      end
-      
-      unless File.exist?(test_file)
-        debug "Файл тестов не найден: #{test_file}" if defined?(debug)
-        return false
-      end
+    test_file = "tasks/#{task}-asserts.rb"
 
-      # Создаем новый контекст для каждого теста
-      test_context = Module.new
-      
-      # Загружаем решение в контекст
-      test_context.module_eval(File.read(solution_file))
-      
-      # Загружаем и выполняем тесты в том же контексте
-      test_context.module_eval(File.read(test_file))
-      
-      true
-    rescue StandardError => e
-      debug "Ошибка в тесте #{task} (#{solution_file}): #{e.message}" if defined?(debug)
-      false
+    unless File.exist?(solution_file)
+      debug "Файл решения не найден: #{solution_file}" if defined?(debug)
+      return false
     end
+
+    unless File.exist?(test_file)
+      debug "Файл тестов не найден: #{test_file}" if defined?(debug)
+      return false
+    end
+
+    # Создаем новый контекст для каждого теста
+    test_context = Module.new
+
+    # Загружаем решение в контекст
+    test_context.module_eval(File.read(solution_file))
+
+    # Загружаем и выполняем тесты в том же контексте
+    test_context.module_eval(File.read(test_file))
+
+    true
+  rescue StandardError => e
+    debug "Ошибка в тесте #{task} (#{solution_file}): #{e.message}" if defined?(debug)
+    false
   end
 
   def display_results(tasks, models)
@@ -133,7 +133,7 @@ class TestRunner
     table = Terminal::Table.new do |t|
       t.headings = ['Task'] + models
       t.rows = rows
-      t.style = { 
+      t.style = {
         alignment: :center,
         padding_left: 1,
         padding_right: 1
@@ -154,8 +154,8 @@ elsif ARGV.length == 1
 elsif ARGV.length == 2
   runner.run_model_tests(ARGV[0], ARGV[1])
 else
-  puts "Использование:"
-  puts "  ruby run_tests.rb                    # запуск всех тестов"
-  puts "  ruby run_tests.rb t8                 # запуск тестов для задачи t8"
-  puts "  ruby run_tests.rb t8 deepseek        # запуск тестов задачи t8 для модели deepseek"
-end 
+  puts 'Использование:'
+  puts '  ruby run_tests.rb                    # запуск всех тестов'
+  puts '  ruby run_tests.rb t8                 # запуск тестов для задачи t8'
+  puts '  ruby run_tests.rb t8 deepseek        # запуск тестов задачи t8 для модели deepseek'
+end

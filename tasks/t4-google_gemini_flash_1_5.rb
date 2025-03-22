@@ -1,5 +1,0 @@
-def mean_absolute_deviation(numbers)
-  return 0.0 if numbers.empty?
-  mean = numbers.sum.to_f / numbers.size
-  numbers.map { |x| (x - mean).abs }.sum.to_f / numbers.size
-end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'thor'
 require_relative 'test_runner'
 
@@ -6,15 +8,15 @@ module TestRunner
     package_name 'Test Runner'
 
     class_option :log_level,
-                type: :string,
-                enum: %w[none normal debug],
-                default: 'normal',
-                desc: 'Уровень логирования'
+                 type: :string,
+                 enum: %w[none normal debug],
+                 default: 'normal',
+                 desc: 'Уровень логирования'
 
     class_option :report_total,
-                type: :boolean,
-                default: false,
-                desc: 'Показать только сводный отчет по моделям'
+                 type: :boolean,
+                 default: false,
+                 desc: 'Показать только сводный отчет по моделям'
 
     desc 'all', 'Запустить все тесты'
     def all
@@ -38,4 +40,4 @@ module TestRunner
       true
     end
   end
-end 
+end

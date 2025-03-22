@@ -1,5 +1,7 @@
-require_relative "logger"
-require_relative "log_levels"
+# frozen_string_literal: true
+
+require_relative 'logger'
+require_relative 'log_levels'
 
 module HumanEval
   module Assert
@@ -10,7 +12,7 @@ module HumanEval
       attr_reader :expected, :actual, :assertion_info
 
       def initialize(message, expected = nil, actual = nil, assertion_info = nil)
-        super(message || "Assertion failed")
+        super(message || 'Assertion failed')
         @expected = expected
         @actual = actual
         @assertion_info = assertion_info
@@ -19,12 +21,12 @@ module HumanEval
 
     def assert(condition, message = nil)
       debug_log "assert called with condition: #{condition.inspect}, message: #{message.inspect}"
-      
+
       begin
         # Если condition это результат сравнения (например, a == b)
         result = condition
         debug_log "assert result: #{result.inspect}"
-        
+
         unless result
           raise AssertionError.new(
             message || "Expected #{condition.inspect} to be truthy",
@@ -33,8 +35,8 @@ module HumanEval
             "assert(#{condition.inspect})"
           )
         end
-        
-        debug_log "assertion passed"
+
+        debug_log 'assertion passed'
         true
       rescue NoMethodError => e
         debug_log "NoMethodError in assert: #{e.message}"
@@ -43,7 +45,7 @@ module HumanEval
           "NoMethodError: #{e.message}",
           true,
           nil,
-          "assert(...) - NoMethodError"
+          'assert(...) - NoMethodError'
         )
       rescue StandardError => e
         debug_log "Error in assert: #{e.class} - #{e.message}"
@@ -88,7 +90,7 @@ module HumanEval
       expected_float = Float(expected)
       actual_float = Float(actual)
       delta_float = Float(delta)
-      
+
       unless (expected_float - actual_float).abs <= delta_float
         raise AssertionError.new(
           message || "Expected #{actual.inspect} to be within #{delta} of #{expected.inspect}",
@@ -104,17 +106,15 @@ module HumanEval
       debug_log "assert_raises(#{exception_class.inspect})"
       begin
         yield
-      rescue => e
-        if e.is_a?(exception_class)
-          return e
-        else
-          raise AssertionError.new(
-            "Expected #{exception_class.inspect} but got #{e.class.inspect}",
-            exception_class,
-            e.class,
-            "assert_raises(#{exception_class.inspect})"
-          )
-        end
+      rescue StandardError => e
+        return e if e.is_a?(exception_class)
+
+        raise AssertionError.new(
+          "Expected #{exception_class.inspect} but got #{e.class.inspect}",
+          exception_class,
+          e.class,
+          "assert_raises(#{exception_class.inspect})"
+        )
       end
       raise AssertionError.new(
         "Expected #{exception_class.inspect} but nothing was raised",
@@ -128,7 +128,7 @@ module HumanEval
       dependencies.each do |pred, succ|
         pred_index = result.index(pred)
         succ_index = result.index(succ)
-        raise "Неверный порядок сортировки" unless pred_index < succ_index
+        raise 'Неверный порядок сортировки' unless pred_index < succ_index
       end
     end
 
@@ -136,8 +136,8 @@ module HumanEval
       puts "#{__FILE__}:#{__LINE__} [DEBUG] | debug_assert(#{condition}, #{message})"
       assert_result = condition
       puts "#{__FILE__}:#{__LINE__} [DEBUG] | assert_result =#{assert_result.inspect}"
-      
+
       assert(condition, message)
     end
   end
-end 
+end
