@@ -1,0 +1,5 @@
+assert decode_shift("mjqqt") == "hello"
+assert decode_shift("fgjjj") == "abeee"
+assert decode_shift("") == ""
+assert decode_shift("abcdef") == "vwxyza"
+assert decode_shift("z") == "u"
