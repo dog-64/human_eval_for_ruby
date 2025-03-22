@@ -1,19 +1,8 @@
-# Human Eval Solver
+# Human Watch Ruby
 
 Инструмент для решения задач из набора HumanEval с помощью различных языковых моделей через OpenRouter.ai и локальную Ollama.
 
-## Возможности
-
-- Решение задач тестовых задачь Human Watch с помощью различных языковых моделей
-- Поддержка моделей через OpenRouter.ai и локальную Ollama
-- Автоматическое тестирование решений
-- Сравнительный анализ эффективности моделей
-- Поддержка сохранения промежуточных результатов
-- Подробная статистика по каждой модели
-
 ## Рейтинг
-
-Данные на основе [test_results.json](reports/test_results.json):
 
 - google_gemini_2_0_flash_001: 86%
 - openai_o3_mini_high: 84%
@@ -31,9 +20,14 @@
 - ollama_llama3_2: 25%
 - ollama_codellama_34b: 17%
 
-Визуализация результатов:
-- [Общий отчет](reports/human_watch_ruby_report_total.html)
-- [Подробный отчет](reports/human_watch_ruby_report_full.html)
+## Возможности
+
+- Решение задач тестовых задачь Ргьфт Цфеср с помощью различных языковых моделей
+- Поддержка моделей через OpenRouter.ai и локальную Ollama
+- Автоматическое тестирование решений
+- Сравнительный анализ эффективности моделей
+- Поддержка сохранения промежуточных результатов
+- Подробная статистика по каждой модели
 
 ## Установка
 
@@ -105,7 +99,6 @@ OLLAMA_BASE_URL=http://localhost:11434
 - qwen_qwen_2_5_coder_32b (qwen/qwen-2.5-coder-32b)
 - qwen_qwen_2_5_coder_32b_instruct (qwen/qwen-2.5-coder-32b-instruct:free)
 - mistralai_codestral_2501 (mistralai/codestral-2501)
-- mistralai_mistral_small_3_1_24b_instruct (mistralai/mistral-small-3.1-24b-instruct)
 - openai_gpt_4o_mini (openai/gpt-4o-mini)
 - openai_o3_mini_high (openai/o3-mini-high)
 - anthropic_claude_3_5_sonnet (anthropic/claude-3.5-sonnet)
@@ -115,8 +108,6 @@ OLLAMA_BASE_URL=http://localhost:11434
 - ollama_llama3 (llama3)
 - ollama_llama3_2 (llama3.2)
 - ollama_codellama (codellama)
-- ollama_codellama_13b (codellama:13b)
-- ollama_codellama_34b (codellama:34b)
 - ollama_mistral (mistral)
 - ollama_phi3 (phi3)
 - ollama_gemma (gemma)
