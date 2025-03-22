@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require_relative '../lib/assert'
+require_relative '../lib/human_eval/assert'
 
 RSpec.describe HumanEval::Assert do
   let(:test_class) do

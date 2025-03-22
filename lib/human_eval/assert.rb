@@ -50,7 +50,7 @@ module HumanEval
         debug_log "Error in assert: #{e.class} - #{e.message}"
         debug_log "Backtrace: #{e.backtrace&.join("\n")}"
         raise AssertionError.new(
-          "Error: divided by 0",
+          "ZeroDivisionError: #{e.message}",
           true,
           nil,
           "assert(...) - #{e.class}"
@@ -69,6 +69,7 @@ module HumanEval
 
     def assert_equal(expected, actual, message = nil)
       debug_log "assert_equal(#{expected.inspect}, #{actual.inspect}, #{message.inspect})"
+
       unless expected == actual
         raise AssertionError.new(
           message || "Expected #{actual.inspect} to equal #{expected.inspect}",
@@ -77,11 +78,13 @@ module HumanEval
           "assert_equal(#{expected.inspect}, #{actual.inspect})"
         )
       end
+
       true
     end
 
     def assert_not_equal(expected, actual, message = nil)
       debug_log "assert_not_equal(#{expected.inspect}, #{actual.inspect}, #{message.inspect})"
+
       if expected == actual
         raise AssertionError.new(
           message || "Expected #{actual.inspect} to not equal #{expected.inspect}",
@@ -90,51 +93,62 @@ module HumanEval
           "assert_not_equal(#{expected.inspect}, #{actual.inspect})"
         )
       end
+
       true
     end
 
     def assert_in_delta(expected, actual, delta, message = nil)
       debug_log "assert_in_delta(#{expected.inspect}, #{actual.inspect}, #{delta.inspect}, #{message.inspect})"
+
       begin
         expected_float = Float(expected)
         actual_float = Float(actual)
         delta_float = Float(delta)
 
-        unless (expected_float - actual_float).abs <= delta_float
+        difference = (expected_float - actual_float).abs
+
+        unless difference <= delta_float
           raise AssertionError.new(
-            message || "Expected #{actual.inspect} to be within #{delta} of #{expected.inspect}",
+            message || "Expected #{actual.inspect} to be within #{delta.inspect} of #{expected.inspect}, but difference was #{difference}",
             expected,
             actual,
             "assert_in_delta(#{expected.inspect}, #{actual.inspect}, #{delta.inspect})"
           )
         end
+
         true
       rescue ArgumentError => e
+        debug_log "Error in assert_in_delta: #{e.class} - #{e.message}"
         raise AssertionError.new(
-          "Error: invalid value for Float",
+          "ArgumentError: #{e.message}",
           expected,
           actual,
-          "assert_in_delta(#{expected.inspect}, #{actual.inspect}, #{delta.inspect})"
+          "assert_in_delta(...) - #{e.class}"
         )
       end
     end
 
     def assert_raises(exception_class = StandardError)
       debug_log "assert_raises(#{exception_class.inspect})"
+
       begin
         yield
+      rescue exception_class => e
+        debug_log "Expected exception raised: #{e.class} - #{e.message}"
+        return e
       rescue StandardError => e
-        return e if e.is_a?(exception_class)
-
+        debug_log "Unexpected exception raised: #{e.class} - #{e.message}"
         raise AssertionError.new(
-          "Expected #{exception_class.inspect} but got #{e.class.inspect}",
+          "Expected #{exception_class} but got #{e.class}",
           exception_class,
           e.class,
           "assert_raises(#{exception_class.inspect})"
         )
       end
+
+      debug_log "No exception raised"
       raise AssertionError.new(
-        "Expected #{exception_class.inspect} but nothing was raised",
+        "Expected #{exception_class} but nothing was raised",
         exception_class,
         nil,
         "assert_raises(#{exception_class.inspect})"
@@ -143,22 +157,19 @@ module HumanEval
 
     def assert_valid_order(result, dependencies)
       dependencies.each do |pred, succ|
-        pred_index = result.index(pred)
-        succ_index = result.index(succ)
-        raise 'Неверный порядок сортировки' unless pred_index < succ_index
+        pred_idx = result.index(pred)
+        succ_idx = result.index(succ)
+        next unless pred_idx && succ_idx
+
+        unless pred_idx < succ_idx
+          raise AssertionError.new('Неверный порядок сортировки')
+        end
       end
     end
 
     def debug_assert(condition, message = nil)
       message_str = message.nil? ? "nil" : message
-      puts "debug_assert(#{condition}, #{message_str})"
-      assert_result = begin
-        condition
-      rescue NoMethodError, ZeroDivisionError, StandardError => e
-        e
-      end
-      puts "assert_result = #{assert_result.inspect}"
-
+      puts "debug_assert(#{condition.inspect}, #{message_str})"
       assert(condition, message)
     end
   end

@@ -9,6 +9,7 @@ require 'shellwords'
 require 'fileutils'
 require_relative 'human_eval_solver'
 require_relative 'human_eval/report_generator'
+require_relative 'human_eval/assert'
 
 module TestRunner
   class Runner

@@ -5,9 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="34ab27e5-df89-4365-9f7c-834a57db50b5" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.cursor/rules/common.mdc" beforeDir="false" afterPath="$PROJECT_DIR$/.cursor/rules/common.mdc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/assert.rb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/human_eval/assert.rb" beforeDir="false" afterPath="$PROJECT_DIR$/lib/human_eval/assert.rb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/run_tests.rb" beforeDir="false" afterPath="$PROJECT_DIR$/lib/run_tests.rb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/test_runner.rb" beforeDir="false" afterPath="$PROJECT_DIR$/lib/test_runner.rb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reports/human_watch_ruby_report_full.html" beforeDir="false" afterPath="$PROJECT_DIR$/reports/human_watch_ruby_report_full.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reports/human_watch_ruby_report_total.html" beforeDir="false" afterPath="$PROJECT_DIR$/reports/human_watch_ruby_report_total.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/spec/assert_spec.rb" beforeDir="false" afterPath="$PROJECT_DIR$/spec/assert_spec.rb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,12 +58,13 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "spec-convertor-2",
+    "git-widget-placeholder": "json-reports",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "ruby.structure.view.model.defaults.configured": "true",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
