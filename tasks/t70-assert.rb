@@ -1,0 +1,12 @@
+assert strange_sort_list([1, 2, 3, 4]) == [1, 4, 2, 3]
+assert strange_sort_list([5, 5, 5, 5]) == [5, 5, 5, 5]
+assert strange_sort_list([]) == []
+assert strange_sort_list([-1, 0, 1, 2, -2]) == [-2, 2, -1, 1, 0]
+assert strange_sort_list([1, 2, 3, 4, 5, 6]) == [1, 6, 2, 5, 3, 4]
+assert strange_sort_list([10, 9, 8, 7, 6]) == [6, 10, 7, 9, 8]
+assert strange_sort_list([0]) == [0]
+assert strange_sort_list([-5, 0, 5]) == [-5, 5, 0]
+assert strange_sort_list([1, 1, 1, 1]) == [1, 1, 1, 1]
+assert strange_sort_list([100, -100, 0]) == [-100, 100, 0]
+assert strange_sort_list([-10, -20, -30]) == [-30, -10, -20]
+
