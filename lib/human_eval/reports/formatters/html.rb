@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
+require_relative 'base'
+
 module HumanEval
   module Reports
     module Formatters
       # Форматтер для HTML отчетов
       class HTML < Base
         def generate
+          FileUtils.mkdir_p(output_dir)
           generate_total_report
           generate_full_report
         end

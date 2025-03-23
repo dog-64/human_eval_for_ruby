@@ -5,30 +5,28 @@ module HumanEval
     module Formatters
       # Базовый класс для форматтеров отчетов
       class Base
-        attr_reader :results, :output_dir
+        attr_reader :output_dir, :task_results, :model_stats, :timestamp
 
-        def initialize(results, output_dir)
-          @results = results
-          @output_dir = output_dir
-          FileUtils.mkdir_p(output_dir)
+        def initialize(options = {})
+          validate_required_options!(options)
+          @output_dir = options[:output_dir]
+          @task_results = options[:task_results]
+          @model_stats = options[:model_stats]
+          @timestamp = options[:timestamp] || Time.now.strftime('%Y-%m-%d %H:%M:%S')
         end
 
         def generate
-          raise NotImplementedError, 'Subclasses must implement #generate'
+          raise NotImplementedError, 'Метод generate должен быть реализован в подклассе'
         end
 
-        protected
+        private
 
-        def model_stats
-          @results[:model_stats]
-        end
+        def validate_required_options!(options)
+          required_options = [:output_dir, :task_results, :model_stats]
+          missing_options = required_options.select { |opt| options[opt].nil? }
+          return if missing_options.empty?
 
-        def task_results
-          @results[:task_results]
-        end
-
-        def timestamp
-          Time.now.strftime('%Y-%m-%d %H:%M:%S')
+          raise ArgumentError, "Отсутствуют обязательные параметры: #{missing_options.join(', ')}"
         end
       end
     end
