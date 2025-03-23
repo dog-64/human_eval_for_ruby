@@ -24,6 +24,7 @@ require_relative '../lib/human_eval/solver'
 require_relative '../lib/test_runner/runner'
 require_relative '../lib/human_eval/assert'
 require_relative '../lib/human_eval/converter'
+require_relative '../lib/human_eval/reports'
 
 WebMock.enable!
 WebMock.disable_net_connect!
@@ -43,6 +44,16 @@ RSpec.configure do |config|
   config.warnings = true
   config.order = :random
   Kernel.srand config.seed
+
+  config.before(:suite) do
+    # Создаем временную директорию для тестов
+    FileUtils.mkdir_p(File.join('spec', 'tmp'))
+  end
+
+  config.after(:suite) do
+    # Удаляем временную директорию после всех тестов
+    FileUtils.rm_rf(File.join('spec', 'tmp'))
+  end
 
   config.before(:each) do
     WebMock.reset!

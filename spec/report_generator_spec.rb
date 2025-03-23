@@ -4,7 +4,7 @@ require 'spec_helper'
 require_relative '../lib/human_eval/report_generator'
 
 RSpec.describe HumanEval::ReportGenerator do
-  let(:test_reports_dir) { Dir.mktmpdir('test_reports_') }
+  let(:test_reports_dir) { File.join('spec', 'tmp', 'test_reports') }
   let(:model_stats) { { 'model1' => 100, 'model2' => 50 } }
   let(:task_results) { { 't1' => { 'model1' => true, 'model2' => false } } }
   let(:results) { { model_stats: model_stats, task_results: task_results } }

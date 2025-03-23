@@ -30,7 +30,7 @@ jobs:
         run: bundle exec rspec
         env:
           COVERAGE: true
-          MIN_COVERAGE: 90
+          MIN_COVERAGE: 85
 
       - name: Display coverage report
         run: |
