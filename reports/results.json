@@ -1,0 +1,10 @@
+{
+  "t1": {
+    "model1": true,
+    "model2": false
+  },
+  "t2": {
+    "model1": true,
+    "model2": true
+  }
+}
