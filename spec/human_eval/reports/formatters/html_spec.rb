@@ -4,7 +4,7 @@ require 'spec_helper'
 require 'fileutils'
 
 RSpec.describe HumanEval::Reports::Formatters::HTML do
-  let(:output_dir) { File.join('tmp', 'test_reports') }
+  let(:output_dir) { File.join('spec', 'tmp', 'test_reports') }
   let(:task_results) do
     {
       't1' => { 'model1' => true, 'model2' => false },

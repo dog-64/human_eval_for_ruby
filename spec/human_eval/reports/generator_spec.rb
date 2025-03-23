@@ -5,7 +5,7 @@ require 'fileutils'
 require 'json'
 
 RSpec.describe HumanEval::Reports::Generator do
-  let(:output_dir) { File.join('tmp', 'test_reports') }
+  let(:output_dir) { File.join('spec', 'tmp', 'test_reports') }
   let(:options) { { output_dir: output_dir, format: 'all' } }
   let(:generator) { described_class.new(options) }
 

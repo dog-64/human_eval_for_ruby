@@ -45,6 +45,16 @@ RSpec.configure do |config|
   config.order = :random
   Kernel.srand config.seed
 
+  config.before(:suite) do
+    # Создаем временную директорию для тестов
+    FileUtils.mkdir_p(File.join('spec', 'tmp'))
+  end
+
+  config.after(:suite) do
+    # Удаляем временную директорию после всех тестов
+    FileUtils.rm_rf(File.join('spec', 'tmp'))
+  end
+
   config.before(:each) do
     WebMock.reset!
   end

@@ -5,7 +5,7 @@ require 'webmock/rspec'
 require 'tmpdir'
 
 RSpec.describe HumanEval::SolverClass do
-  let(:tasks_dir) { File.join(Dir.tmpdir, "test_tasks_#{Time.now.to_i}") }
+  let(:tasks_dir) { File.join('spec', 'tmp', 'test_tasks') }
   let(:task_content) do
     <<~TASK
       # Напишите функцию, которая складывает два числа
