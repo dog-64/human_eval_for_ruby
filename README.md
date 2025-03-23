@@ -9,6 +9,7 @@
 - deepseek_deepseek_chat_free: 79%
 - google_gemini_2_0_flash_lite_001: 79%
 - deepseek_deepseek_chat: 77%
+- google_gemma_3_27b_it: 77%
 - openai_gpt_4o_mini: 76%
 - google_gemini_flash_1_5: 75%
 - mistralai_codestral_2501: 75%
@@ -19,6 +20,7 @@
 - ollama_codellama_13b: 26%
 - ollama_llama3_2: 25%
 - ollama_codellama_34b: 17%
+
 
 ## Возможности
 
