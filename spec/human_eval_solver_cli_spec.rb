@@ -5,18 +5,18 @@ require_relative '../lib/human_eval_solver_cli'
 
 RSpec.describe HumanEval::SolverCLI do
   let(:cli) { described_class.new }
-  let(:solver_double) { instance_double('HumanEval::Solver') }
+  let(:solver_double) { instance_double('HumanEval::SolverClass') }
   let(:tasks_dir) { 'tasks' }
 
   before do
-    allow(HumanEval::Solver).to receive(:new).and_return(solver_double)
+    allow(HumanEval::SolverClass).to receive(:new).and_return(solver_double)
     allow(solver_double).to receive(:process)
   end
 
   describe '#solve' do
     context 'with default options' do
       it 'creates solver with default options' do
-        expect(HumanEval::Solver).to receive(:new).with(
+        expect(HumanEval::SolverClass).to receive(:new).with(
           tasks_dir,
           hash_including(
             model: nil,
@@ -45,7 +45,7 @@ RSpec.describe HumanEval::SolverCLI do
       end
 
       it 'creates solver with custom options' do
-        expect(HumanEval::Solver).to receive(:new).with(
+        expect(HumanEval::SolverClass).to receive(:new).with(
           tasks_dir,
           hash_including(
             model: 'gpt-4',
@@ -62,7 +62,7 @@ RSpec.describe HumanEval::SolverCLI do
       let(:cli) { described_class.new([], { 'log_level' => 'invalid' }) }
 
       it 'creates solver with invalid log_level' do
-        expect(HumanEval::Solver).to receive(:new).with(
+        expect(HumanEval::SolverClass).to receive(:new).with(
           tasks_dir,
           hash_including(log_level: 'invalid')
         )

@@ -49,6 +49,27 @@ RSpec.describe TestRunner::Runner do
     end
   end
 
+  describe '#colorize' do
+    it 'возвращает красный цвет для низкого процента' do
+      expect(runner.colorize('text', 20)).to eq("\e[31mtext\e[0m")
+    end
+
+    it 'возвращает желтый цвет для среднего процента' do
+      expect(runner.colorize('text', 50)).to eq("\e[33mtext\e[0m")
+    end
+
+    it 'возвращает зеленый цвет для высокого процента' do
+      expect(runner.colorize('text', 80)).to eq("\e[32mtext\e[0m")
+    end
+
+    it 'корректно обрабатывает граничные значения' do
+      expect(runner.colorize('text', 33)).to eq("\e[31mtext\e[0m")
+      expect(runner.colorize('text', 34)).to eq("\e[33mtext\e[0m")
+      expect(runner.colorize('text', 66)).to eq("\e[33mtext\e[0m")
+      expect(runner.colorize('text', 67)).to eq("\e[32mtext\e[0m")
+    end
+  end
+
   describe '#run_task_tests' do
     it 'runs tests only for mock solutions of specific task' do
       results = runner.run_task_tests('t1')
@@ -96,6 +117,41 @@ RSpec.describe TestRunner::Runner do
     it 'handles timeouts' do
       runner = described_class.new(timeout: 1, log_level: 'none')
       allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  while true; end\n  a + b\nend")
+      results = runner.run_model_tests('t1', 'model1')
+      expect(results['t1']['model1']).to be false
+    end
+
+    it 'handles empty solution files' do
+      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("   \n  \n  ")
+      results = runner.run_model_tests('t1', 'model1')
+      expect(results['t1']['model1']).to be false
+    end
+
+    it 'handles missing solution files' do
+      allow(File).to receive(:exist?).with('tasks/t1-model1.rb').and_return(false)
+      results = runner.run_model_tests('t1', 'model1')
+      expect(results).to eq({})
+    end
+
+    it 'handles runtime errors in solution' do
+      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  raise 'Runtime error'\nend")
+      results = runner.run_model_tests('t1', 'model1')
+      expect(results['t1']['model1']).to be false
+    end
+
+    it 'handles invalid task format' do
+      results = runner.run_model_tests('invalid', 'model1')
+      expect(results).to eq({})
+    end
+
+    it 'handles invalid model name format' do
+      results = runner.run_model_tests('t1', 'invalid/model')
+      expect(results).to eq({})
+    end
+
+    it 'handles interrupts gracefully' do
+      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  a + b\nend")
+      allow(runner).to receive(:test_solution).and_raise(Interrupt)
       results = runner.run_model_tests('t1', 'model1')
       expect(results['t1']['model1']).to be false
     end

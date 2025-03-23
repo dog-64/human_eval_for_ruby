@@ -8,7 +8,7 @@ module HumanEval
     desc "solve TASKS_DIR", "Solve tasks from TASKS_DIR using AI models"
     method_option :model,
                  type: :string,
-                 desc: "Use specific model (#{Solver::MODELS.join(', ')})"
+                 desc: "Use specific model (#{SolverClass::MODELS.keys.join(', ')})"
     method_option :task,
                  type: :string,
                  desc: "Solve specific task number"
@@ -30,7 +30,7 @@ module HumanEval
         keep_existing: options[:keep_existing]
       }
 
-      solver = Solver.new(tasks_dir, options_hash)
+      solver = SolverClass.new(tasks_dir, options_hash)
       solver.process
     end
 
