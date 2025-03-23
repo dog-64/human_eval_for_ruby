@@ -29,6 +29,7 @@ module HumanEval
       def generate
         results = @results.empty? ? collect_results : @results
         generate_reports(results)
+        { model_stats: calculate_model_stats(results) }
       end
 
       private

@@ -194,13 +194,28 @@ OLLAMA_BASE_URL=http://localhost:11434
 ### Генерация отчетов
 
 ```bash
-# Генерация полных отчетов по всем моделям и задачам
-./bin/generate_report
+# Генерация отчетов (HTML и Markdown)
+./bin/reports
+
+# Генерация только HTML отчета
+./bin/reports generate --format html
+
+# Генерация отчетов в указанную директорию
+./bin/reports generate --output-dir my_reports
+
+# Просмотр доступных команд
+./bin/reports help
 ```
 
-Скрипт создает два отчета в каталоге `reports/`:
-- `human_watch_ruby_report_total.md` - общая статистика успешности моделей
-- `human_watch_ruby_report_full.md` - подробный отчет с результатами по каждой задаче
+Скрипт создает отчеты в указанной директории (по умолчанию `reports/`):
+- `report.html` - интерактивный HTML отчет с таблицами и стилями
+- `report.md` - отчет в формате Markdown
+- `style.css` - стили для HTML отчета
+
+Отчеты содержат:
+- Общую статистику успешности моделей
+- Детальные результаты по каждой задаче
+- Цветовую индикацию успешных и неуспешных тестов
 
 ## Структура проекта
 
@@ -210,13 +225,26 @@ OLLAMA_BASE_URL=http://localhost:11434
     - `t*-MODEL_NAME.rb` - решения от моделей
 - `lib/` - исходный код
     - `human_eval_solver.rb` - основной класс для работы с моделями
-    - `test_runner.rb` - система тестирования
-    - `assert.rb` - модуль для тестовых утверждений
+    - `test_runner/` - система тестирования
+        - `runner.rb` - запуск тестов
+        - `assert.rb` - модуль для тестовых утверждений
+    - `human_eval/` - основные компоненты
+        - `reports/` - генерация отчетов
+            - `generator.rb` - основной генератор отчетов
+            - `cli.rb` - интерфейс командной строки для отчетов
+            - `formatters/` - форматтеры отчетов
+                - `base.rb` - базовый класс форматтера
+                - `html.rb` - HTML форматтер
+                - `markdown.rb` - Markdown форматтер
 - `rules/` - правила и промпты для моделей
 - `bin/` - исполняемые скрипты
+    - `human_eval_solver` - работа с моделями
+    - `run_tests` - запуск тестов
+    - `reports` - генерация отчетов
 - `reports/` - сгенерированные отчеты
-    - `human_watch_ruby_report_total.md` - общая статистика
-    - `human_watch_ruby_report_full.md` - подробный отчет
+    - `report.html` - HTML отчет
+    - `report.md` - Markdown отчет
+    - `style.css` - стили для HTML отчета
 
 ## Лицензия
 

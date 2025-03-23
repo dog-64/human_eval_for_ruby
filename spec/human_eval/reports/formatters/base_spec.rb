@@ -81,4 +81,28 @@ RSpec.describe HumanEval::Reports::Formatters::Base do
       expect { formatter.generate }.to raise_error(NotImplementedError)
     end
   end
+
+  describe 'безопасность файловых операций' do
+    let(:unsafe_paths) do
+      [
+        '../outside_spec',
+        '/tmp/outside_spec',
+        '../../outside_project',
+        '~/outside_home'
+      ]
+    end
+
+    it 'проверяет, что output_dir находится внутри spec' do
+      unsafe_paths.each do |unsafe_path|
+        expect {
+          described_class.new(
+            output_dir: unsafe_path,
+            task_results: task_results,
+            model_stats: model_stats,
+            timestamp: timestamp
+          )
+        }.to raise_error(ArgumentError, /должен находиться внутри каталога spec/)
+      end
+    end
+  end
 end 
