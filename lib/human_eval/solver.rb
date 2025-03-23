@@ -22,7 +22,6 @@ module HumanEval
       mistralai/codestral-2501
       openai/gpt-4o-mini
       openai/o3-mini-high
-
       anthropic/claude-3.5-sonnet
     ]
 

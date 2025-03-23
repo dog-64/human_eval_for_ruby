@@ -1,5 +1,18 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
-require_relative '../lib/test_runner_cli'
+require 'bundler/setup'
+require 'json'
+require_relative '../lib/test_runner'
 
-TestRunner::CLI.start(ARGV) 
+# Создаем директорию для отчетов, если её нет
+FileUtils.mkdir_p('reports')
+
+# Запускаем тесты
+runner = TestRunner::Runner.new
+results = runner.run_all_tests
+
+# Сохраняем результаты в JSON
+File.write('reports/results.json', JSON.pretty_generate(results))
+
+puts "Результаты тестов сохранены в reports/results.json" 

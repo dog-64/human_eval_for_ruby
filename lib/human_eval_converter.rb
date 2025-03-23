@@ -15,7 +15,7 @@ class HumanEvalConverter
   Dotenv.load
 
   OPENROUTER_API_KEY = ENV['OPENROUTER_API_KEY']
-  AI_MODEL = ENV['AI_MODEL'] || 'google/gemini-flash-1.5'
+  AI_MODEL = ENV['AI_MODEL'] || 'anthropic/claude-3-sonnet-20240229'
   
   def initialize(input_file, output_dir, options = {})
     @input_file = input_file

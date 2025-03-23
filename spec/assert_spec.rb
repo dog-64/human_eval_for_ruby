@@ -1,16 +1,19 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require_relative '../lib/human_eval/assert'
+require_relative '../lib/assert'
+require_relative '../lib/human_eval/log_levels'
 
 RSpec.describe HumanEval::Assert do
   let(:test_class) do
     Class.new do
       include HumanEval::Assert
       include HumanEval::Logger
+      include HumanEval::LogLevels
+      
       def initialize
         @options = { log_level: :debug }
-        @log_level = HumanEval::Logger::LOG_LEVELS[:debug]
+        @log_level = HumanEval::LogLevels::DEBUG
       end
     end
   end

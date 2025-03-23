@@ -4,7 +4,7 @@ require 'spec_helper'
 require 'webmock/rspec'
 
 RSpec.describe HumanEvalConverter do
-  let(:input_file) { 'test.jsonl' }
+  let(:input_file) { 'spec/fixtures/test.jsonl' }
   let(:output_dir) { 'output' }
   let(:api_key) { 'test_key' }
   let(:converter) { described_class.new(input_file, output_dir, log_level: 'none') }
@@ -35,6 +35,7 @@ RSpec.describe HumanEvalConverter do
 
   before do
     # Устанавливаем API ключ
+    ENV['OPENROUTER_API_KEY'] = api_key
     stub_const("#{described_class}::OPENROUTER_API_KEY", api_key)
 
     # Мокаем чтение файлов
@@ -50,22 +51,44 @@ RSpec.describe HumanEvalConverter do
     # Мокаем API ответы для описаний
     stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
       .with(
-        headers: { 'Authorization' => "Bearer #{api_key}" },
+        headers: { 
+          'Authorization' => "Bearer #{api_key}",
+          'Content-Type' => 'application/json',
+          'Http-Referer' => 'https://github.com/yourusername/human-eval-converter',
+          'X-Title' => 'Human Eval Converter',
+          'Openai-Organization' => 'openrouter',
+          'User-Agent' => 'Human Eval Converter/1.0.0'
+        },
         body: hash_including(
+          'model' => 'anthropic/claude-3-sonnet-20240229',
           'messages' => array_including(
             hash_including('content' => /Add two numbers/)
-          )
+          ),
+          'temperature' => 0.7,
+          'max_tokens' => 1000,
+          'stream' => false
         )
       )
       .to_return(status: 200, body: { choices: [{ message: { content: llm_response_description1 } }] }.to_json)
 
     stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
       .with(
-        headers: { 'Authorization' => "Bearer #{api_key}" },
+        headers: { 
+          'Authorization' => "Bearer #{api_key}",
+          'Content-Type' => 'application/json',
+          'HTTP-Referer' => 'https://github.com/yourusername/human-eval-converter',
+          'X-Title' => 'Human Eval Converter',
+          'OpenAI-Organization' => 'openrouter',
+          'User-Agent' => 'Human Eval Converter/1.0.0'
+        },
         body: hash_including(
+          'model' => 'anthropic/claude-3-sonnet-20240229',
           'messages' => array_including(
             hash_including('content' => /Multiply two numbers/)
-          )
+          ),
+          'temperature' => 0.7,
+          'max_tokens' => 1000,
+          'stream' => false
         )
       )
       .to_return(status: 200, body: { choices: [{ message: { content: llm_response_description2 } }] }.to_json)
@@ -73,22 +96,44 @@ RSpec.describe HumanEvalConverter do
     # Мокаем API ответы для тестов
     stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
       .with(
-        headers: { 'Authorization' => "Bearer #{api_key}" },
+        headers: { 
+          'Authorization' => "Bearer #{api_key}",
+          'Content-Type' => 'application/json',
+          'HTTP-Referer' => 'https://github.com/yourusername/human-eval-converter',
+          'X-Title' => 'Human Eval Converter',
+          'OpenAI-Organization' => 'openrouter',
+          'User-Agent' => 'Human Eval Converter/1.0.0'
+        },
         body: hash_including(
+          'model' => 'anthropic/claude-3-sonnet-20240229',
           'messages' => array_including(
             hash_including('content' => /#{llm_response_description1}/)
-          )
+          ),
+          'temperature' => 0.7,
+          'max_tokens' => 1000,
+          'stream' => false
         )
       )
       .to_return(status: 200, body: { choices: [{ message: { content: llm_response_tests1 } }] }.to_json)
 
     stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
       .with(
-        headers: { 'Authorization' => "Bearer #{api_key}" },
+        headers: { 
+          'Authorization' => "Bearer #{api_key}",
+          'Content-Type' => 'application/json',
+          'HTTP-Referer' => 'https://github.com/yourusername/human-eval-converter',
+          'X-Title' => 'Human Eval Converter',
+          'OpenAI-Organization' => 'openrouter',
+          'User-Agent' => 'Human Eval Converter/1.0.0'
+        },
         body: hash_including(
+          'model' => 'anthropic/claude-3-sonnet-20240229',
           'messages' => array_including(
             hash_including('content' => /#{llm_response_description2}/)
-          )
+          ),
+          'temperature' => 0.7,
+          'max_tokens' => 1000,
+          'stream' => false
         )
       )
       .to_return(status: 200, body: { choices: [{ message: { content: llm_response_tests2 } }] }.to_json)
@@ -165,24 +210,60 @@ RSpec.describe HumanEvalConverter do
     context 'when API returns error' do
       before do
         stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
-          .with(headers: { 'Authorization' => "Bearer #{api_key}" })
-          .to_return(status: 500, body: 'Internal Server Error')
+          .with(
+            headers: { 
+              'Authorization' => "Bearer #{api_key}",
+              'Content-Type' => 'application/json',
+              'Http-Referer' => 'https://github.com/yourusername/human-eval-converter',
+              'X-Title' => 'Human Eval Converter',
+              'Openai-Organization' => 'openrouter',
+              'User-Agent' => 'Human Eval Converter/1.0.0'
+            },
+            body: hash_including(
+              'model' => 'anthropic/claude-3-sonnet-20240229',
+              'messages' => array_including(
+                hash_including('content' => /Add two numbers/)
+              ),
+              'temperature' => 0.7,
+              'max_tokens' => 1000,
+              'stream' => false
+            )
+          )
+          .to_return(status: 500, body: { error: 'Internal Server Error' }.to_json)
       end
 
       it 'handles API errors gracefully' do
-        expect { converter.process }.not_to raise_error
+        expect { converter.process }.to raise_error(RuntimeError, /Ошибка API/)
       end
     end
 
     context 'when API returns empty response' do
       before do
         stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
-          .with(headers: { 'Authorization' => "Bearer #{api_key}" })
+          .with(
+            headers: { 
+              'Authorization' => "Bearer #{api_key}",
+              'Content-Type' => 'application/json',
+              'Http-Referer' => 'https://github.com/yourusername/human-eval-converter',
+              'X-Title' => 'Human Eval Converter',
+              'Openai-Organization' => 'openrouter',
+              'User-Agent' => 'Human Eval Converter/1.0.0'
+            },
+            body: hash_including(
+              'model' => 'anthropic/claude-3-sonnet-20240229',
+              'messages' => array_including(
+                hash_including('content' => /Add two numbers/)
+              ),
+              'temperature' => 0.7,
+              'max_tokens' => 1000,
+              'stream' => false
+            )
+          )
           .to_return(status: 200, body: { choices: [{ message: { content: '' } }] }.to_json)
       end
 
       it 'handles empty responses gracefully' do
-        expect { converter.process }.not_to raise_error
+        expect { converter.process }.to raise_error(RuntimeError, /Пустой ответ от API/)
       end
     end
   end

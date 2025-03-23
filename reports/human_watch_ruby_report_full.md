@@ -1,6 +1,6 @@
 # Отчет о тестировании моделей
 
-Дата: 2025-03-16 16:16:32
+Дата: 2025-03-23 12:39:07
 
 ## Результаты
 
@@ -12,8 +12,8 @@
 | google_gemini_2_0_flash_lite_001 | 79% |
 | deepseek_deepseek_chat | 77% |
 | openai_gpt_4o_mini | 76% |
-| google_gemini_flash_1_5 | 75% |
 | mistralai_codestral_2501 | 75% |
+| google_gemini_flash_1_5 | 75% |
 | qwen_qwen_2_5_coder_32b_instruct | 74% |
 | meta_llama_llama_3_1_70b_instruct | 69% |
 

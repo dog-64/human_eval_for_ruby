@@ -2,9 +2,9 @@
 
 require "terminal-table"
 require "pry"
-require_relative "lib/assert"
+require_relative "assert"
 
-class TestRunner
+class RunTests
   DONE_MARK = '✓'
   FAIL_MARK = ' '
 
@@ -145,7 +145,7 @@ class TestRunner
 end
 
 # Использование:
-runner = TestRunner.new
+runner = RunTests.new
 
 if ARGV.empty?
   runner.run_all_tests

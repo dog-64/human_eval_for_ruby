@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 require_relative '../lib/human_eval/cli'
-require_relative '../lib/human_eval/converter'
+require_relative '../lib/human_eval_converter'
 
 RSpec.describe HumanEval::CLI do
   let(:cli) { described_class.new }
@@ -144,6 +144,70 @@ RSpec.describe HumanEval::CLI do
       it 'displays help instead of converting' do
         expect(HumanEvalConverter).not_to receive(:new)
         expect { cli.convert(source, target) }.to output(/Конвертирует задачи из формата human-eval/).to_stdout
+      end
+    end
+
+    context 'with multiple options' do
+      before do
+        cli.options = {
+          create_rules: true,
+          keep_existing: true,
+          preserve_old: true,
+          task: '42',
+          log_level: 'debug'
+        }
+      end
+
+      it 'passes all options to converter' do
+        expect(HumanEvalConverter).to receive(:new).with(
+          source,
+          target,
+          {
+            create_rules: true,
+            keep_existing: true,
+            preserve_old: true,
+            task_number: '42',
+            log_level: 'debug'
+          }
+        )
+
+        cli.convert(source, target)
+      end
+    end
+
+    context 'with invalid options' do
+      before do
+        cli.options = { log_level: 'invalid' }
+      end
+
+      it 'passes invalid options to converter' do
+        expect(HumanEvalConverter).to receive(:new).with(
+          source,
+          target,
+          hash_including(log_level: 'invalid')
+        )
+
+        cli.convert(source, target)
+      end
+    end
+
+    context 'when converter raises an error' do
+      before do
+        allow(converter_double).to receive(:process).and_raise(StandardError.new('Test error'))
+      end
+
+      it 'propagates the error' do
+        expect { cli.convert(source, target) }.to raise_error(StandardError, 'Test error')
+      end
+    end
+
+    context 'with missing source or target' do
+      it 'raises an error for nil source' do
+        expect { cli.convert(nil, target) }.to raise_error(ArgumentError, 'Source path is required')
+      end
+
+      it 'raises an error for nil target' do
+        expect { cli.convert(source, nil) }.to raise_error(ArgumentError, 'Target path is required')
       end
     end
   end

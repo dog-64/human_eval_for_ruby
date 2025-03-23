@@ -1,5 +1,5 @@
 require 'thor'
-require_relative 'human_eval_solver'
+require_relative 'human_eval/solver'
 
 module HumanEval
   class SolverCLI < Thor
