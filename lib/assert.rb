@@ -1,5 +1,7 @@
-require_relative "logger"
-require_relative "log_levels"
+# frozen_string_literal: true
+
+require_relative "human_eval/log_levels"
+require_relative "human_eval/logger"
 
 module HumanEval
   module Assert

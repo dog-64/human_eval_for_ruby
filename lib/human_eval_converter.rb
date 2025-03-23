@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'json'
 require 'fileutils'
 require 'net/http'
 require 'uri'
 require 'dotenv'
 require 'pry'
-require_relative 'logger'
+require_relative 'human_eval/logger'
 
 class HumanEvalConverter
   include HumanEval::Logger

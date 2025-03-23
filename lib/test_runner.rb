@@ -1,8 +1,13 @@
-require "terminal-table"
-require "timeout"
-require_relative "logger"
-require_relative "assert"
-require_relative "log_levels"
+# frozen_string_literal: true
+
+require 'timeout'
+require_relative 'assert'
+require_relative 'human_eval/log_levels'
+require_relative 'human_eval/logger'
+require 'shellwords'
+require 'fileutils'
+require_relative 'human_eval/solver'
+require_relative 'human_eval/reports'
 
 module TestRunner
   class Runner
@@ -15,8 +20,18 @@ module TestRunner
     def initialize(options = {})
       @options = options
       @results = {}
-      self.log_level = @options[:log_level] || :normal
+      self.log_level = parse_log_level(@options[:log_level])
       @timeout = @options[:timeout] || 5  # Таймаут по умолчанию 5 секунд
+    end
+
+    def parse_log_level(level)
+      case level&.to_s&.downcase
+      when 'debug' then DEBUG
+      when 'info' then INFO
+      when 'warning' then WARNING
+      when 'error' then ERROR
+      else INFO
+      end
     end
 
     def colorize(text, percentage)
@@ -30,8 +45,8 @@ module TestRunner
 
     def run_all_tests
       if Dir.glob('tasks/t*-*.rb').empty?
-        error "Ошибка: Не найдены файлы с решениями в директории tasks"
-        return
+        error_log "Ошибка: Не найдены файлы с решениями в директории tasks"
+        return {}
       end
       # Находим все файлы с решениями в директории tasks
       solutions = Dir.glob('tasks/t*-*.rb').reject { |f| f.end_with?('-assert.rb') }
@@ -63,23 +78,25 @@ module TestRunner
 
       debug_log "Final results: #{@results.inspect}"
       display_results(tasks, models)
+      @results
     end
 
     def run_task_tests(task)
       unless task.to_s.match?(/^t\d+$/)
-        error "Ошибка: Неверный формат задачи. Ожидается формат 't<число>' (например, 't1')"
-        return
+        error_log "Ошибка: Неверный формат задачи. Ожидается формат 't<число>' (например, 't1')"
+        return {}
       end
       test_file = "tasks/#{task}-assert.rb"
       unless File.exist?(test_file)
-        error "Файл с тестами #{test_file} не найден"
-        return
+        error_log "Файл с тестами #{test_file} не найден"
+        return {}
       end
 
       solutions = Dir.glob("tasks/#{task}-*.rb").reject { |f| f.end_with?('-assert.rb') }.sort
       models = solutions.map { |s| File.basename(s).split('-')[1..-1].join('-').sub('.rb', '') }
 
-      @results = Hash.new { |h, k| h[k] = {} }
+      @results = {}
+      @results[task] = {}
 
       solutions.each do |solution|
         model = File.basename(solution).split('-')[1..-1].join('-').sub('.rb', '')
@@ -88,30 +105,33 @@ module TestRunner
       end
 
       display_results([task], models)
+      @results
     end
 
     def run_model_tests(task, model)
       unless task.to_s.match?(/^t\d+$/)
-        error "Ошибка: Неверный формат задачи. Ожидается формат 't<число>' (например, 't1')"
-        return
+        error_log "Ошибка: Неверный формат задачи. Ожидается формат 't<число>' (например, 't1')"
+        return {}
       end
 
       unless model.to_s.match?(/^[a-zA-Z0-9_-]+$/)
-        error "Ошибка: Неверный формат названия модели"
-        return
+        error_log "Ошибка: Неверный формат названия модели"
+        return {}
       end
       solution = Dir.glob("tasks/#{task}-#{model}.rb").first
 
       if solution.nil?
-        error "Решение для задачи #{task} модели #{model} не найдено"
-        return
+        error_log "Решение для задачи #{task} модели #{model} не найдено"
+        return {}
       end
 
+      @results = {}
       @results[task] = {}
       success = test_solution(task, solution)
       @results[task][model] = success
 
       display_results([task], [model])
+      @results
     end
 
     def get_model_stats
@@ -146,23 +166,23 @@ module TestRunner
       test_file = "tasks/#{task}-assert.rb"
       
       unless File.exist?(solution_file)
-        error "\nРешение #{File.basename(solution_file)}:"
-        error "  ❌ Файл решения не найден: #{solution_file}"
+        error_log "\nРешение #{File.basename(solution_file)}:"
+        error_log "  ❌ Файл решения не найден: #{solution_file}"
         return false
       end
       
       unless File.exist?(test_file)
-        error "\nРешение #{File.basename(solution_file)}:"
-        error "  ❌ Файл тестов не найден: #{test_file}"
+        error_log "\nРешение #{File.basename(solution_file)}:"
+        error_log "  ❌ Файл тестов не найден: #{test_file}"
         return false
       end
 
-      log "Решение #{File.basename(solution_file)}"
+      info_log "Решение #{File.basename(solution_file)}"
       
       # Проверяем на пустой файл
       solution_content = File.read(solution_file)
       if solution_content.strip.empty?
-        error "  ❌ Файл решения пуст"
+        error_log "  ❌ Файл решения пуст"
         return false
       end
       
@@ -172,8 +192,8 @@ module TestRunner
         temp_context.module_eval(solution_content)
         debug_log "  ✅ Синтаксис решения корректен"
       rescue SyntaxError => e
-        error "  ❌ Ошибка синтаксиса в решении:"
-        error "     #{e.message}"
+        error_log "  ❌ Ошибка синтаксиса в решении:"
+        error_log "     #{e.message}"
         return false
       end
 
@@ -214,7 +234,7 @@ module TestRunner
         extend self
       end
       
-      test_context.log_level = @options[:log_level] || :normal
+      test_context.log_level = parse_log_level(@options[:log_level])
       
       begin
         test_content = File.read(test_file)
@@ -266,8 +286,8 @@ module TestRunner
             
             test_context.module_eval(solution_content)
             test_context.extend(test_context)
-            test_context.log_level = @options[:log_level] || :normal
-            test_context.options = @options.dup  # Добавляем .dup чтобы избежать проблем с разделяемыми объектами
+            test_context.log_level = parse_log_level(@options[:log_level])
+            test_context.options = @options.dup
             
             begin
               debug_log "  🔄 Выполняем тесты в контексте..."
@@ -288,12 +308,12 @@ module TestRunner
                   model = File.basename(solution_file).split('-')[1..-1].join('-').sub('.rb', '')
                   task = File.basename(solution_file).split('-').first
                   
-                  debug_log "\n  ❌ Тест не пройден на строке #{line_number}:"
-                  debug_log "     #{line.strip}"
+                  error_log "\n  ❌ Тест не пройден на строке #{line_number}:"
+                  error_log "     #{line.strip}"
                   
                   if e.expected && e.actual
-                    debug_log "     Ожидалось: #{e.expected.inspect}"
-                    debug_log "     Получено: #{e.actual.inspect}"
+                    error_log "     Ожидалось: #{e.expected.inspect}"
+                    error_log "     Получено: #{e.actual.inspect}"
                   end
                   
                   result.push({
@@ -314,11 +334,11 @@ module TestRunner
               debug_log "  ✅ Тесты выполнены успешно"
               result.push({status: :success})
             rescue StandardError => e
-              debug_log "  ❌ Ошибка при выполнении тестов: #{e.class} - #{e.message}"
-              debug_log "  ❌ Ошибка: #{e.message || "Unknown error"}"
+              error_log "  ❌ Ошибка при выполнении тестов: #{e.class} - #{e.message}"
+              error_log "  ❌ Ошибка: #{e.message || "Unknown error"}"
               result.push(test_context.handle_error(e))
             rescue Exception => e
-              debug_log "  ❌ Критическая ошибка при выполнении тестов: #{e.class} - #{e.message}"
+              error_log "  ❌ Критическая ошибка при выполнении тестов: #{e.class} - #{e.message}"
               result.push({
                 status: :error,
                 error: {
@@ -329,7 +349,7 @@ module TestRunner
               })
             end
           rescue StandardError => e
-            debug_log "  ❌ Ошибка в тестовом потоке: #{e.class} - #{e.message}"
+            error_log "  ❌ Ошибка в тестовом потоке: #{e.class} - #{e.message}"
             result.push({
               status: :error,
               error: {
@@ -339,7 +359,7 @@ module TestRunner
               }
             })
           rescue Exception => e
-            debug_log "  ❌ Критическая ошибка в тестовом потоке: #{e.class} - #{e.message}"
+            error_log "  ❌ Критическая ошибка в тестовом потоке: #{e.class} - #{e.message}"
             result.push({
               status: :error,
               error: {
@@ -362,66 +382,68 @@ module TestRunner
               return true
             when :error
               error = res[:error]
-              debug_log "  ❌ Тест не пройден:"
-              debug_log "     #{error[:class]}: #{error[:message]}"
-              debug_log "     Стек вызовов:"
+              error_log "  ❌ Тест не пройден:"
+              error_log "     #{error[:class]}: #{error[:message]}"
+              if error[:expected] && error[:actual]
+                error_log "     Ожидалось: #{error[:expected].inspect}"
+                error_log "     Получено: #{error[:actual].inspect}"
+              end
               if error[:backtrace]&.any?
+                debug_log "     Стек вызовов:"
                 error[:backtrace].each { |line| debug_log "       #{line}" }
-              else
-                debug_log "       Стек вызовов недоступен"
               end
               return false
             else
-              error "  ❌ Неизвестный статус результата: #{res[:status]}"
+              error_log "  ❌ Неизвестный статус результата: #{res[:status]}"
               return false
             end
           end
         rescue Timeout::Error
           thread.kill
-          thread.join(1) # Даем потоку секунду на завершение
-          error "  ❌ Превышен лимит времени выполнения (#{@timeout} секунд)"
-          error "     Возможно, в решении есть бесконечный цикл"
+          thread.join(1)
+          error_log "  ❌ Превышен лимит времени выполнения (#{@timeout} секунд)"
+          error_log "     Возможно, в решении есть бесконечный цикл"
           return false
         ensure
           thread.kill unless thread.nil? || !thread.alive?
         end
       rescue Interrupt => e
-        error "\n  ⚠️  Тест прерван пользователем (Ctrl+C)"
+        error_log "\n  ⚠️  Тест прерван пользователем (Ctrl+C)"
         debug_log "  📍 Место прерывания: #{e.backtrace.first}"
         return false
       rescue NoMethodError => e
-        error "  ❌ Ошибка в тесте: попытка вызвать метод у nil"
-        error "     #{e.message}"
+        error_log "  ❌ Ошибка в тесте: попытка вызвать метод у nil"
+        error_log "     #{e.message}"
         debug_log "     Место ошибки: #{e.backtrace.first}"
         debug_log "     Полный стек вызовов:"
         e.backtrace.each { |line| debug_log "       #{line}" }
         return false
       rescue NameError => e
-        error "  ❌ Ошибка в тесте: неопределенная переменная или метод"
-        error "     #{e.message}"
+        error_log "  ❌ Ошибка в тесте: неопределенная переменная или метод"
+        error_log "     #{e.message}"
         debug_log "     Место ошибки: #{e.backtrace.first}"
         debug_log "     Полный стек вызовов:"
         e.backtrace.each { |line| debug_log "       #{line}" }
         return false
       rescue RegexpError => e
-        error "  ❌ Ошибка в регулярном выражении:"
-        error "     #{e.message}"
+        error_log "  ❌ Ошибка в регулярном выражении:"
+        error_log "     #{e.message}"
         debug_log "     Место ошибки: #{e.backtrace.first}"
         debug_log "     Полный стек вызовов:"
         e.backtrace.each { |line| debug_log "       #{line}" }
         return false
       rescue StandardError => e
-        error "  ❌ Неожиданная ошибка:"
-        error "     Тип: #{e.class}"
-        error "     Сообщение: #{e.message}"
+        error_log "  ❌ Неожиданная ошибка:"
+        error_log "     Тип: #{e.class}"
+        error_log "     Сообщение: #{e.message}"
         debug_log "     Место ошибки: #{e.backtrace.first}"
         debug_log "     Полный стек вызовов:"
         e.backtrace.each { |line| debug_log "       #{line}" }
         return false
       rescue Exception => e
-        error "  ❌ Критическая ошибка:"
-        error "     Тип: #{e.class}"
-        error "     Сообщение: #{e.message}"
+        error_log "  ❌ Критическая ошибка:"
+        error_log "     Тип: #{e.class}"
+        error_log "     Сообщение: #{e.message}"
         debug_log "     Место ошибки: #{e.backtrace.first}"
         debug_log "     Полный стек вызовов:"
         e.backtrace.each { |line| debug_log "       #{line}" }
@@ -487,19 +509,14 @@ module TestRunner
     end
 
     def display_results(tasks, models)
-      # Всегда создаем оба отчета
-      create_reports(tasks, models)
+      # Создаем только total отчет
+      create_total_report(tasks, models)
       
       # Выводим total отчет в консоль
       display_total_console(tasks, models)
-      
-      # Если не запрошен только total отчет, выводим также детальный отчет в консоль
-      unless @options[:report_total]
-        display_detailed_console(tasks, models)
-      end
     end
 
-    def create_reports(tasks, models)
+    def create_total_report(tasks, models)
       # Подсчитываем статистику для каждой модели
       model_stats = models.map do |model|
         total_tasks = tasks.size
@@ -522,47 +539,11 @@ module TestRunner
         end
       end
       
-      # Сохраняем подробный отчет
-      full_report_file = File.join('reports', "human_watch_ruby_report_full.md")
-      File.open(full_report_file, 'w') do |file|
-        file.puts "# Отчет о тестировании моделей"
-        file.puts
-        file.puts "Дата: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}"
-        file.puts
-        file.puts "## Результаты"
-        file.puts
-        file.puts "| Модель | Успешность |"
-        file.puts "|--------|------------|"
-        
-        model_stats.each do |model, percentage|
-          file.puts "| #{model} | #{percentage}% |"
-        end
-        
-        file.puts
-        file.puts "## Детальная информация"
-        file.puts
-        file.puts "Всего задач: #{tasks.size}"
-        file.puts
-        
-        # Добавляем детальную информацию по каждой задаче
-        file.puts "### Результаты по задачам"
-        file.puts
-        file.puts "| Задача | " + models.join(" | ") + " |"
-        file.puts "|--------|" + models.map { |_| "----------" }.join("|") + "|"
-        
-        tasks.each do |task|
-          row = "| #{task} |"
-          models.each do |model|
-            status = @results[task][model]
-            row += " #{status ? '✓' : '✗'} |"
-          end
-          file.puts row
-        end
-      end
-      
-      puts "\nОтчеты сохранены в файлах:"
-      puts "- Total отчет: #{total_report_file}"
-      puts "- Подробный отчет: #{full_report_file}"
+      puts "\nРезультаты тестов сохранены в reports/results.json"
+    end
+
+    def create_reports(tasks, models)
+      create_total_report(tasks, models)
     end
   end
 end 
