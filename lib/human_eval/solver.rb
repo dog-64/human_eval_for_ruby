@@ -27,6 +27,7 @@ module HumanEval
       @model = options[:model]
       @task_number = options[:task]
       @keep_existing = options[:keep_existing]
+      @rules_dir = options[:rules_dir] || 'rules'
       self.log_level = options[:log_level] || :normal
       validate_environment
     end
@@ -78,7 +79,7 @@ module HumanEval
       debug content
       debug "---END ORIGINAL CONTENT---"
 
-      solver_prompt = File.read(File.join('rules', 'model_solver_prompt.txt'))
+      solver_prompt = File.read(File.join(@rules_dir, 'model_solver_prompt.txt'))
       debug "Загружен промпт для решения:"
       debug "---BEGIN SOLVER PROMPT---"
       debug solver_prompt
@@ -95,7 +96,12 @@ module HumanEval
       debug prompt
       debug "---END FULL PROMPT---"
 
-      raw_solution = call_openrouter(prompt, model)
+      raw_solution = if @model.start_with?('ollama/')
+        call_ollama(prompt)
+      else
+        call_openrouter(prompt)
+      end
+
       debug "Получено решение от модели #{model}"
       debug "---BEGIN MODEL RESPONSE---"
       debug raw_solution
@@ -118,34 +124,45 @@ module HumanEval
       debug "Решение сохранено в #{output_file}"
     end
 
-    def call_openrouter(prompt, model)
-      debug "Вызов OpenRouter API с моделью #{model}"
+    def call_openrouter(prompt)
+      debug "Вызов OpenRouter API с моделью #{@model}"
       uri = URI('https://openrouter.ai/api/v1/chat/completions')
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
 
       request = Net::HTTP::Post.new(uri)
-      request['Authorization'] = "Bearer #{OPENROUTER_API_KEY}"
+      request['Authorization'] = "Bearer #{ENV['OPENROUTER_API_KEY']}"
       request['Content-Type'] = 'application/json'
-      request['Http-Referer'] = ENV['HTTP_REFERER'] || 'https://github.com/yourusername/human-eval-converter'
+      request['Http-Referer'] = ENV['HTTP_REFERER']
       request['X-Title'] = 'Human Eval Converter'
       request['Openai-Organization'] = 'openrouter'
       request['User-Agent'] = 'Human Eval Converter/1.0.0'
 
-      request.body = {
-        model: model,
+      body = {
+        model: @model,
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.1,
-        max_tokens: 32000, # 1000 - для всех, 32000 - для o3-mini-high 
+        max_tokens: 32000,
         stream: false
-      }.to_json
+      }
 
-      debug "Ожидаем ответ от API"
+      request.body = body.to_json
+
+      puts "[DEBUG] Request URL: #{uri}"
+      puts "[DEBUG] Request headers: #{request.to_hash.inspect}"
+      puts "[DEBUG] Request body: #{body.inspect}"
+      puts "[DEBUG] WebMock stub format:"
+      puts "stub_request(:post, '#{uri}')"
+      puts "  .with("
+      puts "    headers: #{request.to_hash.inspect},"
+      puts "    body: #{body.to_json}"
+      puts "  )"
+
       response = http.request(request)
 
       unless response.is_a?(Net::HTTPSuccess)
         error "Ошибка API: #{response.code} - #{response.body}"
-        raise "Ошибка API при вызове модели #{model}"
+        raise "Ошибка API при вызове модели #{@model}"
       end
 
       begin
@@ -153,7 +170,61 @@ module HumanEval
         content = parsed_response.dig('choices', 0, 'message', 'content')
 
         if content.nil? || content.empty?
-          error "Пустой ответ от API для модели #{model}"
+          error "Пустой ответ от API для модели #{@model}"
+          error "Ответ API: #{parsed_response.inspect}"
+          raise "Пустой ответ от API"
+        end
+
+        content.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
+      rescue JSON::ParserError => e
+        error "Ошибка парсинга JSON: #{e.message}"
+        raise "Ошибка парсинга ответа API: #{e.message}"
+      end
+    end
+
+    def call_ollama(prompt)
+      debug "Вызов Ollama API с моделью #{@model}"
+      uri = URI('http://localhost:11434/api/chat')
+      http = Net::HTTP.new(uri.host, uri.port)
+
+      request = Net::HTTP::Post.new(uri)
+      request['Content-Type'] = 'application/json'
+
+      body = {
+        model: @model.sub('ollama/', ''),
+        messages: [{ role: 'user', content: prompt }],
+        options: {
+          temperature: 0.1,
+          num_predict: 4096
+        },
+        stream: false
+      }
+
+      request.body = body.to_json
+
+      puts "[DEBUG] Request URL: #{uri}"
+      puts "[DEBUG] Request headers: #{request.to_hash.inspect}"
+      puts "[DEBUG] Request body: #{body.inspect}"
+      puts "[DEBUG] WebMock stub format:"
+      puts "stub_request(:post, '#{uri}')"
+      puts "  .with("
+      puts "    headers: #{request.to_hash.inspect},"
+      puts "    body: #{body.to_json}"
+      puts "  )"
+
+      response = http.request(request)
+
+      unless response.is_a?(Net::HTTPSuccess)
+        error "Ошибка API: #{response.code} - #{response.body}"
+        raise "Ошибка API при вызове модели #{@model}"
+      end
+
+      begin
+        parsed_response = JSON.parse(response.body)
+        content = parsed_response['response']
+
+        if content.nil? || content.empty?
+          error "Пустой ответ от API для модели #{@model}"
           error "Ответ API: #{parsed_response.inspect}"
           raise "Пустой ответ от API"
         end
