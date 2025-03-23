@@ -9,6 +9,7 @@ require 'shellwords'
 require 'fileutils'
 require_relative '../human_eval/solver'
 require_relative '../human_eval/report_generator'
+require_relative '../human_eval/reports/generator'
 
 module TestRunner
   class Runner
@@ -183,6 +184,16 @@ module TestRunner
       else
         debug_log '       Стек вызовов недоступен'
       end
+    end
+
+    # Этот метод больше не используется, так как функционал отчетов
+    # был перенесен в отдельный модуль. Метод оставлен для обратной
+    # совместимости и будет удален в следующих версиях.
+    #
+    # @deprecated Используйте ReportGenerator вместо этого метода
+    def create_reports(tasks, models)
+      warn "DEPRECATED: Метод create_reports устарел и будет удален. Используйте ReportGenerator."
+      # Оставляем пустую реализацию
     end
 
     private
@@ -458,254 +469,88 @@ module TestRunner
       # Сортируем по убыванию процента успешных тестов
       model_stats.sort_by! { |_, percentage| -percentage }
 
-      # Выводим в консоль в простом формате
-      puts 'Результат прогона тестов:'
+      # Выводим общую статистику
+      log "\nРезультаты тестирования моделей:"
       model_stats.each do |model, percentage|
-        puts "- #{model} - #{percentage}%"
+        log "- #{model}: #{colorize("#{percentage}%", percentage)}"
       end
+    end
+
+    def display_detailed_console(tasks, models)
+      # Существующий код для детального отчета
+      rows = []
+      tasks.each do |task|
+        row = [task]
+        models.each do |model|
+          status = @results[task][model]
+          mark = status ? DONE_MARK : FAIL_MARK
+          row << mark
+        end
+        rows << row
+      end
+
+      # Создаем заголовок таблицы
+      header = ['Task'] + models.map { |m| m.gsub('_', "\n") }
+
+      # Создаем и выводим таблицу
+      table = Terminal::Table.new(
+        headings: header,
+        rows: rows,
+        style: {
+          border_x: '-',
+          border_y: '|',
+          border_i: '+',
+          alignment: :center
+        }
+      )
+
+      log "\nДетальные результаты:"
+      log table
     end
 
     def display_results(tasks, models)
-      # Всегда создаем оба отчета
-      create_reports(tasks, models)
+      # Создаем отчеты через генератор отчетов
+      generator = HumanEval::Reports::Generator.new(
+        output_dir: 'reports',
+        format: 'all',
+        results: @results,
+        tasks: tasks,
+        models: models
+      )
+      generator.generate
 
-      # Выводим только суммарный отчет в консоль
+      # Выводим общую статистику
       display_total_console(tasks, models)
+
+      # Выводим детальный отчет
+      display_detailed_console(tasks, models)
     end
 
-    # Получает информацию о модели из константы MODELS
-    # @param model_key [String] ключ модели
-    # @return [Hash] информация о модели или хеш с именем модели, если модель не найдена
     def get_model_info(model_key)
       # Проверяем доступность константы MODELS
       if defined?(HumanEval::SolverClass::MODELS)
-        model_info = HumanEval::SolverClass::MODELS[model_key]
-        return model_info if model_info
+        HumanEval::SolverClass::MODELS[model_key] || { name: model_key, provider: 'unknown' }
+      else
+        { name: model_key, provider: 'unknown' }
       end
-      # Если модель не найдена, возвращаем хеш с именем модели
-      { name: model_key, provider: 'unknown' }
     end
 
-    # Получает отображаемое имя модели
-    # @param model_key [String] ключ модели
-    # @return [String] отображаемое имя модели
     def get_display_model_name(model_key)
       model_info = get_model_info(model_key)
       name = model_info[:name]
       provider = model_info[:provider]
+      note = model_info[:note]
 
-      if provider && provider != 'unknown'
-        "#{name} (#{provider})"
-      else
-        model_key # Используем ключ как имя, если не удалось получить информацию
-      end
-    end
+      display_name = name.dup
+      display_name << " (#{provider})" if provider != 'unknown'
+      display_name << " - #{note}" if note
 
-    def create_reports(tasks, models)
-      # Подсчитываем статистику для каждой модели
-      model_stats = models.map do |model|
-        total_tasks = tasks.size
-        passed_tasks = tasks.count { |task| @results[task][model] }
-        percentage = (passed_tasks * 100.0 / total_tasks).round
-        [model, percentage]
-      end
-
-      # Сортируем по убыванию процента успешных тестов
-      model_stats.sort_by! { |_, percentage| -percentage }
-
-      # Создаем каталог reports, если он не существует
-      FileUtils.mkdir_p('reports')
-
-      # Путь к отчетам
-      total_report_file = File.join('reports', 'human_eval_for_ruby_report_total.html')
-      full_report_file = File.join('reports', 'human_eval_for_ruby_report_full.html')
-
-      # Общий HTML заголовок и стили для обоих отчетов
-      html_header = generate_html_header
-
-      # Генерируем суммарный отчет в HTML
-      File.open(total_report_file, 'w') do |file|
-        file.puts html_header
-        file.puts '<h1>Суммарный отчет о тестировании моделей</h1>'
-        file.puts "<p>Дата: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}</p>"
-
-        file.puts "<div class='model-results'>"
-        file.puts '<table>'
-        file.puts '<tr><th>Модель</th><th>Успешность</th></tr>'
-
-        model_stats.each do |model, percentage|
-          display_name = get_display_model_name(model)
-          file.puts "<tr><td>#{add_soft_hyphens(display_name)}</td><td>#{percentage}%</td></tr>"
-        end
-
-        file.puts '</table>'
-        file.puts '</div>'
-        file.puts '</body></html>'
-      end
-
-      # Подсчитываем статистику для каждой задачи
-      task_stats = tasks.map do |task|
-        total_models = models.size
-        passed_models = models.count { |model| @results[task][model] }
-        percentage = (passed_models * 100.0 / total_models).round
-        [task, percentage]
-      end
-
-      # Генерируем детальный отчет в HTML
-      File.open(full_report_file, 'w') do |file|
-        file.puts html_header
-        file.puts '<h1>Отчет о тестировании моделей</h1>'
-        file.puts "<p>Дата: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}</p>"
-
-        file.puts '<h2>Результаты</h2>'
-
-        # Таблица результатов моделей
-        file.puts '<h3>Результаты по моделям</h3>'
-        file.puts "<div class='model-results'>"
-        file.puts '<table>'
-        file.puts '<tr><th>Модель</th><th>Успешность</th></tr>'
-
-        model_stats.each do |model, percentage|
-          display_name = get_display_model_name(model)
-          file.puts "<tr><td>#{add_soft_hyphens(display_name)}</td><td>#{percentage}%</td></tr>"
-        end
-
-        file.puts '</table>'
-        file.puts '</div>'
-
-        file.puts '<h2>Детальная информация</h2>'
-        file.puts "<p>Всего задач: #{tasks.size}</p>"
-        file.puts "<p>Всего моделей: #{models.size}</p>"
-
-        # Детальная таблица по задачам и моделям
-        file.puts '<h3>Результаты по задачам и моделям</h3>'
-        file.puts "<div class='task-results'>"
-        file.puts '<table>'
-
-        # Заголовок таблицы
-        file.puts '<tr><th>Задача</th>'
-        file.puts '<th>Успешность</th>'
-        models.each do |model|
-          display_name = get_display_model_name(model)
-          file.puts "<th>#{add_soft_hyphens(display_name)}</th>"
-        end
-        file.puts '</tr>'
-
-        # Строки таблицы с данными
-        tasks.each do |task|
-          file.puts "<tr><td><a href='../tasks/#{task}.md'>#{task}</a></td>"
-
-          # Добавляем процент успешности для задачи сразу после названия задачи
-          task_percentage = task_stats.find { |t, _| t == task }[1]
-          color_class = if task_percentage == 100
-                          'success'
-                        elsif task_percentage.zero?
-                          'failure'
-                        else
-                          ''
-                        end
-          file.puts "<td class='#{color_class}'>#{task_percentage}%</td>"
-
-          models.each do |model|
-            status = @results[task][model]
-            css_class = status ? 'success' : 'failure'
-            symbol = status ? '✓' : '✗'
-            file.puts "<td class='#{css_class}'>#{symbol}</td>"
-          end
-
-          file.puts '</tr>'
-        end
-
-        file.puts '</table>'
-        file.puts '</div>'
-        file.puts '</body></html>'
-      end
-    end
-
-    # Генерирует HTML-заголовок с CSS-стилями
-    # @return [String] HTML-заголовок с CSS
-    def generate_html_header
-      <<~HTML
-        <!DOCTYPE html>
-        <html lang="ru">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Отчет о тестировании моделей</title>
-          <style>
-            body {
-              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                           Helvetica, Arial, sans-serif;
-              line-height: 1.6;
-              max-width: 1200px;
-              margin: 0 auto;
-              padding: 20px;
-              color: #333;
-              hyphens: auto;
-              word-wrap: break-word;
-              overflow-wrap: break-word;
-            }
-            h1, h2, h3 {
-              color: #2c3e50;
-            }
-            table {
-              border-collapse: collapse;
-              width: 100%;
-              margin-bottom: 20px;
-              font-size: 14px;
-            }
-            th, td {
-              hyphens: auto;
-              word-wrap: break-word;
-              overflow-wrap: break-word;
-              border: 1px solid #ddd;
-              padding: 8px;
-              text-align: center;
-            }
-            th {
-              background-color: #f2f2f2;
-              position: sticky;
-              top: 0;
-              vertical-align: top;
-            }
-            tr:nth-child(even) {
-              background-color: #f9f9f9;
-            }
-            .success {
-              color: #27ae60;
-              font-weight: bold;
-            }
-            .failure {
-              color: #e74c3c;
-              font-weight: bold;
-            }
-            .model-results td:first-child {
-              text-align: left;
-              font-weight: bold;
-            }
-            .task-results td:first-child {
-              text-align: left;
-              font-weight: bold;
-            }
-            .task-results th {
-              vertical-align: top;
-            }
-            @media (max-width: 768px) {
-              table {
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
-              }
-            }
-          </style>
-        </head>
-        <body>
-      HTML
+      display_name
     end
 
     # Форматирует название модели с мягкими переносами
-    # @param model [String] название модели
-    # @return [String] отформатированное название с мягкими переносами
+    # @param text [String] текст для форматирования
+    # @return [String] отформатированный текст с мягкими переносами
     def add_soft_hyphens(text)
       text.gsub('_', '_&shy;')
     end
