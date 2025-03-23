@@ -37,10 +37,11 @@ RSpec.describe HumanEvalConverter do
     # Устанавливаем API ключ
     ENV['OPENROUTER_API_KEY'] = api_key
     stub_const("#{described_class}::OPENROUTER_API_KEY", api_key)
+    stub_const("#{described_class}::AI_MODEL", 'anthropic/claude-3-sonnet-20240229')
 
     # Мокаем чтение файлов
     allow(File).to receive(:exist?).and_return(true)
-    allow(File).to receive(:read).with(input_file).and_return("#{task1_data.to_json}\n#{task2_data.to_json}")
+    allow(File).to receive(:readlines).with(input_file).and_return([task1_data.to_json, task2_data.to_json])
     allow(File).to receive(:read).with('rules/description_prompt.txt').and_return('Опиши задачу')
     allow(File).to receive(:read).with('rules/test_prompt.txt').and_return('Создай тесты')
     
@@ -76,9 +77,9 @@ RSpec.describe HumanEvalConverter do
         headers: { 
           'Authorization' => "Bearer #{api_key}",
           'Content-Type' => 'application/json',
-          'HTTP-Referer' => 'https://github.com/yourusername/human-eval-converter',
+          'Http-Referer' => 'https://github.com/yourusername/human-eval-converter',
           'X-Title' => 'Human Eval Converter',
-          'OpenAI-Organization' => 'openrouter',
+          'Openai-Organization' => 'openrouter',
           'User-Agent' => 'Human Eval Converter/1.0.0'
         },
         body: hash_including(
@@ -99,9 +100,9 @@ RSpec.describe HumanEvalConverter do
         headers: { 
           'Authorization' => "Bearer #{api_key}",
           'Content-Type' => 'application/json',
-          'HTTP-Referer' => 'https://github.com/yourusername/human-eval-converter',
+          'Http-Referer' => 'https://github.com/yourusername/human-eval-converter',
           'X-Title' => 'Human Eval Converter',
-          'OpenAI-Organization' => 'openrouter',
+          'Openai-Organization' => 'openrouter',
           'User-Agent' => 'Human Eval Converter/1.0.0'
         },
         body: hash_including(
@@ -121,9 +122,9 @@ RSpec.describe HumanEvalConverter do
         headers: { 
           'Authorization' => "Bearer #{api_key}",
           'Content-Type' => 'application/json',
-          'HTTP-Referer' => 'https://github.com/yourusername/human-eval-converter',
+          'Http-Referer' => 'https://github.com/yourusername/human-eval-converter',
           'X-Title' => 'Human Eval Converter',
-          'OpenAI-Organization' => 'openrouter',
+          'Openai-Organization' => 'openrouter',
           'User-Agent' => 'Human Eval Converter/1.0.0'
         },
         body: hash_including(
@@ -145,14 +146,16 @@ RSpec.describe HumanEvalConverter do
         expect(FileUtils).to receive(:mkdir_p).with(output_dir)
         
         # Проверяем сохранение файлов для задачи 1
-        expect(File).to receive(:write).with("#{output_dir}/t1.jsonl", task1_data.to_json)
-        expect(File).to receive(:write).with("#{output_dir}/t1.json", JSON.pretty_generate(task1_data))
+        jsonl_task1 = task1_data.transform_values { |v| v.is_a?(String) ? v.gsub("\n", "\\n") : v }
+        expect(File).to receive(:write).with("#{output_dir}/t1.jsonl", JSON.dump(jsonl_task1))
+        expect(File).to receive(:write).with("#{output_dir}/t1.json", JSON.pretty_generate(jsonl_task1))
         expect(File).to receive(:write).with("#{output_dir}/t1.md", /#{llm_response_description1}/)
         expect(File).to receive(:write).with("#{output_dir}/t1-assert.rb", llm_response_tests1)
         
         # Проверяем сохранение файлов для задачи 2
-        expect(File).to receive(:write).with("#{output_dir}/t2.jsonl", task2_data.to_json)
-        expect(File).to receive(:write).with("#{output_dir}/t2.json", JSON.pretty_generate(task2_data))
+        jsonl_task2 = task2_data.transform_values { |v| v.is_a?(String) ? v.gsub("\n", "\\n") : v }
+        expect(File).to receive(:write).with("#{output_dir}/t2.jsonl", JSON.dump(jsonl_task2))
+        expect(File).to receive(:write).with("#{output_dir}/t2.json", JSON.pretty_generate(jsonl_task2))
         expect(File).to receive(:write).with("#{output_dir}/t2.md", /#{llm_response_description2}/)
         expect(File).to receive(:write).with("#{output_dir}/t2-assert.rb", llm_response_tests2)
 
@@ -167,8 +170,9 @@ RSpec.describe HumanEvalConverter do
         expect(FileUtils).to receive(:mkdir_p).with(output_dir)
         
         # Проверяем сохранение файлов только для задачи 1
-        expect(File).to receive(:write).with("#{output_dir}/t1.jsonl", task1_data.to_json)
-        expect(File).to receive(:write).with("#{output_dir}/t1.json", JSON.pretty_generate(task1_data))
+        jsonl_task1 = task1_data.transform_values { |v| v.is_a?(String) ? v.gsub("\n", "\\n") : v }
+        expect(File).to receive(:write).with("#{output_dir}/t1.jsonl", JSON.dump(jsonl_task1))
+        expect(File).to receive(:write).with("#{output_dir}/t1.json", JSON.pretty_generate(jsonl_task1))
         expect(File).to receive(:write).with("#{output_dir}/t1.md", /#{llm_response_description1}/)
         expect(File).to receive(:write).with("#{output_dir}/t1-assert.rb", llm_response_tests1)
         

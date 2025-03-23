@@ -65,11 +65,13 @@ class HumanEvalConverter
     if @keep_existing && (File.exist?(jsonl_path) || File.exist?(json_path))
       debug "Пропускаем существующие файлы в #{@output_dir}"
     else
+      # Предварительно обрабатываем символы новой строки
+      jsonl_task = task.transform_values { |v| v.is_a?(String) ? v.gsub("\n", "\\n") : v }
       debug "Сохраняем JSONL в #{jsonl_path}"
-      File.write(jsonl_path, JSON.generate(task))
+      File.write(jsonl_path, JSON.dump(jsonl_task))
 
       debug "Сохраняем JSON в #{json_path}"
-      File.write(json_path, JSON.pretty_generate(task))
+      File.write(json_path, JSON.pretty_generate(jsonl_task))
     end
 
     # Генерируем остальные файлы
@@ -86,6 +88,7 @@ class HumanEvalConverter
     rescue StandardError => e
       error "Ошибка при создании дополнительных файлов для #{task_id}: #{e.message}"
       error "Исходные данные сохранены в: #{jsonl_path} и #{json_path}"
+      raise e
     end
   end
 
@@ -186,9 +189,9 @@ class HumanEvalConverter
     request = Net::HTTP::Post.new(uri)
     request['Authorization'] = "Bearer #{OPENROUTER_API_KEY}"
     request['Content-Type'] = 'application/json'
-    request['HTTP-Referer'] = ENV['HTTP_REFERER'] || 'https://github.com/yourusername/human-eval-converter'
+    request['Http-Referer'] = ENV['HTTP_REFERER'] || 'https://github.com/yourusername/human-eval-converter'
     request['X-Title'] = 'Human Eval Converter'
-    request['OpenAI-Organization'] = 'openrouter'
+    request['Openai-Organization'] = 'openrouter'
     request['User-Agent'] = 'Human Eval Converter/1.0.0'
 
     request.body = {
@@ -208,6 +211,11 @@ class HumanEvalConverter
     debug "Получен ответ с кодом: #{response.code}"
     debug "Заголовки ответа: #{response.to_hash}"
 
+    unless response.is_a?(Net::HTTPSuccess)
+      error "Ошибка API: #{response.code} - #{response.body}"
+      raise "Ошибка API при вызове модели #{AI_MODEL}"
+    end
+
     begin
       debug "Парсим ответ"
       # Безопасно выводим тело ответа, экранируя проблемные символы
@@ -220,7 +228,7 @@ class HumanEvalConverter
       if content.nil? || content.empty?
         error "Пустой ответ от API"
         error "Полный ответ: #{parsed_response.inspect}"
-        raise 'Пустой ответ от API'
+        raise "Пустой ответ от API при вызове модели #{AI_MODEL}"
       end
       
       # Принудительно конвертируем контент в UTF-8

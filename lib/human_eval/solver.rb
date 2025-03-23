@@ -10,23 +10,9 @@ module HumanEval
   class Solver
     include HumanEval::Logger
 
-    MODELS = %w[ 
-      deepseek/deepseek-chat
-      deepseek/deepseek-chat:free 
-      google/gemini-2.0-flash-001
-      google/gemini-2.0-flash-lite-001
-      google/gemini-flash-1.5 
-      meta-llama/llama-3.1-70b-instruct
-      qwen/qwen-2.5-coder-32b 
-      qwen/qwen-2.5-coder-32b-instruct:free 
-      mistralai/codestral-2501
-      openai/gpt-4o-mini
-      openai/o3-mini-high
-      anthropic/claude-3.5-sonnet
-    ]
-
     Dotenv.load
     OPENROUTER_API_KEY = ENV['OPENROUTER_API_KEY']
+    AI_MODEL = ENV['AI_MODEL'] || 'anthropic/claude-3-sonnet-20240229'
 
     def initialize(tasks_dir, options = {})
       @tasks_dir = tasks_dir
@@ -64,12 +50,7 @@ module HumanEval
       debug "Детали задачи #{task_number}:"
 
       content = File.read(file)
-      models = @model ? [@model] : MODELS
-
-      models.each_with_index do |model, index|
-        log "  Модель #{index + 1}/#{models.size}: #{model}"
-        solve_with_model(task_number, content, model)
-      end
+      solve_with_model(task_number, content, AI_MODEL)
     end
 
     def solve_with_model(task_number, content, model)
@@ -138,8 +119,10 @@ module HumanEval
       request = Net::HTTP::Post.new(uri)
       request['Authorization'] = "Bearer #{OPENROUTER_API_KEY}"
       request['Content-Type'] = 'application/json'
-      request['HTTP-Referer'] = ENV['HTTP_REFERER'] || 'https://github.com/yourusername/human-eval-solver'
-      request['X-Title'] = 'Human Eval Solver'
+      request['Http-Referer'] = ENV['HTTP_REFERER'] || 'https://github.com/yourusername/human-eval-converter'
+      request['X-Title'] = 'Human Eval Converter'
+      request['Openai-Organization'] = 'openrouter'
+      request['User-Agent'] = 'Human Eval Converter/1.0.0'
 
       request.body = {
         model: model,
