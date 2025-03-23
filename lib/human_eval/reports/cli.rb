@@ -6,46 +6,47 @@ require_relative '../reports'
 module HumanEval
   module Reports
     # CLI класс для генерации отчетов
-    class CLI
-      include Thor::Shell
+    class CLI < Thor
+      default_command :generate
 
-      DEFAULT_OPTIONS = {
-        format: 'all',
-        output_dir: 'reports'
-      }.freeze
-
-      attr_writer :options
-
-      def initialize(options = {})
-        @options = DEFAULT_OPTIONS.merge(options)
-        @shell = Thor::Shell::Color.new
-      end
-
+      desc 'generate', 'Генерирует HTML отчет о тестировании моделей'
+      method_option :format, type: :string, default: 'html',
+                           desc: 'Формат отчета (только html)'
+      method_option :output_dir, type: :string, default: 'reports',
+                               desc: 'Директория для сохранения отчетов'
+      method_option :results_file, type: :string, default: 'reports/results.json',
+                                desc: 'Файл с результатами тестирования'
       def generate
-        generator = Generator.new(@options)
-        generator.generate
-      rescue Error => e
-        puts "Ошибка при генерации отчета: #{e.message}"
+        validate_results_file!(options[:results_file])
+
+        HumanEval::Reports.generate_reports(
+          results_file: options[:results_file],
+          output_dir: options[:output_dir],
+          format: options[:format]
+        )
+
+        say "Отчеты сгенерированы в директории: #{options[:output_dir]}"
+        say "Формат: #{options[:format]}"
+      rescue ArgumentError => e
+        say_error e.message
+        exit 1
+      rescue JSON::ParserError => e
+        say_error "Ошибка при чтении файла результатов: #{e.message}"
+        exit 1
+      rescue StandardError => e
+        say_error "Неожиданная ошибка: #{e.message}"
         exit 1
       end
 
       private
 
       def say_error(message)
-        @shell.say "Error: #{message}", :red
+        say "Error: #{message}", :red
       end
 
-      def display_total(results)
-        return unless results && results[:model_stats]
-
-        @shell.say "\nРезультаты тестирования моделей:"
-        results[:model_stats].sort_by { |_, percentage| -percentage }.each do |model, percentage|
-          color = case percentage
-                 when 0..33 then :red
-                 when 34..66 then :yellow
-                 else :green
-                 end
-          @shell.say "- #{model}: #{percentage}%", color
+      def validate_results_file!(file_path)
+        unless File.exist?(file_path)
+          raise ArgumentError, "Файл с результатами #{file_path} не существует"
         end
       end
     end

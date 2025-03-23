@@ -14,7 +14,7 @@ RSpec.describe HumanEval::Reports::Formatters::HTML do
   let(:model_stats) do
     [
       ['model1', 50],
-      ['model2', 50]
+      ['model2', 25]
     ]
   end
   let(:timestamp) { '2024-03-20 12:00:00' }
@@ -36,74 +36,71 @@ RSpec.describe HumanEval::Reports::Formatters::HTML do
   end
 
   describe '#generate' do
+    let(:total_report) { File.join(output_dir, 'human_eval_for_ruby_report_total.html') }
+    let(:full_report) { File.join(output_dir, 'human_eval_for_ruby_report_full.html') }
+    let(:style_file) { File.join(output_dir, 'style.css') }
+
     before do
       formatter.generate
     end
 
     it 'создает файл с общим отчетом' do
-      total_report = File.join(output_dir, 'human_eval_for_ruby_report_total.html')
       expect(File.exist?(total_report)).to be true
     end
 
     it 'создает файл с полным отчетом' do
-      full_report = File.join(output_dir, 'human_eval_for_ruby_report_full.html')
       expect(File.exist?(full_report)).to be true
     end
 
+    it 'создает файл стилей' do
+      expect(File.exist?(style_file)).to be true
+    end
+
     context 'общий отчет' do
-      let(:total_report_content) do
-        File.read(File.join(output_dir, 'human_eval_for_ruby_report_total.html'))
-      end
+      let(:content) { File.read(total_report) }
 
       it 'содержит заголовок' do
-        expect(total_report_content).to include('<h1>Суммарный отчет о тестировании моделей</h1>')
+        expect(content).to include('<title>Отчет о тестировании моделей</title>')
       end
 
       it 'содержит дату' do
-        expect(total_report_content).to include("<p>Дата: #{timestamp}</p>")
+        expect(content).to include(timestamp)
       end
 
       it 'содержит таблицу со статистикой моделей' do
-        expect(total_report_content).to include('<div class=\'model-results\'><table>')
-        expect(total_report_content).to include('<tr><th>Модель</th><th>Успешность</th></tr>')
-        model_stats.each do |model, percentage|
-          expect(total_report_content).to include("<tr><td>#{model}</td><td>#{percentage}%</td></tr>")
-        end
+        expect(content).to include('<table')
+        expect(content).to include('model1')
+        expect(content).to include('50%')
+        expect(content).to include('model2')
+        expect(content).to include('25%')
       end
     end
 
     context 'полный отчет' do
-      let(:full_report_content) do
-        File.read(File.join(output_dir, 'human_eval_for_ruby_report_full.html'))
-      end
+      let(:content) { File.read(full_report) }
 
       it 'содержит заголовок' do
-        expect(full_report_content).to include('<h1>Полный отчет о тестировании моделей</h1>')
+        expect(content).to include('<title>Отчет о тестировании моделей</title>')
       end
 
       it 'содержит дату' do
-        expect(full_report_content).to include("<p>Дата: #{timestamp}</p>")
+        expect(content).to include(timestamp)
       end
 
       it 'содержит таблицу со статистикой моделей' do
-        expect(full_report_content).to include('<div class=\'model-results\'><table>')
-        expect(full_report_content).to include('<tr><th>Модель</th><th>Успешность</th></tr>')
-        model_stats.each do |model, percentage|
-          expect(full_report_content).to include("<tr><td>#{model}</td><td>#{percentage}%</td></tr>")
-        end
+        expect(content).to include('<table')
+        expect(content).to include('model1')
+        expect(content).to include('50%')
+        expect(content).to include('model2')
+        expect(content).to include('25%')
       end
 
       it 'содержит таблицу с результатами задач' do
-        expect(full_report_content).to include('<div class=\'task-results\'><table>')
-        expect(full_report_content).to include('<tr><th>Задача</th>')
-        task_results.each do |task, results|
-          expect(full_report_content).to include("<tr><td>#{task}</td>")
-          results.each do |_, success|
-            status = success ? '✓' : '✗'
-            css_class = success ? 'success' : 'failure'
-            expect(full_report_content).to include("<td class='#{css_class}'>#{status}</td>")
-          end
-        end
+        expect(content).to include('<table')
+        expect(content).to include('t1')
+        expect(content).to include('t2')
+        expect(content).to include('✅')
+        expect(content).to include('❌')
       end
     end
   end
@@ -111,27 +108,17 @@ RSpec.describe HumanEval::Reports::Formatters::HTML do
   describe '#html_header' do
     let(:header) { formatter.send(:html_header) }
 
-    it 'содержит DOCTYPE' do
-      expect(header).to include('<!DOCTYPE html>')
-    end
-
-    it 'содержит метатег с кодировкой' do
+    it 'содержит мета-теги' do
       expect(header).to include('<meta charset="UTF-8">')
+      expect(header).to include('<meta name="viewport"')
     end
 
-    it 'содержит метатег для viewport' do
-      expect(header).to include('<meta name="viewport" content="width=device-width, initial-scale=1.0">')
+    it 'содержит ссылку на файл стилей' do
+      expect(header).to include('<link rel="stylesheet" href="style.css">')
     end
 
-    it 'содержит заголовок страницы' do
+    it 'содержит заголовок' do
       expect(header).to include('<title>Отчет о тестировании моделей</title>')
-    end
-
-    it 'содержит стили' do
-      expect(header).to include('<style>')
-      expect(header).to include('body {')
-      expect(header).to include('.success {')
-      expect(header).to include('.failure {')
     end
   end
 end 

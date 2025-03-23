@@ -5,21 +5,23 @@ require 'stringio'
 
 RSpec.describe HumanEval::Reports::CLI do
   let(:output_dir) { File.join('spec', 'tmp', 'test_reports') }
-  let(:default_options) do
-    {
-      format: 'all',
-      output_dir: 'reports'
-    }
-  end
-  let(:custom_options) do
-    {
-      format: 'html',
-      output_dir: output_dir
-    }
-  end
-
+  let(:results_file) { File.join('spec', 'fixtures', 'results.json') }
+  let(:total_report) { File.join(output_dir, 'human_eval_for_ruby_report_total.html') }
+  let(:full_report) { File.join(output_dir, 'human_eval_for_ruby_report_full.html') }
+  let(:style_file) { File.join(output_dir, 'style.css') }
+  
   before(:each) do
     FileUtils.mkdir_p(output_dir)
+    FileUtils.mkdir_p(File.dirname(results_file))
+    
+    # Создаем тестовый файл с результатами
+    File.write(results_file, {
+      'results' => {
+        't1' => { 'model1' => true, 'model2' => false },
+        't2' => { 'model1' => false, 'model2' => true }
+      }
+    }.to_json)
+
     # Перехватываем STDOUT для тестирования вывода
     @original_stdout = $stdout
     @stdout = StringIO.new
@@ -28,99 +30,80 @@ RSpec.describe HumanEval::Reports::CLI do
 
   after(:each) do
     FileUtils.rm_rf(output_dir)
+    FileUtils.rm_f(results_file)
     # Восстанавливаем оригинальный STDOUT
     $stdout = @original_stdout
   end
 
-  describe '#initialize' do
-    it 'использует значения по умолчанию, если опции не указаны' do
-      cli = described_class.new
-      expect(cli.instance_variable_get(:@options)).to eq(default_options)
-    end
-
-    it 'объединяет пользовательские опции с опциями по умолчанию' do
-      cli = described_class.new(custom_options)
-      expect(cli.instance_variable_get(:@options)).to eq(default_options.merge(custom_options))
-    end
-  end
-
   describe '#generate' do
-    let(:generator) { instance_double(HumanEval::Reports::Generator) }
-    let(:cli) { described_class.new(custom_options) }
+    let(:cli) { described_class.new }
 
     context 'когда генерация проходит успешно' do
-      before do
-        allow(HumanEval::Reports::Generator).to receive(:new).and_return(generator)
-        allow(generator).to receive(:generate)
+      it 'генерирует HTML отчеты и выводит сообщение об успехе' do
+        cli.invoke(:generate, [], {
+          output_dir: output_dir,
+          results_file: results_file,
+          format: 'html'
+        })
+
+        expect(@stdout.string).to include("Отчеты сгенерированы в директории: #{output_dir}")
+        expect(@stdout.string).to include("Формат: html")
+        
+        expect(File.exist?(total_report)).to be true
+        expect(File.exist?(full_report)).to be true
+        expect(File.exist?(style_file)).to be true
       end
 
-      it 'создает генератор с правильными опциями' do
-        expect(HumanEval::Reports::Generator).to receive(:new).with(custom_options)
-        cli.generate
-      end
+      it 'использует HTML формат по умолчанию' do
+        cli.invoke(:generate, [], {
+          output_dir: output_dir,
+          results_file: results_file
+        })
 
-      it 'вызывает generate у генератора' do
-        expect(generator).to receive(:generate)
-        cli.generate
-      end
-    end
-
-    context 'когда возникает ошибка' do
-      let(:error_message) { 'Тестовая ошибка' }
-
-      before do
-        allow(HumanEval::Reports::Generator).to receive(:new).and_return(generator)
-        allow(generator).to receive(:generate).and_raise(HumanEval::Reports::Error, error_message)
-      end
-
-      it 'выводит сообщение об ошибке' do
-        expect { cli.generate }.to raise_error(SystemExit)
-        expect(@stdout.string).to include("Ошибка при генерации отчета: #{error_message}")
-      end
-
-      it 'завершает программу с кодом 1' do
-        expect { cli.generate }.to raise_error(SystemExit) do |error|
-          expect(error.status).to eq(1)
-        end
+        expect(File.exist?(total_report)).to be true
+        expect(File.exist?(full_report)).to be true
+        expect(File.exist?(style_file)).to be true
       end
     end
-  end
 
-  describe '#display_total' do
-    let(:cli) { described_class.new }
-    let(:results) do
-      {
-        model_stats: {
-          'model1' => 75,
-          'model2' => 50,
-          'model3' => 25
-        }
-      }
-    end
+    context 'когда возникают ошибки' do
+      it 'выводит сообщение об ошибке при некорректном формате' do
+        expect {
+          cli.invoke(:generate, [], {
+            output_dir: output_dir,
+            results_file: results_file,
+            format: 'invalid'
+          })
+        }.to raise_error(SystemExit)
 
-    it 'выводит результаты в правильном формате' do
-      cli.send(:display_total, results)
-      output = @stdout.string
+        expect(@stdout.string).to include('Неподдерживаемый формат')
+      end
 
-      expect(output).to include('Результаты тестирования моделей:')
-      expect(output).to include('model1: 75%')
-      expect(output).to include('model2: 50%')
-      expect(output).to include('model3: 25%')
-    end
+      it 'выводит сообщение об ошибке при отсутствии файла с результатами' do
+        expect {
+          cli.invoke(:generate, [], {
+            output_dir: output_dir,
+            results_file: 'non_existent.json',
+            format: 'html'
+          })
+        }.to raise_error(SystemExit)
 
-    it 'сортирует результаты по убыванию процентов' do
-      cli.send(:display_total, results)
-      output = @stdout.string.split("\n")
-      
-      model_lines = output.select { |line| line.start_with?('- ') }
-      percentages = model_lines.map { |line| line[/(\d+)%/, 1].to_i }
-      expect(percentages).to eq([75, 50, 25])
-    end
+        expect(@stdout.string).to include('не существует')
+      end
 
-    it 'не вызывает ошибку при пустых результатах' do
-      expect { cli.send(:display_total, nil) }.not_to raise_error
-      expect { cli.send(:display_total, {}) }.not_to raise_error
-      expect { cli.send(:display_total, { model_stats: {} }) }.not_to raise_error
+      it 'выводит сообщение об ошибке при некорректном JSON' do
+        File.write(results_file, 'invalid json')
+
+        expect {
+          cli.invoke(:generate, [], {
+            output_dir: output_dir,
+            results_file: results_file,
+            format: 'html'
+          })
+        }.to raise_error(SystemExit)
+
+        expect(@stdout.string).to include('Ошибка при чтении файла результатов')
+      end
     end
   end
 
@@ -129,9 +112,8 @@ RSpec.describe HumanEval::Reports::CLI do
     let(:error_message) { 'Тестовая ошибка' }
 
     it 'выводит сообщение об ошибке в правильном формате' do
-      shell = cli.instance_variable_get(:@shell)
-      expect(shell).to receive(:say).with("Error: #{error_message}", :red)
       cli.send(:say_error, error_message)
+      expect(@stdout.string).to include("Error: #{error_message}")
     end
   end
 end 

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'base'
+require 'fileutils'
 
 module HumanEval
   module Reports
@@ -11,6 +12,7 @@ module HumanEval
           FileUtils.mkdir_p(output_dir)
           generate_total_report
           generate_full_report
+          generate_styles
         end
 
         private
@@ -33,6 +35,12 @@ module HumanEval
             file.puts generate_model_stats_table
             file.puts generate_task_results_table
             file.puts '</body></html>'
+          end
+        end
+
+        def generate_styles
+          File.open(File.join(output_dir, 'style.css'), 'w') do |file|
+            file.puts css_styles
           end
         end
 
@@ -61,7 +69,7 @@ module HumanEval
           task_results.each do |task, results|
             content += "<tr><td>#{task}</td>"
             results.each do |_, success|
-              status = success ? '✓' : '✗'
+              status = success ? '✅' : '❌'
               css_class = success ? 'success' : 'failure'
               content += "<td class='#{css_class}'>#{status}</td>"
             end
@@ -80,33 +88,37 @@ module HumanEval
               <meta charset="UTF-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
               <title>Отчет о тестировании моделей</title>
-              <style>
-                body {
-                  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-                  line-height: 1.6;
-                  max-width: 1200px;
-                  margin: 0 auto;
-                  padding: 20px;
-                }
-                table {
-                  border-collapse: collapse;
-                  width: 100%;
-                  margin: 20px 0;
-                }
-                th, td {
-                  border: 1px solid #ddd;
-                  padding: 8px;
-                  text-align: left;
-                }
-                th {
-                  background-color: #f5f5f5;
-                }
-                .success { color: #2ecc71; }
-                .failure { color: #e74c3c; }
-              </style>
+              <link rel="stylesheet" href="style.css">
             </head>
             <body>
           HTML
+        end
+
+        def css_styles
+          <<~CSS
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+              line-height: 1.6;
+              max-width: 1200px;
+              margin: 0 auto;
+              padding: 20px;
+            }
+            table {
+              border-collapse: collapse;
+              width: 100%;
+              margin: 20px 0;
+            }
+            th, td {
+              border: 1px solid #ddd;
+              padding: 8px;
+              text-align: left;
+            }
+            th {
+              background-color: #f5f5f5;
+            }
+            .success { color: #2ecc71; }
+            .failure { color: #e74c3c; }
+          CSS
         end
       end
     end

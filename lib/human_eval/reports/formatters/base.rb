@@ -9,6 +9,7 @@ module HumanEval
 
         def initialize(options = {})
           validate_required_options!(options)
+          validate_output_dir_safety!(options[:output_dir])
           @output_dir = options[:output_dir]
           @task_results = options[:task_results]
           @model_stats = options[:model_stats]
@@ -27,6 +28,15 @@ module HumanEval
           return if missing_options.empty?
 
           raise ArgumentError, "Отсутствуют обязательные параметры: #{missing_options.join(', ')}"
+        end
+
+        def validate_output_dir_safety!(path)
+          absolute_path = File.expand_path(path)
+          spec_dir = File.expand_path('spec')
+          
+          unless absolute_path.start_with?(spec_dir)
+            raise ArgumentError, "Путь #{path} должен находиться внутри каталога spec"
+          end
         end
       end
     end
