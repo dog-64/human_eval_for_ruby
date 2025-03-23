@@ -12,6 +12,8 @@ gem 'rubocop'
 gem 'standard', '>= 1.35.1'
 gem 'terminal-table', '~> 3.0'
 gem 'thor', '~> 1.3'
+gem 'reline'
+gem 'irb'
 
 group :test do
   gem 'rspec', '~> 3.12'

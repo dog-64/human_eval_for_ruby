@@ -13,6 +13,14 @@ module HumanEval
     Dotenv.load
     OPENROUTER_API_KEY = ENV['OPENROUTER_API_KEY']
     AI_MODEL = ENV['AI_MODEL'] || 'anthropic/claude-3-sonnet-20240229'
+    MODELS = [
+      'anthropic/claude-3-sonnet-20240229',
+      'anthropic/claude-3-opus-20240229',
+      'anthropic/claude-2.1',
+      'google/gemini-pro',
+      'meta-llama/llama-2-70b-chat',
+      'mistral/mistral-7b-instruct'
+    ].freeze
 
     def initialize(tasks_dir, options = {})
       @tasks_dir = tasks_dir
