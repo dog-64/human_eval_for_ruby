@@ -22,6 +22,7 @@ module TestRunner
       @results = {}
       self.log_level = parse_log_level(@options[:log_level])
       @timeout = @options[:timeout] || 5  # Таймаут по умолчанию 5 секунд
+      @base_dir = File.expand_path(File.join(File.dirname(__FILE__), '..'))
     end
 
     def parse_log_level(level)
@@ -41,6 +42,14 @@ module TestRunner
               else "\e[32m"                # Зеленый
               end
       "#{color}#{text}\e[0m"
+    end
+
+    def validate_path(path)
+      expanded_path = File.expand_path(path)
+      unless expanded_path.start_with?(@base_dir)
+        raise SecurityError, "Попытка доступа к файлу вне рабочей директории: #{path}"
+      end
+      expanded_path
     end
 
     def run_all_tests
@@ -529,10 +538,11 @@ module TestRunner
       model_stats.sort_by! { |_, percentage| -percentage }
       
       # Создаем каталог reports, если он не существует
-      Dir.mkdir('reports') unless Dir.exist?('reports')
+      reports_dir = validate_path('reports')
+      Dir.mkdir(reports_dir) unless Dir.exist?(reports_dir)
       
       # Сохраняем total отчет
-      total_report_file = File.join('reports', "human_watch_ruby_report_total.md")
+      total_report_file = validate_path(File.join('reports', "human_watch_ruby_report_total.md"))
       File.open(total_report_file, 'w') do |file|
         model_stats.each do |model, percentage|
           file.puts "#{model}: #{percentage}%"

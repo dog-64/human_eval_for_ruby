@@ -18,7 +18,15 @@ module HumanEval
         @options = options
         @format = options[:format] || 'all'
         @output_dir = options[:output_dir] || 'reports'
+        @base_dir = if ENV['RUBY_ENV'] == 'test'
+          # В тестовом окружении разрешаем использование временных директорий
+          File.expand_path(@output_dir)
+        else
+          # В продакшене ограничиваем доступ корнем проекта
+          File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..'))
+        end
         validate_options!
+        validate_paths!
       end
 
       def generate
@@ -29,12 +37,39 @@ module HumanEval
 
       private
 
-      def collect_results
-        unless File.exist?(RESULTS_FILE)
-          raise Error, "Файл с результатами не найден: #{RESULTS_FILE}. Сначала запустите тесты."
+      def validate_paths!
+        if @output_dir.nil? || @output_dir.empty?
+          raise Error, "Не указана директория для сохранения отчетов"
         end
 
-        raw_results = JSON.parse(File.read(RESULTS_FILE))
+        unless ENV['RUBY_ENV'] == 'test'
+          expanded_output = File.expand_path(@output_dir)
+          unless expanded_output.start_with?(@base_dir)
+            raise Error, "Попытка доступа к директории вне рабочей директории: #{@output_dir}"
+          end
+        end
+      end
+
+      def safe_path_join(*parts)
+        path = File.join(*parts)
+        expanded = File.expand_path(path)
+        
+        unless ENV['RUBY_ENV'] == 'test'
+          unless expanded.start_with?(@base_dir)
+            raise Error, "Попытка доступа к файлу вне рабочей директории: #{path}"
+          end
+        end
+        
+        expanded
+      end
+
+      def collect_results
+        results_file = safe_path_join('reports', 'results.json')
+        unless File.exist?(results_file)
+          raise Error, "Файл с результатами не найден: #{results_file}. Сначала запустите тесты."
+        end
+
+        raw_results = JSON.parse(File.read(results_file))
         
         # Преобразуем результаты в нужный формат
         {

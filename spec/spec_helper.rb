@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+ENV['RUBY_ENV'] = 'test'
+
 require 'simplecov'
 SimpleCov.start do
   add_filter '/spec/' # исключаем тесты из отчета
@@ -20,6 +22,7 @@ require 'vcr'
 require 'pry'
 require 'pry-byebug'
 require 'fileutils'
+require 'tmpdir'
 
 require_relative '../lib/test_runner'
 require_relative '../lib/human_eval/solver'
@@ -50,5 +53,16 @@ RSpec.configure do |config|
 
   config.before(:each) do
     WebMock.reset!
+  end
+
+  # Включаем более подробный вывод ошибок
+  config.full_backtrace = true
+
+  # Включаем цветной вывод
+  config.color = true
+
+  # Очищаем временные файлы после тестов
+  config.after(:suite) do
+    FileUtils.rm_rf(Dir["#{Dir.tmpdir}/test_*"])
   end
 end
