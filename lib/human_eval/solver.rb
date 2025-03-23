@@ -32,6 +32,8 @@ module HumanEval
       'anthropic_claude_3_5_sonnet' => { name: 'anthropic/claude-3.5-sonnet', provider: 'openrouter.ai' },
       'mistralai_mistral-small-3_1-24b-instruct' => { name: 'mistralai/mistral-small-3.1-24b-instruct',
                                                       provider: 'openrouter.ai', note: '32b https://openrouter.ai/mistralai/mistral-small-3.1-24b-instruct-2503' },
+      'google_gemma-3-27b-it' => { name: 'google/gemma-3-27b-it',
+                                                      provider: 'openrouter.ai', note: 'https://openrouter.ai/google/gemma-3-27b-it' },
 
       'ollama_llama3_2' => { name: 'llama3.2', provider: 'ollama' },
       'ollama_codellama' => { name: 'codellama', provider: 'ollama',
