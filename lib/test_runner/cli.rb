@@ -4,41 +4,60 @@ require 'thor'
 require 'fileutils'
 require_relative 'runner'
 
-module TestRunner
+module Runner
   class CLI < Thor
     package_name 'Test Runner'
 
+    LOG_LEVELS = {
+      'debug' => :debug,
+      'normal' => :normal,
+      'error' => :error
+    }
+
     class_option :log_level,
                  type: :string,
-                 enum: %w[none normal debug],
+                 enum: LOG_LEVELS.keys,
                  default: 'normal',
                  desc: 'Уровень логирования'
 
-    class_option :report_total,
-                 type: :boolean,
-                 default: false,
-                 desc: 'Показать только сводный отчет по моделям'
+    class_option :timeout,
+                 type: :numeric,
+                 default: 5,
+                 desc: 'Таймаут выполнения теста в секундах'
 
     desc 'all', 'Запустить все тесты'
     def all
-      runner = Runner.new(options)
+      runner = TestRunner::Runner.new(
+        log_level: LOG_LEVELS[options[:log_level]],
+        timeout: options[:timeout]
+      )
       runner.run_all_tests
     end
 
-    desc 'task TASK_NUMBER', 'Запустить тесты для конкретной задачи'
-    def task(task_number)
-      runner = Runner.new(options)
-      runner.run_task_tests(task_number)
+    desc 'model MODEL', 'Запустить тесты для конкретной модели'
+    def model(model_name)
+      runner = TestRunner::Runner.new(
+        log_level: LOG_LEVELS[options[:log_level]],
+        timeout: options[:timeout]
+      )
+      runner.run_model_tests(nil, model_name)
     end
 
-    desc 'model TASK_NUMBER MODEL', 'Запустить тесты для конкретной задачи и модели'
-    def model(task_number, model)
-      runner = Runner.new(options)
-      runner.run_model_tests(task_number, model)
+    desc 'task TASK', 'Запустить тесты для конкретного задания'
+    def task(task_name)
+      runner = TestRunner::Runner.new(
+        log_level: LOG_LEVELS[options[:log_level]],
+        timeout: options[:timeout]
+      )
+      runner.run_task_tests(task_name)
     end
 
     def self.exit_on_failure?
       true
+    end
+
+    def self.start(given_args = ARGV, config = {})
+      super
     end
   end
 end

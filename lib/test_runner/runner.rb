@@ -109,43 +109,72 @@ module TestRunner
     end
 
     def run_model_tests(task, model)
-      unless task.to_s.match?(/^t\d+$/)
-        error "Ошибка: Неверный формат задачи. Ожидается формат 't<число>' (например, 't1')"
-        return {}
-      end
-
       unless model.to_s.match?(/^[a-zA-Z0-9_-]+$/)
         error 'Ошибка: Неверный формат названия модели'
         return {}
       end
-      solution = Dir.glob("tasks/#{task}-#{model}.rb").first
 
-      if solution.nil?
-        error "Решение для задачи #{task} модели #{model} не найдено"
-        return {}
+      if task.nil?
+        # Если задача не указана, запускаем тесты для всех задач этой модели
+        solutions = Dir.glob("tasks/t*-#{model}.rb")
+        if solutions.empty?
+          error "Решения для модели #{model} не найдены"
+          return {}
+        end
+
+        @results = Hash.new { |h, k| h[k] = {} }
+        tasks = solutions.map { |f| File.basename(f).split('-').first }.uniq.sort
+
+        tasks.each do |t|
+          solution = Dir.glob("tasks/#{t}-#{model}.rb").first
+          next unless solution && File.exist?(solution)
+
+          begin
+            success = test_solution(t, solution)
+            @results[t][model] = success || false
+          rescue Interrupt => e
+            error "Тест прерван для задачи #{t} модели #{model}"
+            @results[t][model] = false
+          end
+        end
+
+        begin
+          display_results(tasks, [model])
+        rescue Interrupt
+          error "Отображение результатов прервано для модели #{model}"
+        end
+
+        @results
+      else
+        # Если задача указана, проверяем её формат и запускаем тест
+        unless task.to_s.match?(/^t\d+$/)
+          error "Ошибка: Неверный формат задачи. Ожидается формат 't<число>' (например, 't1')"
+          return {}
+        end
+
+        solution = Dir.glob("tasks/#{task}-#{model}.rb").first
+        if solution.nil? || !File.exist?(solution)
+          error "Решение для задачи #{task} модели #{model} не найдено"
+          return {}
+        end
+
+        @results = Hash.new { |h, k| h[k] = {} }
+        begin
+          success = test_solution(task, solution)
+          @results[task][model] = success || false
+        rescue Interrupt => e
+          error "Тест прерван для задачи #{task} модели #{model}"
+          @results[task][model] = false
+        end
+
+        begin
+          display_results([task], [model])
+        rescue Interrupt
+          error "Отображение результатов прервано для задачи #{task} модели #{model}"
+        end
+
+        @results
       end
-
-      unless File.exist?(solution)
-        error "Решение для задачи #{task} модели #{model} не найдено"
-        return {}
-      end
-
-      @results = Hash.new { |h, k| h[k] = {} }
-      begin
-        success = test_solution(task, solution)
-        @results[task][model] = success || false
-      rescue Interrupt => e
-        error "Тест прерван для задачи #{task} модели #{model}"
-        @results[task][model] = false
-      end
-
-      begin
-        display_results([task], [model])
-      rescue Interrupt
-        error "Отображение результатов прервано для задачи #{task} модели #{model}"
-      end
-
-      @results
     end
 
     def get_model_stats
