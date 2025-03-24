@@ -31,7 +31,8 @@ module Runner
     def all
       runner = TestRunner::Runner.new(
         log_level: LOG_LEVELS[options[:log_level]],
-        timeout: options[:timeout]
+        timeout: options[:timeout],
+        generate_reports: true
       )
       runner.run_all_tests
     end
@@ -41,7 +42,8 @@ module Runner
       validate_argument('model', model_name)
       runner = TestRunner::Runner.new(
         log_level: LOG_LEVELS[options[:log_level]],
-        timeout: options[:timeout]
+        timeout: options[:timeout],
+        generate_reports: false
       )
       runner.run_model_tests(nil, model_name)
     end
@@ -51,7 +53,8 @@ module Runner
       validate_argument('task', task_name)
       runner = TestRunner::Runner.new(
         log_level: LOG_LEVELS[options[:log_level]],
-        timeout: options[:timeout]
+        timeout: options[:timeout],
+        generate_reports: false
       )
       runner.run_task_tests(task_name)
     end

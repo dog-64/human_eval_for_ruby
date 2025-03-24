@@ -21,9 +21,10 @@ module TestRunner
 
     def initialize(options = {})
       @options = options
+      self.log_level = options[:log_level] || :normal
+      @timeout = options[:timeout] || 5
+      @generate_reports = options[:generate_reports] || false
       @results = {}
-      self.log_level = @options[:log_level] || :normal
-      @timeout = @options[:timeout] || 5 # Таймаут по умолчанию 5 секунд
     end
 
     def colorize(text, percentage)
@@ -66,13 +67,15 @@ module TestRunner
 
       debug_log "Final results: #{@results.inspect}"
 
-      # Генерируем отчеты
-      report_data = {
-        model_stats: get_model_stats,
-        task_results: @results
-      }
+      # Генерируем отчеты только если это разрешено
+      if @generate_reports
+        report_data = {
+          model_stats: get_model_stats,
+          task_results: @results
+        }
 
-      HumanEval::ReportGenerator.new(report_data).generate_all
+        HumanEval::ReportGenerator.new(report_data).generate_all
+      end
 
       display_total_console(tasks, models)
       @results
@@ -506,15 +509,17 @@ module TestRunner
     end
 
     def display_results(tasks, models)
-      # Создаем отчеты через генератор отчетов
-      generator = HumanEval::Reports::Generator.new(
-        output_dir: 'reports',
-        format: 'all',
-        results: @results,
-        tasks: tasks,
-        models: models
-      )
-      generator.generate
+      # Создаем отчеты через генератор отчетов только если это разрешено
+      if @generate_reports
+        generator = HumanEval::Reports::Generator.new(
+          output_dir: 'reports',
+          format: 'all',
+          results: @results,
+          tasks: tasks,
+          models: models
+        )
+        generator.generate
+      end
 
       # Выводим общую статистику
       display_total_console(tasks, models)
