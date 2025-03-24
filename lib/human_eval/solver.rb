@@ -27,13 +27,20 @@ module HumanEval
                                               provider: 'openrouter.ai' },
       'mistralai_codestral_2501' => { name: 'mistralai/codestral-2501', provider: 'openrouter.ai' },
       'openai_gpt_4o_mini' => { name: 'openai/gpt-4o-mini', provider: 'openrouter.ai' },
-      'openai_o3_mini_high' => { name: 'openai/o3-mini-high', provider: 'openrouter.ai', note: 'дорогой, медленный' },
+      'openai_o3_mini_high' => { name: 'openai/o3-mini-high',
+                                 provider: 'openrouter.ai',
+                                 note: 'дорогой, медленный' },
 
       'anthropic_claude_3_5_sonnet' => { name: 'anthropic/claude-3.5-sonnet', provider: 'openrouter.ai' },
       'mistralai_mistral-small-3_1-24b-instruct' => { name: 'mistralai/mistral-small-3.1-24b-instruct',
-                                                      provider: 'openrouter.ai', note: '32b https://openrouter.ai/mistralai/mistral-small-3.1-24b-instruct-2503' },
+                                                      provider: 'openrouter.ai',
+                                                      note: '32b https://openrouter.ai/mistralai/mistral-small-3.1-24b-instruct-2503' },
       'google_gemma-3-27b-it' => { name: 'google/gemma-3-27b-it',
-                                                      provider: 'openrouter.ai', note: 'https://openrouter.ai/google/gemma-3-27b-it' },
+                                   provider: 'openrouter.ai',
+                                   note: 'https://openrouter.ai/google/gemma-3-27b-it' },
+      'microsoft_phi-4-multimodal-instruct' => { name: 'microsoft/phi-4-multimodal-instruct',
+                                                 provider: 'openrouter.ai',
+                                                 note: 'https://openrouter.ai/microsoft/phi-4-multimodal-instruct' },
 
       'ollama_llama3_2' => { name: 'llama3.2', provider: 'ollama' },
       'ollama_codellama' => { name: 'codellama', provider: 'ollama',
@@ -422,7 +429,7 @@ module HumanEval
     # @return [String] извлеченное содержимое
     def extract_ollama_content(parsed_response, model_name)
       content = parsed_response.dig('message', 'content') || parsed_response['response']
-      
+
       if content.nil? || content.empty?
         error "Пустой ответ от Ollama API для модели #{model_name}"
         error "Ответ API: #{parsed_response.inspect}"
@@ -438,10 +445,10 @@ module HumanEval
     def extract_and_join_code_blocks(input)
       # Проверяем наличие блоков кода в разных форматах
       has_code_blocks = input.include?('```ruby') ||
-                        input.include?('```rb') ||
-                        input.include?('```python') ||
-                        input.include?('```') ||
-                        input.include?('```md')
+        input.include?('```rb') ||
+        input.include?('```python') ||
+        input.include?('```') ||
+        input.include?('```md')
 
       return input unless has_code_blocks
 
@@ -499,7 +506,7 @@ module HumanEval
       return unless models_to_use.empty?
 
       raise 'Нет доступных локальных моделей Ollama. Установите OPENROUTER_API_KEY для использования моделей ' \
-            'OpenRouter.ai'
+              'OpenRouter.ai'
     end
   end
 end

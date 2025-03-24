@@ -17,23 +17,6 @@ RSpec.describe HumanEval::SolverClass do
     TASK
   end
 
-  let(:solver_prompt) do
-    <<~PROMPT
-      - в ответе давай только ruby код, без markdown разметки
-      - не повторяй код, если он уже был в ответе
-      - не нужно никаких примеров использования кроме текста самой функции
-      #{' '}
-
-    PROMPT
-  end
-
-  let(:full_prompt) do
-    <<~PROMPT
-      #{solver_prompt}
-      #{task_content}
-    PROMPT
-  end
-
   before(:all) do
     # Ничего не делаем в before(:all), так как каждый тест будет использовать свою временную директорию
   end
@@ -85,18 +68,7 @@ RSpec.describe HumanEval::SolverClass do
             'Authorization' => 'Bearer test_key',
             'Content-Type' => 'application/json',
             'HTTP-Referer' => 'https://github.com/yourusername/human-eval-solver',
-            'X-Title' => 'Human Eval Solver',
-            'Accept' => '*/*',
-            'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-            'Host' => 'openrouter.ai',
-            'User-Agent' => 'Ruby'
-          },
-          body: {
-            model: 'anthropic/claude-3.5-sonnet',
-            messages: [{ role: 'user', content: full_prompt }],
-            temperature: 0.1,
-            max_tokens: 32_000,
-            stream: false
+            'X-Title' => 'Human Eval Solver'
           }
         )
         .to_return(
@@ -135,23 +107,10 @@ RSpec.describe HumanEval::SolverClass do
     end
 
     before do
-      stub_request(:post, "#{ENV['OLLAMA_BASE_URL'] || 'http://localhost:11434'}/api/chat")
+      stub_request(:post, "http://localhost:11434/api/chat")
         .with(
           headers: {
-            'Content-Type' => 'application/json',
-            'Accept' => '*/*',
-            'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-            'Host' => 'localhost:11434',
-            'User-Agent' => 'Ruby'
-          },
-          body: {
-            model: 'codellama',
-            messages: [{ role: 'user', content: full_prompt }],
-            stream: false,
-            options: {
-              temperature: 0.1,
-              num_predict: 4096
-            }
+            'Content-Type' => 'application/json'
           }
         )
         .to_return(
@@ -184,18 +143,7 @@ RSpec.describe HumanEval::SolverClass do
               'Authorization' => 'Bearer test_key',
               'Content-Type' => 'application/json',
               'HTTP-Referer' => 'https://github.com/yourusername/human-eval-solver',
-              'X-Title' => 'Human Eval Solver',
-              'Accept' => '*/*',
-              'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-              'Host' => 'openrouter.ai',
-              'User-Agent' => 'Ruby'
-            },
-            body: {
-              model: 'anthropic/claude-3.5-sonnet',
-              messages: [{ role: 'user', content: full_prompt }],
-              temperature: 0.1,
-              max_tokens: 32_000,
-              stream: false
+              'X-Title' => 'Human Eval Solver'
             }
           )
           .to_return(status: 500, body: 'Internal Server Error')
@@ -216,18 +164,7 @@ RSpec.describe HumanEval::SolverClass do
               'Authorization' => 'Bearer test_key',
               'Content-Type' => 'application/json',
               'HTTP-Referer' => 'https://github.com/yourusername/human-eval-solver',
-              'X-Title' => 'Human Eval Solver',
-              'Accept' => '*/*',
-              'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-              'Host' => 'openrouter.ai',
-              'User-Agent' => 'Ruby'
-            },
-            body: {
-              model: 'anthropic/claude-3.5-sonnet',
-              messages: [{ role: 'user', content: full_prompt }],
-              temperature: 0.1,
-              max_tokens: 32_000,
-              stream: false
+              'X-Title' => 'Human Eval Solver'
             }
           )
           .to_return(

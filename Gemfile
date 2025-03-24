@@ -7,9 +7,9 @@ gem "pry"
 gem "pry-byebug"
 gem "ostruct"
 gem "numo-narray"
-gem "rubocop"
 gem "standard", ">= 1.35.1"
 gem "bundle-audit"
+gem "prime"
 
 group :test do
   gem 'rspec', '~> 3.12'
@@ -22,5 +22,7 @@ group :test do
   gem "rspec-support"
   gem "rspec-core"
   gem 'simplecov', '~> 0.22.0', require: false
+  gem "rubocop"
+  gem "rubocop-rspec"
 end
 
