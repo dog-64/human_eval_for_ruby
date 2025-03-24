@@ -241,6 +241,15 @@ module TestRunner
         include HumanEval::Assert
         include HumanEval::LogLevels
 
+        # Загружаем стандартные библиотеки Ruby с обработкой ошибок
+        %w[prime set json date time base64 digest securerandom pathname].each do |lib|
+          begin
+            require lib
+          rescue LoadError => e
+            warn "  ⚠️ Библиотека #{lib} недоступна: #{e.message}"
+          end
+        end
+
         class << self
           attr_writer :log_level
         end
