@@ -15,9 +15,6 @@ module Runner
     include HumanEval::Logger
     include HumanEval::LogLevels
 
-    DONE_MARK = "\e[32m✓\e[0m".freeze # Зеленый цвет
-    FAIL_MARK = "\e[31m✗\e[0m".freeze # Красный цвет
-
     def initialize(options = {})
       @options = options
       self.log_level = options[:log_level] || :normal
@@ -26,27 +23,15 @@ module Runner
       @results = {}
     end
     
-    def run_all_tests(options = {})
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | run_all_tests(#{options} = {})"
+    def run_all_tests
       # Используем опции из инициализации класса
       tasks = find_solution_files.map { |f| File.basename(f) }.map { |f| f.gsub(/-.*$/, '') }.uniq.sort
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
       if tasks.empty?
-        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         error 'Ошибка: Не найдены файлы с решениями'
         return {}
       end
 
-      # puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
-      # models = find_solution_files.map do |f|
-      #   filename = File.basename(f)
-      #   next if filename.end_with?('_asserts.rb')
-      #
-      #   filename.split('-')[1..].join('-').sub('.rb', '')
-      # end.compact.uniq.sort
-
       @results = Hash.new { |h, k| h[k] = {} }
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
 
       tasks.each do |task|
         task_solutions = find_solution_files(task)
@@ -60,14 +45,11 @@ module Runner
           @results[task][model] = success
         end
       end
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
 
       debug_log "Final results: #{@results.inspect}"
 
       # Генерируем отчеты только если это разрешено
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
       if @generate_reports
-        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         model_stats = get_model_stats
         report_data = {
           model_stats: model_stats,
@@ -77,7 +59,6 @@ module Runner
         generator.generate_all
       end
 
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
       @results
     end
 
@@ -179,16 +160,11 @@ module Runner
     end
 
     def model_stats
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | model_stats"
-      if @results.empty?
-        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
-        run_all_tests
-      end
+      run_all_tests if @results.empty?
 
       model_stats = {}
       solution_files = find_solution_files
 
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
       solution_files.each do |file|
         if (m = file.match(/tasks\/t\d+-(.+)\.rb/))
           puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
@@ -201,7 +177,6 @@ module Runner
         end
       end
 
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
       # Преобразуем статистику в массив пар [модель, процент]
       model_stats.map do |model, stats|
         percentage = stats[:total].zero? ? 0 : (stats[:passed] * 100.0 / stats[:total]).round
@@ -237,39 +212,27 @@ module Runner
     private
 
     def test_solution(solution_file)
-      puts "#{__FILE__}:#{__LINE__} [DEBUG] | test_solution(#{solution_file})"
       unless File.exist?(solution_file)
         log_error("Solution file #{solution_file} does not exist")
-        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         return false
       end
       content = File.read(solution_file)
       if content.strip.empty?
         log_error("Solution file #{solution_file} is empty")
-        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         return false
       end
 
-        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
       begin
-        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         eval(content)
-        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         true
       rescue SyntaxError => e
-        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         log_error("Syntax error in #{solution_file}: #{e.message}")
-        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         false
       rescue StandardError => e
-        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         log_error("Runtime error in #{solution_file}: #{e.message}")
-        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         false
       rescue Exception => e
-        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         log_error("Unexpected error in #{solution_file}: #{e.message}")
-        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         false
       end
     end
@@ -335,10 +298,6 @@ module Runner
         percentage = (passed_tasks * 100.0 / total_tasks).round
         [model, { total: total_tasks, passed: passed_tasks, percentage: percentage }]
       end.to_h
-    end
-
-    def display_total_console(tasks, models)
-      # ... existing code ...
     end
   end
 end
