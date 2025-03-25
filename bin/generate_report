@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-# Инициализируем rbenv и запускаем через bundle exec
-eval "$(rbenv init -)" && bundle exec ruby "$(dirname "$0")/generate_report_helper.rb" "$@" 
