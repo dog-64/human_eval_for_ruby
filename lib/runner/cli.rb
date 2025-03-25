@@ -21,11 +21,6 @@ module Runner
                  default: 'normal',
                  desc: 'Уровень логирования (debug, normal, error)'
 
-    class_option :timeout,
-                 type: :numeric,
-                 default: 5,
-                 desc: 'Таймаут для каждого теста в секундах'
-
     class_option :generate_reports,
                  type: :boolean,
                  default: true,
@@ -36,7 +31,6 @@ module Runner
       puts "Debug: CLI options = #{options.inspect}"
       runner = Runner.new(
         log_level: LOG_LEVELS[options[:log_level]],
-        timeout: options[:timeout],
         generate_reports: options[:generate_reports]
       )
       puts "Debug: Runner options = #{runner.instance_variable_get(:@options).inspect}"
@@ -48,7 +42,6 @@ module Runner
       validate_argument('model', model_name)
       runner = Runner.new(
         log_level: LOG_LEVELS[options[:log_level]],
-        timeout: options[:timeout],
         generate_reports: false
       )
       runner.run_model_tests(nil, model_name)
@@ -59,7 +52,6 @@ module Runner
       validate_argument('task', task_name)
       runner = Runner.new(
         log_level: LOG_LEVELS[options[:log_level]],
-        timeout: options[:timeout],
         generate_reports: false
       )
       runner.run_task_tests(task_name)

@@ -9,7 +9,6 @@ RSpec.describe Runner::CLI do
       runner = instance_double(Runner::Runner)
       expect(Runner::Runner).to receive(:new).with(
         log_level: Runner::CLI::LOG_LEVELS['normal'],
-        timeout: 5,
         generate_reports: true
       ).and_return(runner)
       expect(runner).to receive(:run_all_tests)
@@ -20,11 +19,10 @@ RSpec.describe Runner::CLI do
       runner = instance_double(Runner::Runner)
       expect(Runner::Runner).to receive(:new).with(
         log_level: Runner::CLI::LOG_LEVELS['debug'],
-        timeout: 10,
         generate_reports: true
       ).and_return(runner)
       expect(runner).to receive(:run_all_tests)
-      cli.options = { log_level: 'debug', timeout: 10 }
+      cli.options = { log_level: 'debug', generate_reports: true }
       cli.all
     end
   end
@@ -34,7 +32,6 @@ RSpec.describe Runner::CLI do
       runner = instance_double(Runner::Runner)
       expect(Runner::Runner).to receive(:new).with(
         log_level: Runner::CLI::LOG_LEVELS['normal'],
-        timeout: 5,
         generate_reports: false
       ).and_return(runner)
       expect(runner).to receive(:run_model_tests).with(nil, 'gpt-4')
@@ -45,11 +42,10 @@ RSpec.describe Runner::CLI do
       runner = instance_double(Runner::Runner)
       expect(Runner::Runner).to receive(:new).with(
         log_level: Runner::CLI::LOG_LEVELS['debug'],
-        timeout: 10,
         generate_reports: false
       ).and_return(runner)
       expect(runner).to receive(:run_model_tests).with(nil, 'gpt-4')
-      cli.options = { log_level: 'debug', timeout: 10 }
+      cli.options = { log_level: 'debug' }
       cli.model('gpt-4')
     end
 
@@ -63,7 +59,6 @@ RSpec.describe Runner::CLI do
       runner = instance_double(Runner::Runner)
       expect(Runner::Runner).to receive(:new).with(
         log_level: Runner::CLI::LOG_LEVELS['normal'],
-        timeout: 5,
         generate_reports: false
       ).and_return(runner)
       expect(runner).to receive(:run_task_tests).with('t1')
@@ -74,11 +69,10 @@ RSpec.describe Runner::CLI do
       runner = instance_double(Runner::Runner)
       expect(Runner::Runner).to receive(:new).with(
         log_level: Runner::CLI::LOG_LEVELS['debug'],
-        timeout: 10,
         generate_reports: false
       ).and_return(runner)
       expect(runner).to receive(:run_task_tests).with('t1')
-      cli.options = { log_level: 'debug', timeout: 10 }
+      cli.options = { log_level: 'debug' }
       cli.task('t1')
     end
 
@@ -104,7 +98,7 @@ RSpec.describe Runner::CLI do
 
     it 'handles --task argument with options' do
       expect(runner).to receive(:run_task_tests).with('t1')
-      Runner::CLI.start(['task', 't1', '--log-level', 'debug', '--timeout', '10'])
+      Runner::CLI.start(['task', 't1', '--log-level', 'debug'])
     end
 
     it 'handles --model argument correctly' do
@@ -119,7 +113,7 @@ RSpec.describe Runner::CLI do
 
     it 'handles --all argument with options' do
       expect(runner).to receive(:run_all_tests)
-      Runner::CLI.start(['all', '--log-level', 'debug', '--timeout', '10'])
+      Runner::CLI.start(['all', '--log-level', 'debug'])
     end
 
     context 'with invalid arguments' do
