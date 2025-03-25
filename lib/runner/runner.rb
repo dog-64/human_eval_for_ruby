@@ -22,7 +22,7 @@ module Runner
       @generate_reports = options[:generate_reports] || false
       @results = {}
     end
-    
+
     def run_all_tests
       # Используем опции из инициализации класса
       tasks = find_solution_files.map { |f| File.basename(f) }.map { |f| f.gsub(/-.*$/, '') }.uniq.sort
@@ -235,14 +235,6 @@ module Runner
         log_error("Unexpected error in #{solution_file}: #{e.message}")
         false
       end
-    end
-
-    def handle_timeout(thread)
-      thread.kill
-      thread.join(1) # Даем потоку секунду на завершение
-      error "  ❌ Превышен лимит времени выполнения (#{@timeout} секунд)"
-      error '     Возможно, в решении есть бесконечный цикл'
-      false
     end
 
     def display_results
