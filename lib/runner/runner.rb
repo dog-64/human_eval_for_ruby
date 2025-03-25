@@ -8,7 +8,6 @@ require 'fileutils'
 require_relative '../human_eval/solver'
 require_relative '../human_eval/report_generator'
 require_relative '../human_eval/reports/generator'
-require_relative 'report_generator'
 
 # Класс для запуска и управления тестами решений
 module Runner
@@ -26,31 +25,28 @@ module Runner
       @generate_reports = options[:generate_reports] || false
       @results = {}
     end
-
-    def colorize(text, percentage)
-      color = case percentage
-      when 0..33 then "\e[31m" # Красный
-      when 34..66 then "\e[33m" # Желтый
-      else "\e[32m" # Зеленый
-      end
-      "#{color}#{text}\e[0m"
-    end
-
-    def run_all_tests
+    
+    def run_all_tests(options = {})
+      puts "#{__FILE__}:#{__LINE__} [DEBUG] | run_all_tests(#{options} = {})"
+      # Используем опции из инициализации класса
       tasks = find_solution_files.map { |f| File.basename(f) }.map { |f| f.gsub(/-.*$/, '') }.uniq.sort
+      puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
       if tasks.empty?
+        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         error 'Ошибка: Не найдены файлы с решениями'
         return {}
       end
 
-      models = find_solution_files.map do |f|
-        filename = File.basename(f)
-        next if filename.end_with?('_asserts.rb')
-
-        filename.split('-')[1..].join('-').sub('.rb', '')
-      end.compact.uniq.sort
+      # puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
+      # models = find_solution_files.map do |f|
+      #   filename = File.basename(f)
+      #   next if filename.end_with?('_asserts.rb')
+      #
+      #   filename.split('-')[1..].join('-').sub('.rb', '')
+      # end.compact.uniq.sort
 
       @results = Hash.new { |h, k| h[k] = {} }
+      puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
 
       tasks.each do |task|
         task_solutions = find_solution_files(task)
@@ -64,20 +60,24 @@ module Runner
           @results[task][model] = success
         end
       end
+      puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
 
       debug_log "Final results: #{@results.inspect}"
 
       # Генерируем отчеты только если это разрешено
+      puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
       if @generate_reports
+        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
+        model_stats = get_model_stats
         report_data = {
           model_stats: model_stats,
           task_results: @results
         }
-
-        HumanEval::ReportGenerator.new(report_data).generate_all
+        generator = HumanEval::ReportGenerator.new(report_data)
+        generator.generate_all
       end
 
-      # display_total_console(tasks, models)
+      puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
       @results
     end
 
@@ -98,7 +98,7 @@ module Runner
         return {}
       end
 
-      models = solutions.map { |s| File.basename(s).split('-')[1..].join('-').sub('.rb', '') }
+      # models = solutions.map { |s| File.basename(s).split('-')[1..].join('-').sub('.rb', '') }
       @results = Hash.new { |h, k| h[k] = {} }
 
       solutions.each do |solution|
@@ -107,7 +107,7 @@ module Runner
         @results[task][model] = success
       end
 
-      display_results([task], models)
+      display_results
       @results
     end
 
@@ -143,7 +143,7 @@ module Runner
         end
 
         begin
-          display_results(tasks, [model])
+          display_results
         rescue Interrupt
           error "Отображение результатов прервано для модели #{model}"
         end
@@ -169,7 +169,7 @@ module Runner
         end
 
         begin
-          display_results([task], [model])
+          display_results
         rescue Interrupt
           error "Отображение результатов прервано для задачи #{task} модели #{model}"
         end
@@ -179,15 +179,19 @@ module Runner
     end
 
     def model_stats
+      puts "#{__FILE__}:#{__LINE__} [DEBUG] | model_stats"
       if @results.empty?
+        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         run_all_tests
       end
 
       model_stats = {}
-      solution_files = Dir.glob('tasks/t*-*.rb').reject { |f| f.end_with?('-assert.rb') }
+      solution_files = find_solution_files
 
+      puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
       solution_files.each do |file|
         if (m = file.match(/tasks\/t\d+-(.+)\.rb/))
+          puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
           model = m[1]
           model_stats[model] ||= { total: 0, passed: 0 }
           model_stats[model][:total] += 1
@@ -197,11 +201,12 @@ module Runner
         end
       end
 
+      puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
       # Преобразуем статистику в массив пар [модель, процент]
       model_stats.map do |model, stats|
         percentage = stats[:total].zero? ? 0 : (stats[:passed] * 100.0 / stats[:total]).round
-        [model, percentage]
-      end.sort_by { |model, percentage| [-percentage, model] }
+        [model, { total: stats[:total], passed: stats[:passed], percentage: percentage }]
+      end.sort_by { |_, stats| [-stats[:percentage], _] }
     end
 
     def log_error_details(error)
@@ -231,40 +236,40 @@ module Runner
 
     private
 
-    def test_solution(solution_file, model = nil)
+    def test_solution(solution_file)
+      puts "#{__FILE__}:#{__LINE__} [DEBUG] | test_solution(#{solution_file})"
       unless File.exist?(solution_file)
         log_error("Solution file #{solution_file} does not exist")
+        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         return false
       end
-
       content = File.read(solution_file)
       if content.strip.empty?
         log_error("Solution file #{solution_file} is empty")
+        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         return false
       end
 
+        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
       begin
+        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         eval(content)
-      rescue SyntaxError => e
-        log_error("Syntax error in #{solution_file}: #{e.message}")
-        return false
-      rescue StandardError => e
-        log_error("Error in #{solution_file}: #{e.message}")
-        return false
-      end
-
-      # test_file = solution_file.sub(/tasks\/(t\d+)-.*\.rb$/, 'spec/tmp/tasks/\1-assert.rb')
-      # test_file = solution_file
-      # unless File.exist?(test_file)
-      #   log_error("Test file #{test_file} does not exist")
-      #   return false
-      # end
-
-      begin
-        load solution_file
+        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         true
+      rescue SyntaxError => e
+        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
+        log_error("Syntax error in #{solution_file}: #{e.message}")
+        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
+        false
       rescue StandardError => e
-        log_error("Error running test #{solution_file}: #{e.message}")
+        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
+        log_error("Runtime error in #{solution_file}: #{e.message}")
+        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
+        false
+      rescue Exception => e
+        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
+        log_error("Unexpected error in #{solution_file}: #{e.message}")
+        puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
         false
       end
     end
@@ -277,38 +282,7 @@ module Runner
       false
     end
 
-    # def display_total_console(tasks, models)
-    #   rows = []
-    #   # Используем простые названия моделей для заголовка
-    #   rows << ['Задача'] + models
-    #
-    #   tasks.each do |task|
-    #     row = [task]
-    #     models.each do |model|
-    #       row << (@results[task]&.fetch(model, false) ? DONE_MARK : FAIL_MARK)
-    #     end
-    #     rows << row
-    #   end
-    #
-    #   # Добавляем строку с процентами
-    #   percentages = models.map do |model|
-    #     total = tasks.size
-    #     passed = tasks.count { |task| @results[task]&.fetch(model, false) }
-    #     percentage = total.zero? ? 0 : (passed * 100.0 / total).round(1)
-    #     "#{percentage}%"
-    #   end
-    #   rows << ['%'] + percentages
-    #
-    #   table = Terminal::Table.new(
-    #     title: "\nРезультаты тестирования\n",
-    #     rows: rows,
-    #     style: { border_x: '-', border_i: '+', alignment: :center }
-    #   )
-    #
-    #   print table.to_s + "\n"
-    # end
-
-    def display_results(tasks, models)
+    def display_results
       if @generate_reports
         report_generator = ReportGenerator.new(@results)
         report_generator.generate_reports
@@ -349,6 +323,22 @@ module Runner
     def find_solution_files(task = nil)
       pattern = task ? "tasks/#{task}-*.rb" : 'tasks/t*-*.rb'
       Dir.glob(pattern).reject { |f| f.end_with?('-assert.rb') }
+    end
+
+    def get_model_stats
+      tasks = @results.keys
+      models = @results.values.flat_map(&:keys).uniq
+
+      models.map do |model|
+        total_tasks = tasks.size
+        passed_tasks = tasks.count { |task| @results[task][model] }
+        percentage = (passed_tasks * 100.0 / total_tasks).round
+        [model, { total: total_tasks, passed: passed_tasks, percentage: percentage }]
+      end.to_h
+    end
+
+    def display_total_console(tasks, models)
+      # ... existing code ...
     end
   end
 end

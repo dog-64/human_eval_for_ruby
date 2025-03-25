@@ -19,11 +19,20 @@ module HumanEval
     private
 
     def save_json
-      File.write(File.join(@reports_dir, 'test_results.json'), JSON.pretty_generate({
-        timestamp: Time.now.strftime('%Y-%m-%d %H:%M:%S'),
-        models: @results[:model_stats],
-        tasks: @results[:task_results]
-      }))
+      begin
+        FileUtils.mkdir_p(@reports_dir)
+        json_data = {
+          timestamp: Time.now.to_s,
+          models: @results[:model_stats].to_h,
+          tasks: @results[:task_results]
+        }
+        
+        json_file = File.join(@reports_dir, 'results.json')
+        File.write(json_file, JSON.pretty_generate(json_data))
+      rescue => e
+        puts "Error saving JSON: #{e.class} - #{e.message}"
+        puts e.backtrace
+      end
     end
 
     def create_html_reports
@@ -43,6 +52,7 @@ module HumanEval
     def update_readme
       readme_path = File.join(@reports_dir, 'README.md')
       return unless File.exist?(readme_path)
+
       readme = File.read(readme_path)
       new_content = readme.sub(
         /## Рейтинг.*?(?=##|\z)/m,

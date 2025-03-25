@@ -26,13 +26,20 @@ module Runner
                  default: 5,
                  desc: 'Таймаут для каждого теста в секундах'
 
+    class_option :generate_reports,
+                 type: :boolean,
+                 default: true,
+                 desc: 'Генерировать отчеты'
+
     desc 'all', 'Запустить все тесты'
     def all
+      puts "Debug: CLI options = #{options.inspect}"
       runner = Runner.new(
         log_level: LOG_LEVELS[options[:log_level]],
         timeout: options[:timeout],
-        generate_reports: true
+        generate_reports: options[:generate_reports]
       )
+      puts "Debug: Runner options = #{runner.instance_variable_get(:@options).inspect}"
       runner.run_all_tests
     end
 
