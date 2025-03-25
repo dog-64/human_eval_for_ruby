@@ -27,7 +27,7 @@ module HumanEval
           tasks: @results[:task_results]
         }
         
-        json_file = File.join(@reports_dir, 'results.json')
+        json_file = File.join(@reports_dir, 'test_results.json')
         File.write(json_file, JSON.pretty_generate(json_data))
       rescue => e
         puts "Error saving JSON: #{e.class} - #{e.message}"
