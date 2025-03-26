@@ -17,4 +17,3 @@
 - ollama_codellama_13b: 27%
 - ollama_llama3_2: 25%
 - ollama_codellama_34b: 17%
-- model1: 1%

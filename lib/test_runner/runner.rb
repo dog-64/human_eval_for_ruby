@@ -526,13 +526,16 @@ module TestRunner
         tasks: tasks,
         models: models
       )
+
+      # Генерируем отчеты
       generator.generate
 
-      # Выводим общую статистику
-      display_total_console(tasks, models)
-
-      # Выводим детальный отчет
-      display_detailed_console(tasks, models)
+      # Отображаем результаты в консоли в зависимости от опции report_total
+      if @options[:report_total]
+        display_total_console(tasks, models)
+      else
+        display_detailed_console(tasks, models)
+      end
     end
 
     def get_model_info(model_key)
