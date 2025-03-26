@@ -11,11 +11,11 @@ module HumanEval
 
       desc 'generate', 'Генерирует HTML отчет о тестировании моделей'
       method_option :format, type: :string, default: 'html',
-                           desc: 'Формат отчета (только html)'
+                             desc: 'Формат отчета (только html)'
       method_option :output_dir, type: :string, default: 'reports',
-                               desc: 'Директория для сохранения отчетов'
+                                 desc: 'Директория для сохранения отчетов'
       method_option :results_file, type: :string, default: 'reports/results.json',
-                                desc: 'Файл с результатами тестирования'
+                                   desc: 'Файл с результатами тестирования'
       def generate
         validate_results_file!(options[:results_file])
 
@@ -45,10 +45,10 @@ module HumanEval
       end
 
       def validate_results_file!(file_path)
-        unless File.exist?(file_path)
-          raise ArgumentError, "Файл с результатами #{file_path} не существует"
-        end
+        return if File.exist?(file_path)
+
+        raise ArgumentError, "Файл с результатами #{file_path} не существует"
       end
     end
   end
-end 
+end

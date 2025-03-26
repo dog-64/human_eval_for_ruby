@@ -1,0 +1,8 @@
+## Отчеты
+
+- данные по отчетам должны храниться в reports/total.jsonl
+- каждая строка имеет формат {model: str, task: str, success: boolean}
+- model - название модели, например ollama_codellama_13b
+- task - название задачи - например t1, t95, ...
+- success - true или false - результат решения задачи моделью
+

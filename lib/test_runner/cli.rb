@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'thor'
-require 'fileutils'
 require_relative 'runner'
 
 module TestRunner

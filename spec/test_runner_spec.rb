@@ -44,7 +44,7 @@ RSpec.describe TestRunner::Runner do
     allow(Dir).to receive(:glob).with('tasks/t1-nonexistent.rb').and_return([])
 
     # Мокаем методы работы с README.md
-    allow_any_instance_of(HumanEval::ReportGenerator).to receive(:update_readme)
+    allow_any_instance_of(HumanEval::Reports::Generator).to receive(:generate)
   end
 
   describe '#run_all_tests' do

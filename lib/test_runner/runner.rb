@@ -8,8 +8,9 @@ require_relative '../human_eval/log_levels'
 require 'shellwords'
 require 'fileutils'
 require_relative '../human_eval/solver'
-require_relative '../human_eval/report_generator'
 require_relative '../human_eval/reports/generator'
+require_relative 'report'
+require 'thor'
 
 module TestRunner
   class Runner
@@ -24,6 +25,7 @@ module TestRunner
       @results = {}
       self.log_level = @options[:log_level] || :normal
       @timeout = @options[:timeout] || 5 # Таймаут по умолчанию 5 секунд
+      @report = Report.new(@options)
     end
 
     def colorize(text, percentage)
@@ -72,7 +74,13 @@ module TestRunner
         task_results: @results
       }
       
-      HumanEval::ReportGenerator.new(report_data).generate_all
+      HumanEval::Reports::Generator.new(
+        output_dir: 'reports',
+        format: 'all',
+        results: @results,
+        tasks: tasks,
+        models: models
+      ).generate
       
       display_total_console(tasks, models)
       @results
@@ -190,9 +198,9 @@ module TestRunner
     # был перенесен в отдельный модуль. Метод оставлен для обратной
     # совместимости и будет удален в следующих версиях.
     #
-    # @deprecated Используйте ReportGenerator вместо этого метода
+    # @deprecated Используйте Reports::Generator вместо этого метода
     def create_reports(tasks, models)
-      warn "DEPRECATED: Метод create_reports устарел и будет удален. Используйте ReportGenerator."
+      warn "DEPRECATED: Метод create_reports устарел и будет удален. Используйте Reports::Generator."
       # Оставляем пустую реализацию
     end
 
@@ -200,16 +208,19 @@ module TestRunner
 
     def test_solution(task, solution_file)
       test_file = "tasks/#{task}-assert.rb"
+      model = File.basename(solution_file).split('-')[1..].join('-').sub('.rb', '')
 
       unless File.exist?(solution_file)
         error "\nРешение #{File.basename(solution_file)}:"
         error "  ❌ Файл решения не найден: #{solution_file}"
+        @report.save_result(model: model, task: task, success: false)
         return false
       end
 
       unless File.exist?(test_file)
         error "\nРешение #{File.basename(solution_file)}:"
         error "  ❌ Файл тестов не найден: #{test_file}"
+        @report.save_result(model: model, task: task, success: false)
         return false
       end
 
@@ -217,6 +228,7 @@ module TestRunner
       solution_content = File.read(solution_file)
       if solution_content.strip.empty?
         error '  ❌ Файл решения пуст'
+        @report.save_result(model: model, task: task, success: false)
         return false
       end
 
@@ -228,6 +240,7 @@ module TestRunner
       rescue SyntaxError => e
         error '  ❌ Ошибка синтаксиса в решении:'
         error "     #{e.message}"
+        @report.save_result(model: model, task: task, success: false)
         return false
       rescue StandardError => e
         # Если в решении есть посторонний код, который вызывает ошибку,
@@ -362,10 +375,6 @@ module TestRunner
               begin
                 test_context.module_eval(line)
               rescue HumanEval::Assert::AssertionError => e
-                # Сохраняем информацию о не пройденном тесте
-                File.basename(solution_file).split('-')[1..].join('-').sub('.rb', '')
-                task = File.basename(solution_file).split('-').first
-
                 debug_log "\n  ❌ Тест не пройден на строке #{line_number}:"
                 debug_log "     #{line.strip}"
 
@@ -385,75 +394,50 @@ module TestRunner
                                 test: line.strip
                               }
                             })
+                @report.save_result(model: model, task: task, success: false)
                 return false
               end
             end
 
             debug_log '  ✅ Тесты выполнены успешно'
             result.push({ status: :success })
+            @report.save_result(model: model, task: task, success: true)
+            true
           rescue StandardError => e
             debug_log "  ❌ Ошибка при выполнении тестов: #{e.class} - #{e.message}"
             debug_log "  ❌ Ошибка: #{e.message || 'Unknown error'}"
             result.push(test_context.handle_error(e))
+            @report.save_result(model: model, task: task, success: false)
+            false
           rescue Exception => e
             debug_log "  ❌ Критическая ошибка при выполнении тестов: #{e.class} - #{e.message}"
-            result.push({
-                          status: :error,
-                          error: {
-                            class: e.class.name,
-                            message: e.message || 'Unknown error',
-                            backtrace: e.backtrace || []
-                          }
-                        })
+            @report.save_result(model: model, task: task, success: false)
+            false
           end
         end
 
-        begin
-          Timeout.timeout(@timeout) do
-            debug_log '  ⏳ Ожидаем результат выполнения тестов...'
-            res = result.pop
-            debug_log "   Получен результат: #{res.inspect}"
-            case res[:status]
-            when :success
-              debug_log '  ✅ Все тесты пройдены успешно'
-              return true
-            when :error
-              error = res[:error]
-              log_error_details(error)
-              return false
-            else
-              error "  ❌ Неизвестный статус результата: #{res[:status]}"
-              return false
-            end
-          end
-        rescue Timeout::Error
+        thread.join(@timeout)
+        if thread.alive?
           thread.kill
-          thread.join(1) # Даем потоку секунду на завершение
-          error "  ❌ Превышен лимит времени выполнения (#{@timeout} секунд)"
-          error '     Возможно, в решении есть бесконечный цикл'
-          false
-        ensure
-          thread.kill unless thread.nil? || !thread.alive?
+          error "  ❌ Тест превысил лимит времени (#{@timeout} секунд)"
+          @report.save_result(model: model, task: task, success: false)
+          return false
         end
-      rescue Interrupt => e
-        error "\n  ⚠️  Тест прерван пользователем (Ctrl+C)"
-        debug_log "  📍 Место прерывания: #{e.backtrace.first}"
-        false
+
+        result = result.pop
+        case result[:status]
+        when :success
+          true
+        when :error
+          log_error_details(result[:error])
+          false
+        else
+          error "  ❌ Неизвестный статус результата: #{result[:status]}"
+          false
+        end
       rescue StandardError => e
-        error '  ❌ Неожиданная ошибка:'
-        error "     Тип: #{e.class}"
-        error "     Сообщение: #{e.message}"
-        debug_log "     Место ошибки: #{e.backtrace.first}"
-        debug_log '     Полный стек вызовов:'
-        e.backtrace.each { |line| debug_log "       #{line}" }
-        false
-      rescue Exception => e
-        error '  ❌ Критическая ошибка:'
-        error "     Тип: #{e.class}"
-        error "     Сообщение: #{e.message}"
-        debug_log "     Место ошибки: #{e.backtrace.first}"
-        debug_log '     Полный стек вызовов:'
-        e.backtrace.each { |line| debug_log "       #{line}" }
+        error "  ❌ Ошибка при чтении тестов: #{e.message}"
+        @report.save_result(model: model, task: task, success: false)
         false
       end
     end
@@ -547,19 +531,6 @@ module TestRunner
       end
     end
 
-    def get_display_model_name(model_key)
-      model_info = get_model_info(model_key)
-      name = model_info[:name]
-      provider = model_info[:provider]
-      note = model_info[:note]
-
-      display_name = name.dup
-      display_name << " (#{provider})" if provider != 'unknown'
-      display_name << " - #{note}" if note
-
-      display_name
-    end
-
     # Форматирует название модели с мягкими переносами
     # @param text [String] текст для форматирования
     # @return [String] отформатированный текст с мягкими переносами
@@ -570,6 +541,61 @@ module TestRunner
     def find_solution_files(task = nil)
       pattern = task ? "tasks/#{task}-*.rb" : 'tasks/t*-*.rb'
       Dir.glob(pattern).reject { |f| f.end_with?('-assert.rb') }
+    end
+  end
+
+  class CLI < Thor
+    package_name 'Test Runner'
+
+    desc 'all', 'Запустить все тесты'
+    method_option :report_total, type: :boolean, default: true,
+                  desc: 'Показывать только общий отчет'
+    method_option :log_level, type: :string, default: 'normal',
+                  desc: 'Уровень логирования (debug, normal, quiet)'
+    def all
+      runner = Runner.new(
+        report_total: options[:report_total],
+        log_level: (options[:log_level] || 'normal').to_sym
+      )
+      runner.run_all_tests
+    end
+
+    desc 'task TASK', 'Запустить тесты для конкретной задачи'
+    method_option :report_total, type: :boolean, default: true,
+                  desc: 'Показывать только общий отчет'
+    method_option :log_level, type: :string, default: 'normal',
+                  desc: 'Уровень логирования (debug, normal, quiet)'
+    def task(task)
+      runner = Runner.new(
+        report_total: options[:report_total],
+        log_level: (options[:log_level] || 'normal').to_sym
+      )
+      runner.run_task_tests(task)
+    end
+
+    desc 'model TASK MODEL', 'Запустить тесты для конкретной модели'
+    method_option :report_total, type: :boolean, default: true,
+                  desc: 'Показывать только общий отчет'
+    method_option :log_level, type: :string, default: 'normal',
+                  desc: 'Уровень логирования (debug, normal, quiet)'
+    def model(task, model)
+      runner = Runner.new(
+        report_total: options[:report_total],
+        log_level: (options[:log_level] || 'normal').to_sym
+      )
+      runner.run_model_tests(task, model)
+    end
+
+    def self.exit_on_failure?
+      true
+    end
+
+    def self.start(given_args = ARGV, config = {})
+      # Добавляем опцию --report-total по умолчанию только в production окружении
+      unless ENV['RACK_ENV'] == 'test'
+        given_args << "--report-total" unless given_args.any? { |arg| arg.include?("report-total") }
+      end
+      super
     end
   end
 end

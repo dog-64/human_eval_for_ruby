@@ -1,0 +1,17 @@
+{"model":"deepseek_deepseek_chat","total_tasks":102,"passed_tasks":42,"success_rate":41,"timestamp":"2025-03-26T21:39:06Z"}
+{"model":"deepseek_deepseek_chat_free","total_tasks":88,"passed_tasks":56,"success_rate":64,"timestamp":"2025-03-26T21:39:06Z"}
+{"model":"google_gemini_2_0_flash_001","total_tasks":86,"passed_tasks":60,"success_rate":70,"timestamp":"2025-03-26T21:39:06Z"}
+{"model":"google_gemini_2_0_flash_lite_001","total_tasks":92,"passed_tasks":54,"success_rate":59,"timestamp":"2025-03-26T21:39:06Z"}
+{"model":"google_gemini_flash_1_5","total_tasks":96,"passed_tasks":48,"success_rate":50,"timestamp":"2025-03-26T21:39:06Z"}
+{"model":"google_gemma_3_27b_it","total_tasks":98,"passed_tasks":46,"success_rate":47,"timestamp":"2025-03-26T21:39:06Z"}
+{"model":"meta_llama_llama_3_1_70b_instruct","total_tasks":102,"passed_tasks":36,"success_rate":35,"timestamp":"2025-03-26T21:39:06Z"}
+{"model":"microsoft_phi_4_multimodal_instruct","total_tasks":120,"passed_tasks":16,"success_rate":13,"timestamp":"2025-03-26T21:39:06Z"}
+{"model":"mistralai_codestral_2501","total_tasks":96,"passed_tasks":44,"success_rate":46,"timestamp":"2025-03-26T21:39:06Z"}
+{"model":"mistralai_mistral_small_3_1_24b_instruct","total_tasks":100,"passed_tasks":38,"success_rate":38,"timestamp":"2025-03-26T21:39:06Z"}
+{"model":"ollama_codellama","total_tasks":118,"passed_tasks":16,"success_rate":14,"timestamp":"2025-03-26T21:39:06Z"}
+{"model":"ollama_codellama_13b","total_tasks":114,"passed_tasks":14,"success_rate":12,"timestamp":"2025-03-26T21:39:06Z"}
+{"model":"ollama_codellama_34b","total_tasks":102,"passed_tasks":6,"success_rate":6,"timestamp":"2025-03-26T21:39:06Z"}
+{"model":"ollama_llama3_2","total_tasks":110,"passed_tasks":16,"success_rate":15,"timestamp":"2025-03-26T21:39:06Z"}
+{"model":"openai_gpt_4o_mini","total_tasks":90,"passed_tasks":52,"success_rate":58,"timestamp":"2025-03-26T21:39:06Z"}
+{"model":"openai_o3_mini_high","total_tasks":86,"passed_tasks":58,"success_rate":67,"timestamp":"2025-03-26T21:39:06Z"}
+{"model":"qwen_qwen_2_5_coder_32b_instruct","total_tasks":86,"passed_tasks":48,"success_rate":56,"timestamp":"2025-03-26T21:39:06Z"}
