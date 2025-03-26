@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-03-24 17:59:29",
+  "timestamp": "2025-03-26 18:58:15",
   "models": [
     [
       "google_gemini_2_0_flash_001",
@@ -68,6 +68,10 @@
     [
       "ollama_codellama_34b",
       17
+    ],
+    [
+      "model1",
+      1
     ]
   ],
   "tasks": {
@@ -101,6 +105,7 @@
       "microsoft_phi_4_multimodal_instruct": false,
       "mistralai_codestral_2501": false,
       "mistralai_mistral_small_3_1_24b_instruct": false,
+      "model1": true,
       "ollama_codellama": false,
       "ollama_codellama_13b": false,
       "ollama_codellama_34b": false,
