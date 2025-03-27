@@ -95,9 +95,9 @@ module HumanEval
     def find_task_files
       if @task_number
         task_name = @task_number.start_with?('t') ? @task_number : "t#{@task_number}"
-        [File.join(@tasks_dir, "#{task_name}.md")]
+        [File.join(@tasks_dir, "#{task_name}.json")]
       else
-        Dir[File.join(@tasks_dir, 't*.md')]
+        Dir[File.join(@tasks_dir, 't*.json')]
       end
     end
 
@@ -106,7 +106,7 @@ module HumanEval
     # @param total_tasks [Integer] общее количество задач
     def process_all_tasks(task_files, total_tasks)
       task_files.each_with_index do |file, index|
-        task_number = File.basename(file, '.md').sub('t', '')
+        task_number = File.basename(file, '.json').sub('t', '')
         log "Обработка задачи #{task_number} (#{index + 1}/#{total_tasks})"
         process_task(file)
       end
@@ -115,10 +115,10 @@ module HumanEval
     # Обрабатывает одну задачу
     # @param file [String] путь к файлу задачи
     def process_task(file)
-      task_number = File.basename(file, '.md').sub('t', '')
+      task_number = File.basename(file, '.json').sub('t', '')
       debug "Детали задачи #{task_number}:"
 
-      content = File.read(file)
+      content = JSON.parse(File.read(file))
       models = select_models_for_task
 
       models.each_with_index do |model_key, index|
@@ -185,7 +185,11 @@ module HumanEval
     # @param content [String] содержимое задачи
     # @return [String] полный промпт
     def prepare_prompt(content)
-      solver_prompt = File.read(File.join('rules', 'model_solver_prompt.txt'))
+      solver_prompt = begin
+        File.read(File.join('rules', 'solver_prompt.txt'))
+      rescue Errno::ENOENT
+        "You are a helpful assistant that solves programming tasks.\n\nTask:\n{task}\n\nSolution:"
+      end
 
       # Логируем промпт для решения
       debug 'Загружен промпт для решения:'
@@ -237,13 +241,15 @@ module HumanEval
 
       # Извлекаем код из ответа
       solution = extract_and_join_code_blocks(raw_solution)
+      debug "Извлеченный код (длина: #{solution.length}):"
+      debug solution
 
       # Проверяем, что решение не пустое
       if solution.strip.empty?
         error "❌ Модель #{model_name} вернула пустое решение!"
         error 'Полный ответ модели:'
         error raw_solution
-        return
+        raise "Пустой ответ от API"
       end
 
       # Логируем извлеченное решение
@@ -252,9 +258,21 @@ module HumanEval
       debug solution
       debug '---END EXTRACTED SOLUTION---'
 
+      # Проверяем директорию
+      output_dir = File.dirname(output_file)
+      debug "Проверяем директорию: #{output_dir}"
+      FileUtils.mkdir_p(output_dir) unless Dir.exist?(output_dir)
+
       # Сохраняем решение в файл
-      File.write(output_file, solution)
-      debug "Решение сохранено в #{output_file}"
+      debug "Сохраняем решение в файл: #{output_file}"
+      begin
+        File.write(output_file, solution)
+        debug "✅ Решение успешно сохранено в #{output_file}"
+      rescue => e
+        error "❌ Ошибка при сохранении файла: #{e.message}"
+        error e.backtrace.join("\n")
+        raise
+      end
     end
 
     # Вызывает API OpenRouter.ai
@@ -285,19 +303,18 @@ module HumanEval
     def prepare_openrouter_request(uri, model_name, prompt)
       # Создаем запрос
       request = Net::HTTP::Post.new(uri)
-
-      # Устанавливаем заголовки
       request['Authorization'] = "Bearer #{openrouter_api_key}"
       request['Content-Type'] = 'application/json'
       request['HTTP-Referer'] = ENV['HTTP_REFERER'] || 'https://github.com/yourusername/human-eval-solver'
       request['X-Title'] = 'Human Eval Solver'
+      request['OpenAI-Organization'] = 'openrouter'
+      request['User-Agent'] = 'Human Eval Solver/1.0.0'
 
-      # Формируем тело запроса
       request.body = {
         model: model_name,
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.1,
-        max_tokens: 32_000, # 1000 - для всех, 32000 - для o3-mini-high
+        max_tokens: 1000,
         stream: false
       }.to_json
 
@@ -311,29 +328,22 @@ module HumanEval
     def process_openrouter_response(response, model_name)
       # Проверяем успешность запроса
       unless response.is_a?(Net::HTTPSuccess)
-        error "Ошибка API: #{response.code} - #{response.body}"
-        raise "Ошибка API при вызове модели #{model_name}"
+        error_message = "Ошибка API при вызове модели #{model_name}"
+        error_message += "\nКод ответа: #{response.code}"
+        error_message += "\nТело ответа: #{response.body}" if response.body
+        raise error_message
       end
 
-      # Обрабатываем ответ
       begin
-        # Парсим JSON
         parsed_response = JSON.parse(response.body)
-
-        # Извлекаем содержимое
         content = parsed_response.dig('choices', 0, 'message', 'content')
-
-        # Проверяем, что содержимое не пустое
+        
         if content.nil? || content.empty?
-          error "Пустой ответ от API для модели #{model_name}"
-          error "Ответ API: #{parsed_response.inspect}"
           raise 'Пустой ответ от API'
         end
 
-        # Кодируем в UTF-8
-        content.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
+        content
       rescue JSON::ParserError => e
-        error "Ошибка парсинга JSON: #{e.message}"
         raise "Ошибка парсинга ответа API: #{e.message}"
       end
     end
@@ -396,44 +406,31 @@ module HumanEval
     def process_ollama_response(response, model_name, uri)
       # Проверяем успешность запроса
       unless response.is_a?(Net::HTTPSuccess)
-        error "Ошибка Ollama API: #{response.code} - #{response.body}"
-        debug "URL запроса: #{uri}"
-        debug 'Доступные модели Ollama можно посмотреть с помощью команды: ollama list'
-        raise "Ошибка Ollama API при вызове модели #{model_name}"
+        error_message = "Ошибка API при вызове модели #{model_name}"
+        error_message += "\nКод ответа: #{response.code}"
+        error_message += "\nТело ответа: #{response.body}" if response.body
+        raise error_message
       end
 
-      # Обрабатываем ответ
       begin
-        # Парсим JSON
         parsed_response = JSON.parse(response.body)
-
-        # Логируем ответ
-        debug 'Ответ от Ollama API:'
-        debug parsed_response.to_json
-
-        # Извлекаем содержимое
         content = extract_ollama_content(parsed_response, model_name)
+        
+        if content.nil? || content.empty?
+          raise 'Пустой ответ от API'
+        end
 
-        # Кодируем в UTF-8
-        content.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
+        content
       rescue JSON::ParserError => e
-        error "Ошибка парсинга JSON: #{e.message}"
-        error "Тело ответа: #{response.body}"
-        raise "Ошибка парсинга ответа Ollama API: #{e.message}"
+        raise "Ошибка парсинга ответа API: #{e.message}"
       end
     end
 
-    # Извлекает содержимое из ответа Ollama
-    # @param parsed_response [Hash] разобранный ответ
-    # @param model_name [String] имя модели
-    # @return [String] извлеченное содержимое
     def extract_ollama_content(parsed_response, model_name)
       content = parsed_response.dig('message', 'content') || parsed_response['response']
-
+      
       if content.nil? || content.empty?
-        error "Пустой ответ от Ollama API для модели #{model_name}"
-        error "Ответ API: #{parsed_response.inspect}"
-        raise 'Пустой ответ от Ollama API'
+        raise 'Пустой ответ от API'
       end
 
       content
@@ -450,7 +447,7 @@ module HumanEval
         input.include?('```') ||
         input.include?('```md')
 
-      return input unless has_code_blocks
+      return '' unless has_code_blocks
 
       # Находим все фрагменты, обрамлённые тройными обратными кавычками.
       # Регулярное выражение:
@@ -459,8 +456,8 @@ module HumanEval
       # - Ищет закрывающие "```", перед которыми могут быть пробелы.
       code_blocks = input.scan(/```[^\n]*\n(.*?)\s*```/m).flatten
 
-      # Если блоки кода не найдены, возвращаем исходный текст
-      return input if code_blocks.empty?
+      # Если блоки кода не найдены, возвращаем пустую строку
+      return '' if code_blocks.empty?
 
       # Объединяем найденные блоки в один результат с переводами строк.
       code_blocks.join("\n")

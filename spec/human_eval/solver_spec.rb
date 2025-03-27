@@ -5,83 +5,78 @@ require 'webmock/rspec'
 require 'tmpdir'
 
 RSpec.describe HumanEval::SolverClass do
-  let(:tasks_dir) { File.join('spec', 'tmp', 'test_tasks') }
-  let(:task_content) do
-    <<~TASK
-      # Напишите функцию, которая складывает два числа
-      def add(a, b):
-          """
-          >>> add(2, 3)
-          5
-          """
-    TASK
+  let(:tasks_dir) { Dir.mktmpdir }
+  let(:task_data) do
+    {
+      task_id: 't1',
+      prompt: 'Write a function that adds two numbers',
+      entry_point: 'add',
+      canonical_solution: "def add(a, b)\n  a + b\nend",
+      test: 'assert_equal(4, add(2, 2))'
+    }
   end
-
-  before(:all) do
-    # Ничего не делаем в before(:all), так как каждый тест будет использовать свою временную директорию
-  end
-
-  after(:all) do
-    # Ничего не делаем в after(:all), так как каждый тест сам очистит свою временную директорию
-  end
+  let(:solver_prompt) { 'You are a helpful assistant that solves programming tasks.' }
+  let(:task_json) { task_data.to_json }
+  let(:parsed_task_data) { JSON.parse(task_json) }
 
   before(:each) do
-    FileUtils.mkdir_p(tasks_dir)
-    File.write(File.join(tasks_dir, 't1.md'), task_content)
     ENV['OPENROUTER_API_KEY'] = 'test_key'
-    WebMock.reset!
-    WebMock.disable_net_connect!
+    ENV['HTTP_REFERER'] = 'https://github.com/yourusername/human-eval-solver'
+    ENV['X_TITLE'] = 'Human Eval Solver'
+    ENV['OPENAI_ORGANIZATION'] = 'openrouter'
+    ENV['USER_AGENT'] = 'Human Eval Solver/1.0.0'
+    ENV['COLUMNS'] = '80'
+    ENV['AI_MODEL'] = 'anthropic/claude-3.5-sonnet'
+
+    # Создаем временную директорию и файл задачи
+    @temp_dir = Dir.mktmpdir
+    File.write(File.join(@temp_dir, 't1.json'), task_json)
+
+    # Разрешаем чтение файлов
+    allow(File).to receive(:read).and_call_original
+    allow(File).to receive(:read).with(File.join('rules', 'solver_prompt.txt')).and_return(solver_prompt)
+    allow(Dir).to receive(:[]).with(File.join(@temp_dir, 't*.json')).and_return([File.join(@temp_dir, 't1.json')])
   end
 
   after(:each) do
-    FileUtils.rm_rf(tasks_dir) if Dir.exist?(tasks_dir)
-  end
-
-  describe 'initialization' do
-    it 'initializes without error' do
-      expect { described_class.new(tasks_dir) }.not_to raise_error
-    end
+    FileUtils.remove_entry(@temp_dir) if @temp_dir && Dir.exist?(@temp_dir)
   end
 
   describe 'OpenRouter.ai model' do
-    let(:solver) { described_class.new(tasks_dir, model: 'anthropic_claude_3_5_sonnet') }
-    let(:openrouter_response) do
-      {
-        choices: [{
-          message: {
-            content: <<~SOLUTION
-              ```ruby
-              def add(a, b)
-                a + b
-              end
-              ```
-            SOLUTION
-          }
-        }]
-      }
-    end
+    let(:solver) { described_class.new(@temp_dir, model: 'anthropic_claude_3_5_sonnet') }
 
     before do
-      stub_request(:post, 'https://openrouter.ai/api/v1/chat/completions')
-        .with(
+      stub_request(:post, "https://openrouter.ai/api/v1/chat/completions").
+        with(
+          body: {
+            model: "anthropic/claude-3.5-sonnet",
+            messages: [{
+              role: 'user',
+              content: "#{solver_prompt}\n\n#{parsed_task_data}\n"
+            }],
+            temperature: 0.1,
+            max_tokens: 1000,
+            stream: false
+          }.to_json,
           headers: {
+            'Accept' => '*/*',
+            'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
             'Authorization' => 'Bearer test_key',
             'Content-Type' => 'application/json',
-            'HTTP-Referer' => 'https://github.com/yourusername/human-eval-solver',
+            'Host' => 'openrouter.ai',
+            'Http-Referer' => 'https://github.com/yourusername/human-eval-solver',
+            'Openai-Organization' => 'openrouter',
+            'User-Agent' => 'Human Eval Solver/1.0.0',
             'X-Title' => 'Human Eval Solver'
           }
-        )
-        .to_return(
-          status: 200,
-          body: openrouter_response.to_json,
-          headers: { 'Content-Type' => 'application/json' }
-        )
+        ).
+        to_return(status: 200, body: { choices: [{ message: { content: "Here's a solution:\n\n```ruby\ndef add(a, b)\n  a + b\nend\n```" } }] }.to_json)
     end
 
     it 'processes task with OpenRouter model successfully' do
       solver.process
 
-      solution_file = File.join(tasks_dir, 't1-anthropic_claude_3_5_sonnet.rb')
+      solution_file = File.join(@temp_dir, 't1-anthropic_claude_3_5_sonnet.rb')
       expect(File.exist?(solution_file)).to be true
 
       solution_content = File.read(solution_file)
@@ -91,39 +86,38 @@ RSpec.describe HumanEval::SolverClass do
   end
 
   describe 'Ollama model' do
-    let(:solver) { described_class.new(tasks_dir, model: 'ollama_codellama') }
-    let(:ollama_response) do
-      {
-        message: {
-          content: <<~SOLUTION
-            ```ruby
-            def add(a, b)
-              return a + b
-            end
-            ```
-          SOLUTION
-        }
-      }
-    end
+    let(:solver) { described_class.new(@temp_dir, model: 'ollama_codellama') }
 
     before do
-      stub_request(:post, "http://localhost:11434/api/chat")
-        .with(
+      stub_request(:post, "http://localhost:11434/api/chat").
+        with(
+          body: {
+            model: "codellama",
+            messages: [{
+              role: 'user',
+              content: "#{solver_prompt}\n\n#{parsed_task_data}\n"
+            }],
+            stream: false,
+            options: {
+              temperature: 0.1,
+              num_predict: 4096
+            }
+          }.to_json,
           headers: {
-            'Content-Type' => 'application/json'
+            'Accept' => '*/*',
+            'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+            'Content-Type' => 'application/json',
+            'Host' => 'localhost:11434',
+            'User-Agent' => 'Ruby'
           }
-        )
-        .to_return(
-          status: 200,
-          body: ollama_response.to_json,
-          headers: { 'Content-Type' => 'application/json' }
-        )
+        ).
+        to_return(status: 200, body: { message: { content: "Here's a solution:\n\n```ruby\ndef add(a, b)\n  return a + b\nend\n```" } }.to_json)
     end
 
     it 'processes task with Ollama model successfully' do
       solver.process
 
-      solution_file = File.join(tasks_dir, 't1-ollama_codellama.rb')
+      solution_file = File.join(@temp_dir, 't1-ollama_codellama.rb')
       expect(File.exist?(solution_file)).to be true
 
       solution_content = File.read(solution_file)
@@ -133,44 +127,69 @@ RSpec.describe HumanEval::SolverClass do
   end
 
   describe 'Error handling' do
-    let(:solver) { described_class.new(tasks_dir, model: 'anthropic_claude_3_5_sonnet') }
+    let(:solver) { described_class.new(@temp_dir, model: 'anthropic_claude_3_5_sonnet') }
 
     context 'when API returns an error' do
       before do
-        stub_request(:post, 'https://openrouter.ai/api/v1/chat/completions')
-          .with(
+        stub_request(:post, "https://openrouter.ai/api/v1/chat/completions").
+          with(
+            body: {
+              model: "anthropic/claude-3.5-sonnet",
+              messages: [{
+                role: 'user',
+                content: "#{solver_prompt}\n\n#{parsed_task_data}\n"
+              }],
+              temperature: 0.1,
+              max_tokens: 1000,
+              stream: false
+            }.to_json,
             headers: {
+              'Accept' => '*/*',
+              'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
               'Authorization' => 'Bearer test_key',
               'Content-Type' => 'application/json',
-              'HTTP-Referer' => 'https://github.com/yourusername/human-eval-solver',
+              'Host' => 'openrouter.ai',
+              'Http-Referer' => 'https://github.com/yourusername/human-eval-solver',
+              'Openai-Organization' => 'openrouter',
+              'User-Agent' => 'Human Eval Solver/1.0.0',
               'X-Title' => 'Human Eval Solver'
             }
-          )
-          .to_return(status: 500, body: 'Internal Server Error')
+          ).
+          to_return(status: 500, body: 'Internal Server Error')
       end
 
       it 'handles API errors gracefully' do
-        expect do
-          solver.process
-        end.to raise_error(RuntimeError, %r{Ошибка API при вызове модели anthropic/claude-3\.5-sonnet})
+        expect { solver.process }.to raise_error(RuntimeError, /Ошибка API при вызове модели anthropic\/claude-3\.5-sonnet/)
       end
     end
 
     context 'when API returns empty response' do
       before do
-        stub_request(:post, 'https://openrouter.ai/api/v1/chat/completions')
-          .with(
+        stub_request(:post, "https://openrouter.ai/api/v1/chat/completions").
+          with(
+            body: {
+              model: "anthropic/claude-3.5-sonnet",
+              messages: [{
+                role: 'user',
+                content: "#{solver_prompt}\n\n#{parsed_task_data}\n"
+              }],
+              temperature: 0.1,
+              max_tokens: 1000,
+              stream: false
+            }.to_json,
             headers: {
+              'Accept' => '*/*',
+              'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
               'Authorization' => 'Bearer test_key',
               'Content-Type' => 'application/json',
-              'HTTP-Referer' => 'https://github.com/yourusername/human-eval-solver',
+              'Host' => 'openrouter.ai',
+              'Http-Referer' => 'https://github.com/yourusername/human-eval-solver',
+              'Openai-Organization' => 'openrouter',
+              'User-Agent' => 'Human Eval Solver/1.0.0',
               'X-Title' => 'Human Eval Solver'
             }
-          )
-          .to_return(
-            status: 200,
-            body: { choices: [{ message: { content: '' } }] }.to_json
-          )
+          ).
+          to_return(status: 200, body: { choices: [{ message: { content: '' } }] }.to_json)
       end
 
       it 'handles empty responses gracefully' do

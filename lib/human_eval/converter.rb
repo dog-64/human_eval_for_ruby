@@ -14,9 +14,6 @@ class HumanEvalConverter
   # Загружаем переменные окружения из .env файла
   Dotenv.load
 
-  OPENROUTER_API_KEY = ENV.fetch('OPENROUTER_API_KEY', nil)
-  AI_MODEL = ENV['AI_MODEL'] || 'google/gemini-flash-1.5'
-
   def initialize(input_file, output_dir, options = {})
     @input_file = input_file
     @output_dir = output_dir
@@ -79,9 +76,15 @@ class HumanEvalConverter
       else
         debug "Создаем описание задачи в #{readme_path}"
         description = create_task_markdown(task)
+        if description
+          File.write(readme_path, description)
+        end
 
         debug "Создаем test файл в #{test_path}"
-        create_assertions(@output_dir, task, task_number, description)
+        tests = create_assertions(@output_dir, task, task_number, description)
+        if tests
+          File.write(test_path, tests)
+        end
       end
     rescue StandardError => e
       error "Ошибка при создании дополнительных файлов для #{task_id}: #{e.message}"
@@ -93,7 +96,15 @@ class HumanEvalConverter
 
   def validate_environment
     raise "Файл #{@input_file} не найден" unless File.exist?(@input_file)
-    raise 'Установите переменную OPENROUTER_API_KEY в файле .env' unless OPENROUTER_API_KEY
+    raise 'Установите переменную OPENROUTER_API_KEY в файле .env' unless ENV['OPENROUTER_API_KEY']
+  end
+
+  def openrouter_api_key
+    ENV['OPENROUTER_API_KEY']
+  end
+
+  def ai_model
+    ENV['AI_MODEL'] || 'google/gemini-flash-1.5'
   end
 
   def read_tasks
@@ -181,7 +192,7 @@ class HumanEvalConverter
     http.use_ssl = true
 
     request = Net::HTTP::Post.new(uri)
-    request['Authorization'] = "Bearer #{OPENROUTER_API_KEY}"
+    request['Authorization'] = "Bearer #{openrouter_api_key}"
     request['Content-Type'] = 'application/json'
     request['HTTP-Referer'] = ENV['HTTP_REFERER'] || 'https://github.com/yourusername/human-eval-converter'
     request['X-Title'] = 'Human Eval Converter'
@@ -189,9 +200,9 @@ class HumanEvalConverter
     request['User-Agent'] = 'Human Eval Converter/1.0.0'
 
     request.body = {
-      model: AI_MODEL,
+      model: ai_model,
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
+      temperature: 0.1,
       max_tokens: 1000,
       stream: false
     }.to_json
@@ -217,7 +228,7 @@ class HumanEvalConverter
       if content.nil? || content.empty?
         error 'Пустой ответ от API'
         error "Полный ответ: #{parsed_response.inspect}"
-        raise 'Пустой ответ от API'
+        return nil
       end
 
       # Принудительно конвертируем контент в UTF-8
@@ -227,7 +238,7 @@ class HumanEvalConverter
     rescue JSON::ParserError => e
       error "Ошибка парсинга JSON: #{e.message}"
       error "Тело ответа: #{response.body.inspect}"
-      raise "Ошибка парсинга ответа API: #{e.message}"
+      return nil
     end
   end
-end
+end 

@@ -14,19 +14,21 @@ module HumanEval
     }.freeze
 
     def self.included(base)
-      base.instance_variable_set(:@log_level, LOG_LEVELS[:normal])
+      base.instance_variable_set(:@log_level, :normal)
     end
 
     def log_level=(level)
       @log_level = if level.is_a?(Symbol)
-                     LOG_LEVELS[level] || LOG_LEVELS[:normal]
+                     level
                    else
-                     LOG_LEVELS[level.to_sym] || LOG_LEVELS[:normal]
+                     level.to_sym
                    end
     end
 
     def log(message, level = :normal, depth = 1)
-      return if @log_level < LOG_LEVELS[level]
+      current_level = LOG_LEVELS[@log_level] || LOG_LEVELS[:normal]
+      target_level = LOG_LEVELS[level] || LOG_LEVELS[:normal]
+      return if current_level < target_level
 
       caller_info = caller_locations(depth, 1).first
       file = caller_info ? File.basename(caller_info.path) : ''

@@ -34,8 +34,14 @@ RSpec.describe HumanEvalConverter do
   let(:llm_response_tests2) { "assert_equal(multiply(2, 3), 6)\nassert_equal(multiply(-2, 3), -6)" }
 
   before do
-    # Устанавливаем API ключ
-    stub_const("#{described_class}::OPENROUTER_API_KEY", api_key)
+    # Устанавливаем API ключ и другие переменные окружения
+    allow(ENV).to receive(:[]).with('OPENROUTER_API_KEY').and_return(api_key)
+    allow(ENV).to receive(:[]).with('HTTP_REFERER').and_return(nil)
+    allow(ENV).to receive(:[]).with('X_TITLE').and_return(nil)
+    allow(ENV).to receive(:[]).with('OPENAI_ORGANIZATION').and_return(nil)
+    allow(ENV).to receive(:[]).with('USER_AGENT').and_return(nil)
+    allow(ENV).to receive(:[]).with('AI_MODEL').and_return('google/gemini-flash-1.5')
+    allow(ENV).to receive(:fetch).with('OPENROUTER_API_KEY', nil).and_return(api_key)
 
     # Мокаем чтение файлов
     allow(File).to receive(:exist?).and_return(true)
@@ -50,22 +56,44 @@ RSpec.describe HumanEvalConverter do
     # Мокаем API ответы для описаний
     stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
       .with(
-        headers: { 'Authorization' => "Bearer #{api_key}" },
+        headers: {
+          'Authorization' => "Bearer #{api_key}",
+          'Content-Type' => 'application/json',
+          'HTTP-Referer' => 'https://github.com/yourusername/human-eval-converter',
+          'X-Title' => 'Human Eval Converter',
+          'OpenAI-Organization' => 'openrouter',
+          'User-Agent' => 'Human Eval Converter/1.0.0'
+        },
         body: hash_including(
+          'model' => 'google/gemini-flash-1.5',
           'messages' => array_including(
             hash_including('content' => /Add two numbers/)
-          )
+          ),
+          'temperature' => 0.1,
+          'max_tokens' => 1000,
+          'stream' => false
         )
       )
       .to_return(status: 200, body: { choices: [{ message: { content: llm_response_description1 } }] }.to_json)
 
     stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
       .with(
-        headers: { 'Authorization' => "Bearer #{api_key}" },
+        headers: {
+          'Authorization' => "Bearer #{api_key}",
+          'Content-Type' => 'application/json',
+          'HTTP-Referer' => 'https://github.com/yourusername/human-eval-converter',
+          'X-Title' => 'Human Eval Converter',
+          'OpenAI-Organization' => 'openrouter',
+          'User-Agent' => 'Human Eval Converter/1.0.0'
+        },
         body: hash_including(
+          'model' => 'google/gemini-flash-1.5',
           'messages' => array_including(
             hash_including('content' => /Multiply two numbers/)
-          )
+          ),
+          'temperature' => 0.1,
+          'max_tokens' => 1000,
+          'stream' => false
         )
       )
       .to_return(status: 200, body: { choices: [{ message: { content: llm_response_description2 } }] }.to_json)
@@ -73,22 +101,44 @@ RSpec.describe HumanEvalConverter do
     # Мокаем API ответы для тестов
     stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
       .with(
-        headers: { 'Authorization' => "Bearer #{api_key}" },
+        headers: {
+          'Authorization' => "Bearer #{api_key}",
+          'Content-Type' => 'application/json',
+          'HTTP-Referer' => 'https://github.com/yourusername/human-eval-converter',
+          'X-Title' => 'Human Eval Converter',
+          'OpenAI-Organization' => 'openrouter',
+          'User-Agent' => 'Human Eval Converter/1.0.0'
+        },
         body: hash_including(
+          'model' => 'google/gemini-flash-1.5',
           'messages' => array_including(
             hash_including('content' => /#{llm_response_description1}/)
-          )
+          ),
+          'temperature' => 0.1,
+          'max_tokens' => 1000,
+          'stream' => false
         )
       )
       .to_return(status: 200, body: { choices: [{ message: { content: llm_response_tests1 } }] }.to_json)
 
     stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
       .with(
-        headers: { 'Authorization' => "Bearer #{api_key}" },
+        headers: {
+          'Authorization' => "Bearer #{api_key}",
+          'Content-Type' => 'application/json',
+          'HTTP-Referer' => 'https://github.com/yourusername/human-eval-converter',
+          'X-Title' => 'Human Eval Converter',
+          'OpenAI-Organization' => 'openrouter',
+          'User-Agent' => 'Human Eval Converter/1.0.0'
+        },
         body: hash_including(
+          'model' => 'google/gemini-flash-1.5',
           'messages' => array_including(
             hash_including('content' => /#{llm_response_description2}/)
-          )
+          ),
+          'temperature' => 0.1,
+          'max_tokens' => 1000,
+          'stream' => false
         )
       )
       .to_return(status: 200, body: { choices: [{ message: { content: llm_response_tests2 } }] }.to_json)
@@ -151,8 +201,8 @@ RSpec.describe HumanEvalConverter do
 
     context 'without API key' do
       before do
-        stub_const("#{described_class}::OPENROUTER_API_KEY", nil)
-        ENV['OPENROUTER_API_KEY'] = nil
+        allow(ENV).to receive(:[]).with('OPENROUTER_API_KEY').and_return(nil)
+        allow(ENV).to receive(:fetch).with('OPENROUTER_API_KEY', nil).and_return(nil)
       end
 
       it 'raises error' do
@@ -165,7 +215,25 @@ RSpec.describe HumanEvalConverter do
     context 'when API returns error' do
       before do
         stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
-          .with(headers: { 'Authorization' => "Bearer #{api_key}" })
+          .with(
+            headers: {
+              'Authorization' => "Bearer #{api_key}",
+              'Content-Type' => 'application/json',
+              'HTTP-Referer' => 'https://github.com/yourusername/human-eval-converter',
+              'X-Title' => 'Human Eval Converter',
+              'OpenAI-Organization' => 'openrouter',
+              'User-Agent' => 'Human Eval Converter/1.0.0'
+            },
+            body: hash_including(
+              'model' => 'google/gemini-flash-1.5',
+              'messages' => array_including(
+                hash_including('content' => /Add two numbers/)
+              ),
+              'temperature' => 0.1,
+              'max_tokens' => 1000,
+              'stream' => false
+            )
+          )
           .to_return(status: 500, body: 'Internal Server Error')
       end
 
@@ -177,7 +245,25 @@ RSpec.describe HumanEvalConverter do
     context 'when API returns empty response' do
       before do
         stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
-          .with(headers: { 'Authorization' => "Bearer #{api_key}" })
+          .with(
+            headers: {
+              'Authorization' => "Bearer #{api_key}",
+              'Content-Type' => 'application/json',
+              'HTTP-Referer' => 'https://github.com/yourusername/human-eval-converter',
+              'X-Title' => 'Human Eval Converter',
+              'OpenAI-Organization' => 'openrouter',
+              'User-Agent' => 'Human Eval Converter/1.0.0'
+            },
+            body: hash_including(
+              'model' => 'google/gemini-flash-1.5',
+              'messages' => array_including(
+                hash_including('content' => /Add two numbers/)
+              ),
+              'temperature' => 0.1,
+              'max_tokens' => 1000,
+              'stream' => false
+            )
+          )
           .to_return(status: 200, body: { choices: [{ message: { content: '' } }] }.to_json)
       end
 

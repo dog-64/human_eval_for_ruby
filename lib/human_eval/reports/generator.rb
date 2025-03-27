@@ -13,6 +13,10 @@ module HumanEval
     class Generator
       AVAILABLE_FORMATS = %w[html markdown all].freeze
       RESULTS_FILE = 'reports/results.json'
+      DETAILED_REPORT_FILE = 'reports/detailed.jsonl'
+      TOTAL_REPORT_FILE = 'reports/total.jsonl'
+
+      attr_accessor :results, :tasks, :models
 
       def initialize(options = {})
         @options = options
@@ -21,15 +25,37 @@ module HumanEval
         @results = options[:results] || {}
         @tasks = options[:tasks] || []
         @models = options[:models] || []
+        @report_total = options[:report_total] || true
 
         validate_options!
         validate_paths!
+        ensure_report_directory
       end
 
       def generate
         results = @results.empty? ? collect_results : @results
         generate_reports(results)
+        save_jsonl_reports(results)
         { model_stats: calculate_model_stats(results) }
+      end
+
+      def save_result(model:, task:, success:)
+        result = {
+          model: model,
+          task: task,
+          success: success,
+          timestamp: Time.now.utc.iso8601
+        }
+
+        # Всегда сохраняем детальный отчет
+        File.open(DETAILED_REPORT_FILE, 'a') do |f|
+          f.puts result.to_json
+        end
+
+        # Если report_total = true, сохраняем только общую статистику
+        return unless @report_total
+
+        save_total_stats(model, success)
       end
 
       private
@@ -42,15 +68,19 @@ module HumanEval
         base_dir = File.expand_path('.')
         output_path = File.expand_path(@output_dir)
 
-        unless output_path.start_with?(base_dir)
-          raise Error, 'Директория для отчетов должна находиться внутри текущего проекта'
-        end
+        return if output_path.start_with?(base_dir)
+
+        raise Error, 'Директория для отчетов должна находиться внутри текущего проекта'
       end
 
       def validate_options!
         return if AVAILABLE_FORMATS.include?(@format)
 
         raise Error, "Неверный формат отчета: #{@format}. Доступные форматы: #{AVAILABLE_FORMATS.join(', ')}"
+      end
+
+      def ensure_report_directory
+        FileUtils.mkdir_p(@output_dir)
       end
 
       def collect_results
@@ -75,6 +105,90 @@ module HumanEval
         end
       end
 
+      def save_jsonl_reports(results)
+        # Сохраняем детальный отчет
+        File.open(DETAILED_REPORT_FILE, 'w') do |f|
+          results.each do |task, model_results|
+            model_results.each do |model, success|
+              result = {
+                model: model,
+                task: task,
+                success: success,
+                timestamp: Time.now.utc.iso8601
+              }
+              f.puts result.to_json
+            end
+          end
+        end
+
+        # Сохраняем общий отчет, если включена опция
+        return unless @report_total
+
+        save_total_stats_from_results(results)
+      end
+
+      def save_total_stats(model, success)
+        stats = load_total_stats
+        stats[model] ||= { total: 0, passed: 0 }
+        stats[model][:total] += 1
+        stats[model][:passed] += 1 if success
+
+        File.open(TOTAL_REPORT_FILE, 'w') do |f|
+          stats.each do |model_name, model_stats|
+            percentage = (model_stats[:passed] * 100.0 / model_stats[:total]).round
+            summary = {
+              model: model_name,
+              total_tasks: model_stats[:total],
+              passed_tasks: model_stats[:passed],
+              success_rate: percentage,
+              timestamp: Time.now.utc.iso8601
+            }
+            f.puts summary.to_json
+          end
+        end
+      end
+
+      def save_total_stats_from_results(results)
+        stats = {}
+        results.each_value do |model_results|
+          model_results.each do |model, success|
+            stats[model] ||= { total: 0, passed: 0 }
+            stats[model][:total] += 1
+            stats[model][:passed] += 1 if success
+          end
+        end
+
+        File.open(TOTAL_REPORT_FILE, 'w') do |f|
+          stats.each do |model_name, model_stats|
+            percentage = (model_stats[:passed] * 100.0 / model_stats[:total]).round
+            summary = {
+              model: model_name,
+              total_tasks: model_stats[:total],
+              passed_tasks: model_stats[:passed],
+              success_rate: percentage,
+              timestamp: Time.now.utc.iso8601
+            }
+            f.puts summary.to_json
+          end
+        end
+      end
+
+      def load_total_stats
+        return {} unless File.exist?(TOTAL_REPORT_FILE)
+
+        stats = {}
+        File.readlines(TOTAL_REPORT_FILE).each do |line|
+          data = JSON.parse(line, symbolize_names: true)
+          stats[data[:model]] = {
+            total: data[:total_tasks],
+            passed: data[:passed_tasks]
+          }
+        end
+        stats
+      rescue JSON::ParserError, TypeError
+        {} # Возвращаем пустой хэш в случае ошибки парсинга
+      end
+
       def generate_html_report(results)
         FileUtils.mkdir_p(@output_dir)
         full_report_file = File.join(@output_dir, 'report.html')
@@ -96,12 +210,12 @@ module HumanEval
           model_stats = calculate_model_stats(results)
           model_stats.sort_by { |_, percentage| -percentage }.each do |model, percentage|
             color_class = if percentage == 100
-                           'success'
-                         elsif percentage.zero?
-                           'failure'
-                         else
-                           ''
-                         end
+                            'success'
+                          elsif percentage.zero?
+                            'failure'
+                          else
+                            ''
+                          end
             file.puts "<tr><td>#{model}</td><td class='#{color_class}'>#{percentage}%</td></tr>"
           end
 
@@ -177,12 +291,12 @@ module HumanEval
         tasks = @tasks.empty? ? results.keys : @tasks
         models = @models.empty? ? results.values.flat_map(&:keys).uniq : @models
 
-        models.map do |model|
+        models.to_h do |model|
           total_tasks = tasks.size
           passed_tasks = tasks.count { |task| results[task][model] }
           percentage = (passed_tasks * 100.0 / total_tasks).round
           [model, percentage]
-        end.to_h
+        end
       end
 
       def generate_html_header
@@ -304,4 +418,4 @@ module HumanEval
       end
     end
   end
-end 
+end
