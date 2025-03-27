@@ -2,13 +2,12 @@ puts "#{__FILE__}:#{__LINE__} [DEBUG] | "
 require 'terminal-table'
 require 'timeout'
 require_relative '../human_eval/logger'
-require_relative '../assert'
+require_relative '../human_eval/assert'
 require_relative '../human_eval/log_levels'
 require 'shellwords'
 require 'fileutils'
 require_relative '../human_eval/solver'
 require_relative '../human_eval/reports/generator'
-require_relative '../test_runner/report'
 
 # Класс для запуска и управления тестами решений
 module Runner
@@ -20,9 +19,8 @@ module Runner
       @options = options
       self.log_level = options[:log_level] || :normal
       @timeout = options[:timeout] || 5
-      @generate_reports = options[:generate_reports] || false
+      @generate_reports = false
       @results = {}
-      @report = TestRunner::Report.new
     end
 
     def run_all_tests
@@ -80,17 +78,24 @@ module Runner
         return {}
       end
 
+      # Находим все файлы с решениями
       solutions = find_solution_files(task)
       if solutions.empty?
         error "Решения для задачи #{task} не найдены"
         return {}
       end
 
+      # Получаем список всех моделей
+      models = solutions.map { |f| File.basename(f).split('-')[1..].join('-').sub('.rb', '') }
+
+      # Инициализируем результаты для всех моделей как false
+      models.each { |model| @results[task][model] = false }
+
+      # Тестируем каждое решение
       solutions.each do |solution|
         model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
         success = test_solution(solution)
         @results[task][model] = success
-        @report.save_result(model: model, task: task, success: success)
       end
 
       display_results
@@ -249,29 +254,39 @@ module Runner
       test_context.extend(HumanEval::LogLevels)
       test_context.extend(HumanEval::Logger)
 
-      # Загружаем решение в контекст
-      test_context.module_eval(File.read(solution_file))
+      # Загружаем решение в контекст теста
+      solution_code = File.read(solution_file)
+      test_context.module_eval("module_function\n#{solution_code}")
 
       # Загружаем и выполняем тесты в том же контексте
-      test_context.module_eval(File.read(test_file))
-
-      true
+      test_code = File.read(test_file)
+      test_context.instance_variable_set(:@test_passed, true)
+      test_context.define_singleton_method(:assert) do |condition|
+        unless condition
+          @test_passed = false
+          raise "Assertion failed"
+        end
+      end
+      test_context.module_eval(test_code)
+      test_context.instance_variable_get(:@test_passed)
     rescue StandardError => e
       debug_log "Ошибка в тесте #{task} (#{solution_file}): #{e.message}"
       false
     end
 
     def display_results
-      if @generate_reports
-        model_stats = get_model_stats
-        report_data = {
-          model_stats: model_stats,
-          task_results: @results
-        }
-        generator = HumanEval::Reports::Generator.new(report_data)
-        generator.generate
-        generator.display_total_console
+      model_stats = get_model_stats
+      puts "\nРезультаты тестов:"
+      puts "==================="
+      model_stats.each do |model, percentage|
+        color = case percentage
+                when 0..33 then 31  # красный
+                when 34..66 then 33 # желтый
+                else 32            # зеленый
+                end
+        puts "\e[#{color}m#{model}: #{percentage}%\e[0m"
       end
+      puts "==================="
     end
 
     def get_model_info(model_key)
@@ -309,9 +324,10 @@ module Runner
 
       # Подсчитываем статистику для каждой модели
       model_stats = models.map do |model|
-        total_tasks = tasks.size
-        passed_tasks = tasks.count { |task| @results[task][model] }
-        percentage = (passed_tasks * 100.0 / total_tasks).round
+        tested_tasks = @results.keys
+        total_tasks = tested_tasks.size
+        passed_tasks = tested_tasks.count { |task| @results[task].key?(model) && @results[task][model] }
+        percentage = total_tasks.zero? ? 0 : (passed_tasks * 100.0 / total_tasks).round
         [model, percentage]
       end
 

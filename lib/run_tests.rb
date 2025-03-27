@@ -4,6 +4,7 @@
 require 'terminal-table'
 require 'pry'
 require_relative 'human_eval/assert'
+require_relative 'human_eval/logger'
 
 class TestRunner
   DONE_MARK = '✓'
@@ -15,48 +16,71 @@ class TestRunner
 
   def run_all_tests
     # Находим все файлы с решениями в директории tasks
-    solutions = Dir.glob('tasks/t*-*.rb').reject { |f| f.end_with?('-asserts.rb') }
+    solutions = Dir.glob('tasks/t*-*.rb').reject { |f| f.end_with?('-assert.rb') }
     tasks = solutions.map { |f| File.basename(f) }.map { |f| f.gsub(/-.*$/, '') }.uniq.sort
 
     models = solutions.map do |f|
       filename = File.basename(f)
-      next if filename.end_with?('_asserts.rb')
+      next if filename.end_with?('_assert.rb')
 
       filename.split('-')[1..].join('-').sub('.rb', '')
     end.compact.uniq.sort
 
+    puts "Найдены задачи: #{tasks.inspect}"
+    puts "Найдены модели: #{models.inspect}"
+
     @results = Hash.new { |h, k| h[k] = {} }
 
     tasks.each do |task|
-      task_solutions = Dir.glob("tasks/#{task}-*.rb").reject { |f| f.end_with?('-asserts.rb') }
+      task_solutions = Dir.glob("tasks/#{task}-*.rb").reject { |f| f.end_with?('-assert.rb') }
+      
+      # Пропускаем задачи без решений
+      next if task_solutions.empty?
+
+      puts "\nОбрабатываем задачу #{task}"
+      puts "Найдены решения: #{task_solutions.inspect}"
 
       task_solutions.each do |solution|
         model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
-        success = test_solution(task, solution)
+        puts "Тестируем модель #{model} для задачи #{task}"
+        success = test_solution(solution, "tasks/#{task}-assert.rb")
         @results[task][model] = success
+        puts "Результат для #{model}: #{success}"
       end
     end
+
+    puts "\nИтоговые результаты:"
+    puts @results.inspect
 
     display_results(tasks, models)
   end
 
   def run_task_tests(task)
-    test_file = "tasks/#{task}-asserts.rb"
+    test_file = "tasks/#{task}-assert.rb"
     unless File.exist?(test_file)
       puts "Файл с тестами #{test_file} не найден"
       return
     end
 
-    solutions = Dir.glob("tasks/#{task}-*.rb").reject { |f| f.end_with?('-asserts.rb') }.sort
+    solutions = Dir.glob("tasks/#{task}-*.rb").reject { |f| f.end_with?('-assert.rb') }.sort
     models = solutions.map { |s| File.basename(s).split('-')[1..].join('-').sub('.rb', '') }
+
+    puts "\nНайдены решения для задачи #{task}:"
+    puts solutions.inspect
+    puts "Модели: #{models.inspect}"
 
     @results[task] = {}
 
     solutions.each do |solution|
       model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
-      success = test_solution(task, solution)
+      puts "\nТестируем модель #{model} для задачи #{task}"
+      success = test_solution(solution, test_file)
       @results[task][model] = success
+      puts "Результат для #{model}: #{success}"
     end
+
+    puts "\nИтоговые результаты для задачи #{task}:"
+    puts @results[task].inspect
 
     display_results([task], models)
   end
@@ -70,7 +94,7 @@ class TestRunner
     end
 
     @results[task] = {}
-    success = test_solution(task, solution)
+    success = test_solution(solution, "tasks/#{task}-assert.rb")
     @results[task][model] = success
 
     display_results([task], [model])
@@ -78,32 +102,43 @@ class TestRunner
 
   private
 
-  def test_solution(task, solution_file)
-    test_file = "tasks/#{task}-asserts.rb"
+  def test_solution(solution_file, test_file)
+    puts "\nТестируем #{solution_file}"
+    puts "Тесты из #{test_file}"
 
-    unless File.exist?(solution_file)
-      debug "Файл решения не найден: #{solution_file}" if defined?(debug)
-      return false
+    solution_content = File.read(solution_file)
+    test_content = File.read(test_file)
+
+    puts "Решение:"
+    puts solution_content
+    puts "Тесты:"
+    puts test_content
+
+    test_context = Module.new do
+      extend HumanEval::Assert
+      extend HumanEval::Logger
+      extend self
+
+      puts "Определяем методы в модуле..."
+      instance_eval(solution_content)
+      puts "Доступные методы после instance_eval: #{methods(false)}"
+
+      puts "Начинаем выполнение тестов..."
+      begin
+        instance_eval(test_content)
+        puts "Тесты успешно пройдены!"
+        return true
+      rescue HumanEval::Assert::AssertionError => e
+        puts "Ошибка в тесте #{solution_file}: #{e.message}"
+        puts "Текущий контекст методов: #{methods(false)}"
+        return false
+      rescue StandardError => e
+        puts "Ошибка в тесте #{solution_file}: #{e}"
+        puts "Текущий контекст методов: #{methods(false)}"
+        puts e.backtrace.join("\n")
+        return false
+      end
     end
-
-    unless File.exist?(test_file)
-      debug "Файл тестов не найден: #{test_file}" if defined?(debug)
-      return false
-    end
-
-    # Создаем новый контекст для каждого теста
-    test_context = Module.new
-
-    # Загружаем решение в контекст
-    test_context.module_eval(File.read(solution_file))
-
-    # Загружаем и выполняем тесты в том же контексте
-    test_context.module_eval(File.read(test_file))
-
-    true
-  rescue StandardError => e
-    debug "Ошибка в тесте #{task} (#{solution_file}): #{e.message}" if defined?(debug)
-    false
   end
 
   def display_results(tasks, models)
