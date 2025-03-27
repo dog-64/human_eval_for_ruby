@@ -46,11 +46,9 @@ RSpec.describe HumanEvalConverter do
       )
   end
 
-  after(:each) do
-    # Удаляем временные файлы после тестов
+  after do
     FileUtils.rm_rf(output_dir)
     FileUtils.rm_rf('spec/fixtures')
-    FileUtils.rm_rf('rules')
   end
 
   describe '#initialize' do
