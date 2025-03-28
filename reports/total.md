@@ -1,19 +1,19 @@
 ## Рейтинг
 
-- google_gemini_2_0_flash_001: 87%
-- openai_o3_mini_high: 85%
-- deepseek_deepseek_chat_v3_0324: 82%
-- deepseek_deepseek_chat_free: 79%
-- google_gemini_2_0_flash_lite_001: 79%
-- deepseek_deepseek_chat: 77%
-- google_gemma_3_27b_it: 77%
-- openai_gpt_4o_mini: 77%
-- qwen_qwen_2_5_coder_32b_instruct: 75%
-- mistralai_codestral_2501: 75%
-- google_gemini_flash_1_5: 75%
-- meta_llama_llama_3_1_70b_instruct: 69%
-- mistralai_mistral_small_3_1_24b_instruct: 67%
-- qwen_qwen2_5_vl_3b_instruct_free: 41%
+- google_gemini_2_0_flash_001: 85%
+- openai_o3_mini_high: 84%
+- deepseek_deepseek_chat_v3_0324: 80%
+- deepseek_deepseek_chat_free: 77%
+- google_gemini_2_0_flash_lite_001: 77%
+- deepseek_deepseek_chat: 76%
+- google_gemma_3_27b_it: 76%
+- openai_gpt_4o_mini: 76%
+- qwen_qwen_2_5_coder_32b_instruct: 74%
+- mistralai_codestral_2501: 74%
+- google_gemini_flash_1_5: 74%
+- meta_llama_llama_3_1_70b_instruct: 68%
+- mistralai_mistral_small_3_1_24b_instruct: 66%
+- qwen_qwen2_5_vl_3b_instruct_free: 40%
 - microsoft_phi_4_multimodal_instruct: 35%
 - ollama_codellama: 31%
 - ollama_codellama_13b: 27%

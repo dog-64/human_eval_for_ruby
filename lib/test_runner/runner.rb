@@ -114,7 +114,7 @@ module TestRunner
       begin
         success = test_solution(task, solution)
         @results[task][model] = success || false
-      rescue Interrupt => e
+      rescue Interrupt
         error "Тест прерван для задачи #{task} модели #{model}"
         @results[task][model] = false
       end
@@ -207,15 +207,13 @@ module TestRunner
         temp_context.module_eval(solution_content)
         debug_log '  ✅ Синтаксис решения корректен'
       rescue SyntaxError => e
-        error '  ❌ Ошибка синтаксиса в решении:'
-        error "     #{e.message}"
+        debug_log '  ❌ Ошибка синтаксиса в решении:'
+        debug_log "     #{e.message}"
         return false
       rescue StandardError => e
-        # Если в решении есть посторонний код, который вызывает ошибку,
-        # логируем ошибку, но продолжаем выполнение
-        warn '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при проверке синтаксиса:'
-        warn "     #{e.class}: #{e.message}"
-        warn '     Тесты могут не пройти из-за отсутствия необходимых методов'
+\       debug_log '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при проверке синтаксиса:'
+        debug_log "     #{e.class}: #{e.message}"
+        debug_log '     Тесты могут не пройти из-за отсутствия необходимых методов'
       end
 
       test_context = Module.new do
@@ -224,11 +222,9 @@ module TestRunner
 
         # Загружаем стандартные библиотеки Ruby с обработкой ошибок
         %w[prime set json date time base64 digest securerandom pathname].each do |lib|
-          begin
-            require lib
-          rescue LoadError => e
-            warn "  ⚠️ Библиотека #{lib} недоступна: #{e.message}"
-          end
+          require lib
+        rescue LoadError => e
+          warn "  ⚠️ Библиотека #{lib} недоступна: #{e.message}"
         end
 
         class << self
@@ -467,10 +463,10 @@ module TestRunner
 
     def colorize(text, percentage)
       color = case percentage
-      when 0..33 then "\e[31m" # Красный
-      when 34..66 then "\e[33m" # Желтый
-      else "\e[32m" # Зеленый
-      end
+              when 0..33 then "\e[31m" # Красный
+              when 34..66 then "\e[33m" # Желтый
+              else "\e[32m" # Зеленый
+              end
       "#{color}#{text}\e[0m"
     end
 

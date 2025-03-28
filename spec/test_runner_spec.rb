@@ -252,4 +252,98 @@ RSpec.describe TestRunner::Runner do
       runner.log_error_details(error)
     end
   end
+
+  describe '#raise_log' do
+    let(:runner) { described_class.new(log_level: :debug) }
+    let(:error) { StandardError.new('test error') }
+
+    before do
+      allow(error).to receive(:backtrace).and_return(['line1', 'line2'])
+    end
+
+    it 'логирует ошибку с полным стеком вызовов' do
+      expect(runner).to receive(:debug_log).with(' ❌ test message:')
+      expect(runner).to receive(:debug_log).with('    Тип: StandardError')
+      expect(runner).to receive(:debug_log).with('    Сообщение: test error')
+      expect(runner).to receive(:debug_log).with('    Место ошибки: line1')
+      expect(runner).to receive(:debug_log).with('    Полный стек вызовов:')
+      expect(runner).to receive(:debug_log).with('       line1')
+      expect(runner).to receive(:debug_log).with('       line2')
+
+      runner.send(:raise_log, error, 'test message')
+    end
+  end
+
+  describe '#get_display_model_name' do
+    let(:runner) { described_class.new }
+
+    it 'возвращает базовое имя модели без дополнительной информации' do
+      allow(runner).to receive(:get_model_info).and_return({ name: 'test_model', provider: 'unknown' })
+      expect(runner.send(:get_display_model_name, 'test_model')).to eq('test_model')
+    end
+
+    it 'добавляет провайдера к имени модели' do
+      allow(runner).to receive(:get_model_info).and_return({ name: 'test_model', provider: 'openai' })
+      expect(runner.send(:get_display_model_name, 'test_model')).to eq('test_model (openai)')
+    end
+
+    it 'добавляет заметку к имени модели' do
+      allow(runner).to receive(:get_model_info).and_return({ name: 'test_model', provider: 'unknown', note: 'test note' })
+      expect(runner.send(:get_display_model_name, 'test_model')).to eq('test_model - test note')
+    end
+
+    it 'добавляет и провайдера, и заметку к имени модели' do
+      allow(runner).to receive(:get_model_info).and_return({ name: 'test_model', provider: 'openai', note: 'test note' })
+      expect(runner.send(:get_display_model_name, 'test_model')).to eq('test_model (openai) - test note')
+    end
+  end
+
+  describe '#display_total_console' do
+    let(:runner) { described_class.new }
+    let(:tasks) { ['t1', 't2', 't3'] }
+    let(:models) { ['model1', 'model2'] }
+
+    before do
+      runner.instance_variable_set(:@results, {
+        't1' => { 'model1' => true, 'model2' => false },
+        't2' => { 'model1' => true, 'model2' => true },
+        't3' => { 'model1' => true, 'model2' => false }
+      })
+    end
+
+    it 'выводит статистику для каждой модели в правильном порядке' do
+      expect(runner).to receive(:log).with("\nРезультаты тестирования моделей:")
+      expect(runner).to receive(:log).with("- model1: \e[32m100%\e[0m")
+      expect(runner).to receive(:log).with("- model2: \e[31m33%\e[0m")
+
+      runner.send(:display_total_console, tasks, models)
+    end
+  end
+
+  describe '#models' do
+    let(:runner) { described_class.new }
+
+    before do
+      allow(Dir).to receive(:glob).with('tasks/t*-*.rb').and_return([
+        'tasks/t1-model1.rb',
+        'tasks/t1-model2.rb',
+        'tasks/t2-model1.rb',
+        'tasks/t1-assert.rb',
+        'tasks/t2-model2.rb'
+      ])
+    end
+
+    it 'возвращает отсортированный список уникальных моделей' do
+      expect(runner.send(:models)).to eq(['model1', 'model2'])
+    end
+
+    it 'исключает файлы с тестами' do
+      expect(runner.send(:models)).not_to include('assert')
+    end
+
+    it 'правильно обрабатывает пустой список файлов' do
+      allow(Dir).to receive(:glob).with('tasks/t*-*.rb').and_return([])
+      expect(runner.send(:models)).to eq([])
+    end
+  end
 end
