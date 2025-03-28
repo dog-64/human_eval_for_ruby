@@ -1,61 +1,61 @@
 {
-  "timestamp": "2025-03-28 23:33:31",
+  "timestamp": "2025-03-28 23:49:08",
   "models": [
     [
       "google_gemini_2_0_flash_001",
-      85
+      87
     ],
     [
       "openai_o3_mini_high",
-      84
+      85
     ],
     [
       "deepseek_deepseek_chat_v3_0324",
-      80
+      82
     ],
     [
       "deepseek_deepseek_chat_free",
-      77
+      79
     ],
     [
       "google_gemini_2_0_flash_lite_001",
-      77
+      79
     ],
     [
       "deepseek_deepseek_chat",
-      76
+      77
     ],
     [
       "google_gemma_3_27b_it",
-      76
+      77
     ],
     [
       "openai_gpt_4o_mini",
-      76
+      77
     ],
     [
       "qwen_qwen_2_5_coder_32b_instruct",
-      74
+      75
     ],
     [
       "mistralai_codestral_2501",
-      74
+      75
     ],
     [
       "google_gemini_flash_1_5",
-      74
+      75
     ],
     [
       "meta_llama_llama_3_1_70b_instruct",
-      68
+      69
     ],
     [
       "mistralai_mistral_small_3_1_24b_instruct",
-      66
+      67
     ],
     [
       "qwen_qwen2_5_vl_3b_instruct_free",
-      40
+      41
     ],
     [
       "microsoft_phi_4_multimodal_instruct",
@@ -67,7 +67,7 @@
     ],
     [
       "ollama_codellama_13b",
-      27
+      30
     ],
     [
       "ollama_llama3_2",
@@ -202,7 +202,7 @@
       "mistralai_codestral_2501": true,
       "mistralai_mistral_small_3_1_24b_instruct": true,
       "ollama_codellama": true,
-      "ollama_codellama_13b": false,
+      "ollama_codellama_13b": true,
       "ollama_codellama_34b": false,
       "ollama_llama3_2": true,
       "openai_gpt_4o_mini": true,
@@ -1755,7 +1755,7 @@
       "mistralai_codestral_2501": true,
       "mistralai_mistral_small_3_1_24b_instruct": true,
       "ollama_codellama": true,
-      "ollama_codellama_13b": false,
+      "ollama_codellama_13b": true,
       "ollama_codellama_34b": true,
       "ollama_llama3_2": true,
       "openai_gpt_4o_mini": true,
@@ -2049,7 +2049,7 @@
       "mistralai_codestral_2501": true,
       "mistralai_mistral_small_3_1_24b_instruct": true,
       "ollama_codellama": true,
-      "ollama_codellama_13b": false,
+      "ollama_codellama_13b": true,
       "ollama_codellama_34b": false,
       "ollama_llama3_2": false,
       "openai_gpt_4o_mini": true,
@@ -2154,7 +2154,7 @@
       "mistralai_codestral_2501": true,
       "mistralai_mistral_small_3_1_24b_instruct": true,
       "ollama_codellama": true,
-      "ollama_codellama_13b": false,
+      "ollama_codellama_13b": true,
       "ollama_codellama_34b": false,
       "ollama_llama3_2": true,
       "openai_gpt_4o_mini": true,
@@ -2343,7 +2343,7 @@
       "mistralai_codestral_2501": true,
       "mistralai_mistral_small_3_1_24b_instruct": true,
       "ollama_codellama": true,
-      "ollama_codellama_13b": false,
+      "ollama_codellama_13b": true,
       "ollama_codellama_34b": false,
       "ollama_llama3_2": true,
       "openai_gpt_4o_mini": true,
@@ -3486,46 +3486,46 @@
       "qwen_qwen_2_5_coder_32b_instruct": false
     },
     "t98": {
-      "deepseek_deepseek_chat": false,
-      "deepseek_deepseek_chat_free": false,
-      "deepseek_deepseek_chat_v3_0324": false,
-      "google_gemini_2_0_flash_001": false,
-      "google_gemini_2_0_flash_lite_001": false,
-      "google_gemini_flash_1_5": false,
-      "google_gemma_3_27b_it": false,
-      "meta_llama_llama_3_1_70b_instruct": false,
+      "deepseek_deepseek_chat": true,
+      "deepseek_deepseek_chat_free": true,
+      "deepseek_deepseek_chat_v3_0324": true,
+      "google_gemini_2_0_flash_001": true,
+      "google_gemini_2_0_flash_lite_001": true,
+      "google_gemini_flash_1_5": true,
+      "google_gemma_3_27b_it": true,
+      "meta_llama_llama_3_1_70b_instruct": true,
       "microsoft_phi_4_multimodal_instruct": false,
-      "mistralai_codestral_2501": false,
-      "mistralai_mistral_small_3_1_24b_instruct": false,
+      "mistralai_codestral_2501": true,
+      "mistralai_mistral_small_3_1_24b_instruct": true,
       "ollama_codellama": false,
       "ollama_codellama_13b": false,
       "ollama_codellama_34b": false,
       "ollama_llama3_2": false,
-      "openai_gpt_4o_mini": false,
+      "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": false,
-      "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen2_5_vl_3b_instruct_free": true,
+      "qwen_qwen_2_5_coder_32b_instruct": true
     },
     "t99": {
-      "deepseek_deepseek_chat": false,
-      "deepseek_deepseek_chat_free": false,
-      "deepseek_deepseek_chat_v3_0324": false,
-      "google_gemini_2_0_flash_001": false,
-      "google_gemini_2_0_flash_lite_001": false,
+      "deepseek_deepseek_chat": true,
+      "deepseek_deepseek_chat_free": true,
+      "deepseek_deepseek_chat_v3_0324": true,
+      "google_gemini_2_0_flash_001": true,
+      "google_gemini_2_0_flash_lite_001": true,
       "google_gemini_flash_1_5": false,
-      "google_gemma_3_27b_it": false,
-      "meta_llama_llama_3_1_70b_instruct": false,
+      "google_gemma_3_27b_it": true,
+      "meta_llama_llama_3_1_70b_instruct": true,
       "microsoft_phi_4_multimodal_instruct": false,
-      "mistralai_codestral_2501": false,
+      "mistralai_codestral_2501": true,
       "mistralai_mistral_small_3_1_24b_instruct": false,
       "ollama_codellama": false,
       "ollama_codellama_13b": false,
       "ollama_codellama_34b": false,
       "ollama_llama3_2": false,
       "openai_gpt_4o_mini": false,
-      "openai_o3_mini_high": false,
-      "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "openai_o3_mini_high": true,
+      "qwen_qwen2_5_vl_3b_instruct_free": true,
+      "qwen_qwen_2_5_coder_32b_instruct": true
     }
   }
 }

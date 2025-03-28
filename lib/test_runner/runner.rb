@@ -211,7 +211,7 @@ module TestRunner
         debug_log "     #{e.message}"
         return false
       rescue StandardError => e
-\       debug_log '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при проверке синтаксиса:'
+       debug_log '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при проверке синтаксиса:'
         debug_log "     #{e.class}: #{e.message}"
         debug_log '     Тесты могут не пройти из-за отсутствия необходимых методов'
       end
@@ -219,28 +219,17 @@ module TestRunner
       test_context = Module.new do
         include HumanEval::Assert
         include HumanEval::LogLevels
+        include HumanEval::Logger
 
         # Загружаем стандартные библиотеки Ruby с обработкой ошибок
         %w[prime set json date time base64 digest securerandom pathname].each do |lib|
           require lib
         rescue LoadError => e
-          warn "  ⚠️ Библиотека #{lib} недоступна: #{e.message}"
+          debug_log "  ⚠️ Библиотека #{lib} недоступна: #{e.message}"
         end
 
         class << self
-          attr_writer :log_level
-        end
-
-        class << self
-          attr_reader :log_level
-        end
-
-        class << self
-          attr_writer :options
-        end
-
-        class << self
-          attr_reader :options
+          attr_accessor :log_level, :options
         end
 
         def self.handle_error(e)
@@ -259,11 +248,8 @@ module TestRunner
         begin
           module_eval(solution_content)
         rescue StandardError => e
-          # Если в решении есть посторонний код, который вызывает ошибку,
-          # логируем ошибку, но продолжаем выполнение тестов
           warn '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при загрузке в контекст тестов:'
           warn "     #{e.class}: #{e.message}"
-          warn '     Тесты могут не пройти из-за отсутствия необходимых методов'
         end
 
         extend self
@@ -287,21 +273,10 @@ module TestRunner
           test_context = Module.new do
             include HumanEval::Assert
             include HumanEval::LogLevels
+            include HumanEval::Logger
 
             class << self
-              attr_writer :log_level
-            end
-
-            class << self
-              attr_reader :log_level
-            end
-
-            class << self
-              attr_writer :options
-            end
-
-            class << self
-              attr_reader :options
+              attr_accessor :log_level, :options
             end
 
             def self.handle_error(e)
@@ -318,7 +293,14 @@ module TestRunner
             end
           end
 
-          test_context.module_eval(solution_content)
+          begin
+            test_context.module_eval(solution_content)
+          rescue StandardError => e
+            debug_log '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при загрузке в контекст тестов:'
+            debug_log "     #{e.class}: #{e.message}"
+            debug_log '     Тесты могут не пройти из-за отсутствия необходимых методов'
+          end
+
           test_context.extend(test_context)
           test_context.log_level = @options[:log_level] || :normal
           test_context.options = @options.dup # Добавляем .dup чтобы избежать проблем с разделяемыми объектами
@@ -406,8 +388,8 @@ module TestRunner
         rescue Timeout::Error
           thread.kill
           thread.join(1) # Даем потоку секунду на завершение
-          error "  ❌ Превышен лимит времени выполнения (#{@timeout} секунд)"
-          error '     Возможно, в решении есть бесконечный цикл'
+          debug_log "  ❌ Превышен лимит времени выполнения (#{@timeout} секунд)"
+          debug_log '     Возможно, в решении есть бесконечный цикл'
           false
         ensure
           thread.kill unless thread.nil? || !thread.alive?
