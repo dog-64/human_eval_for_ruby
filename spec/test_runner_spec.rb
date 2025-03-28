@@ -57,23 +57,62 @@ RSpec.describe TestRunner::Runner do
   end
 
   describe '#colorize' do
-    it 'возвращает красный цвет для низкого процента' do
-      expect(runner.colorize('text', 20)).to eq("\e[31mtext\e[0m")
+    subject { runner.send(:colorize, 'text', percentage) }
+
+    context 'when percentage is 20' do
+      let(:percentage) { 20 }
+
+      it 'возвращает красный цвет для низкого процента' do
+        expect(subject).to eq("\e[31mtext\e[0m")
+      end
     end
 
-    it 'возвращает желтый цвет для среднего процента' do
-      expect(runner.colorize('text', 50)).to eq("\e[33mtext\e[0m")
+    context 'when percentage is 50' do
+      let(:percentage) { 50 }
+
+      it 'возвращает желтый цвет для среднего процента' do
+        expect(subject).to eq("\e[33mtext\e[0m")
+      end
     end
 
-    it 'возвращает зеленый цвет для высокого процента' do
-      expect(runner.colorize('text', 80)).to eq("\e[32mtext\e[0m")
+    context 'when percentage is 80' do
+      let(:percentage) { 80 }
+
+      it 'возвращает зеленый цвет для высокого процента' do
+        expect(subject).to eq("\e[32mtext\e[0m")
+      end
     end
 
-    it 'корректно обрабатывает граничные значения' do
-      expect(runner.colorize('text', 33)).to eq("\e[31mtext\e[0m")
-      expect(runner.colorize('text', 34)).to eq("\e[33mtext\e[0m")
-      expect(runner.colorize('text', 66)).to eq("\e[33mtext\e[0m")
-      expect(runner.colorize('text', 67)).to eq("\e[32mtext\e[0m")
+    context 'when percentage is 33' do
+      let(:percentage) { 33 }
+
+      it 'корректно обрабатывает граничные значения' do
+        expect(subject).to eq("\e[31mtext\e[0m")
+      end
+    end
+
+    context 'when percentage is 34' do
+      let(:percentage) { 34 }
+
+      it 'корректно обрабатывает граничные значения' do
+        expect(subject).to eq("\e[33mtext\e[0m")
+      end
+    end
+
+    context 'when percentage is 66' do
+      let(:percentage) { 66 }
+
+      it 'корректно обрабатывает граничные значения' do
+        expect(subject).to eq("\e[33mtext\e[0m")
+      end
+    end
+
+    context 'when percentage is 67' do
+      let(:percentage) { 67 }
+
+      it 'корректно обрабатывает граничные значения' do
+        expect(subject).to eq("\e[32mtext\e[0m")
+      end
     end
   end
 

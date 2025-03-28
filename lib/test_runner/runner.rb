@@ -26,32 +26,25 @@ module TestRunner
       @timeout = @options[:timeout] || 5 # Таймаут по умолчанию 5 секунд
     end
 
-    def colorize(text, percentage)
-      color = case percentage
-      when 0..33 then "\e[31m" # Красный
-      when 34..66 then "\e[33m" # Желтый
-      else "\e[32m" # Зеленый
-      end
-      "#{color}#{text}\e[0m"
-    end
-
     def run_all_tests
       if tasks.empty?
         error 'Ошибка: Не найдены файлы с решениями'
         return {}
       end
 
-      models = find_solution_files.map do |f|
-        filename = File.basename(f)
-        next if filename.end_with?('_asserts.rb')
-
-        filename.split('-')[1..].join('-').sub('.rb', '')
-      end.compact.uniq.sort
-
       @results = Hash.new { |h, k| h[k] = {} }
 
       tasks.each do |task|
-        run_task_tests(task)
+        task_solutions = find_solution_files(task)
+        debug_log "Processing task #{task} with solutions: #{task_solutions.inspect}"
+
+        task_solutions.each do |solution|
+          model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
+          debug_log "Testing solution #{solution} for model #{model}"
+          success = test_solution(task, solution)
+          debug_log "Test result for #{model}: #{success}"
+          @results[task][model] = success
+        end
       end
 
       debug_log "Final results: #{@results.inspect}"
@@ -62,7 +55,7 @@ module TestRunner
       }
       HumanEval::ReportGenerator.new(report_data).generate_all
 
-      display_total_console(tasks, models)
+      display_total_console(tasks, models) if @options[:report]
       @results
     end
 
@@ -91,6 +84,7 @@ module TestRunner
         @results[task][model] = success
       end
 
+      display_total_console(tasks, models) if @options[:report] && !@options[:all]
       @results
     end
 
@@ -167,6 +161,15 @@ module TestRunner
     end
 
     private
+
+    def models
+      find_solution_files.map do |f|
+        filename = File.basename(f)
+        next if filename.end_with?('_asserts.rb')
+
+        filename.split('-')[1..].join('-').sub('.rb', '')
+      end.compact.uniq.sort
+    end
 
     def tasks
       find_solution_files
@@ -461,7 +464,16 @@ module TestRunner
         log "- #{model}: #{colorize("#{percentage}%", percentage)}"
       end
     end
-    
+
+    def colorize(text, percentage)
+      color = case percentage
+      when 0..33 then "\e[31m" # Красный
+      when 34..66 then "\e[33m" # Желтый
+      else "\e[32m" # Зеленый
+      end
+      "#{color}#{text}\e[0m"
+    end
+
     def display_results(tasks, models)
       # Создаем отчеты через генератор отчетов
       generator = HumanEval::Reports::Generator.new(
