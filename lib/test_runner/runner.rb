@@ -28,15 +28,14 @@ module TestRunner
 
     def colorize(text, percentage)
       color = case percentage
-              when 0..33 then "\e[31m" # Красный
-              when 34..66 then "\e[33m" # Желтый
-              else "\e[32m" # Зеленый
-              end
+      when 0..33 then "\e[31m" # Красный
+      when 34..66 then "\e[33m" # Желтый
+      else "\e[32m" # Зеленый
+      end
       "#{color}#{text}\e[0m"
     end
 
     def run_all_tests
-      tasks = find_solution_files.map { |f| File.basename(f) }.map { |f| f.gsub(/-.*$/, '') }.uniq.sort
       if tasks.empty?
         error 'Ошибка: Не найдены файлы с решениями'
         return {}
@@ -52,28 +51,17 @@ module TestRunner
       @results = Hash.new { |h, k| h[k] = {} }
 
       tasks.each do |task|
-        task_solutions = find_solution_files(task)
-        debug_log "Processing task #{task} with solutions: #{task_solutions.inspect}"
-
-        task_solutions.each do |solution|
-          model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
-          debug_log "Testing solution #{solution} for model #{model}"
-          success = test_solution(task, solution)
-          debug_log "Test result for #{model}: #{success}"
-          @results[task][model] = success
-        end
+        run_task_tests(task)
       end
 
       debug_log "Final results: #{@results.inspect}"
-      
-      # Генерируем отчеты
+
       report_data = {
         model_stats: get_model_stats,
         task_results: @results
       }
-      
       HumanEval::ReportGenerator.new(report_data).generate_all
-      
+
       display_total_console(tasks, models)
       @results
     end
@@ -95,7 +83,6 @@ module TestRunner
         return {}
       end
 
-      models = solutions.map { |s| File.basename(s).split('-')[1..].join('-').sub('.rb', '') }
       @results = Hash.new { |h, k| h[k] = {} }
 
       solutions.each do |solution|
@@ -104,7 +91,6 @@ module TestRunner
         @results[task][model] = success
       end
 
-      display_results([task], models)
       @results
     end
 
@@ -137,12 +123,6 @@ module TestRunner
       rescue Interrupt => e
         error "Тест прерван для задачи #{task} модели #{model}"
         @results[task][model] = false
-      end
-
-      begin
-        display_results([task], [model])
-      rescue Interrupt
-        error "Отображение результатов прервано для задачи #{task} модели #{model}"
       end
 
       @results
@@ -186,17 +166,15 @@ module TestRunner
       end
     end
 
-    # Этот метод больше не используется, так как функционал отчетов
-    # был перенесен в отдельный модуль. Метод оставлен для обратной
-    # совместимости и будет удален в следующих версиях.
-    #
-    # @deprecated Используйте ReportGenerator вместо этого метода
-    def create_reports(tasks, models)
-      warn "DEPRECATED: Метод create_reports устарел и будет удален. Используйте ReportGenerator."
-      # Оставляем пустую реализацию
-    end
-
     private
+
+    def tasks
+      find_solution_files
+        .map { |f| File.basename(f) }
+        .map { |f| f.gsub(/-.*$/, '') }
+        .uniq
+        .sort
+    end
 
     def test_solution(task, solution_file)
       test_file = "tasks/#{task}-assert.rb"
@@ -440,22 +418,21 @@ module TestRunner
         debug_log "  📍 Место прерывания: #{e.backtrace.first}"
         false
       rescue StandardError => e
-        error '  ❌ Неожиданная ошибка:'
-        error "     Тип: #{e.class}"
-        error "     Сообщение: #{e.message}"
-        debug_log "     Место ошибки: #{e.backtrace.first}"
-        debug_log '     Полный стек вызовов:'
-        e.backtrace.each { |line| debug_log "       #{line}" }
+        raise_log(e, 'Неожиданная ошибка')
         false
       rescue Exception => e
-        error '  ❌ Критическая ошибка:'
-        error "     Тип: #{e.class}"
-        error "     Сообщение: #{e.message}"
-        debug_log "     Место ошибки: #{e.backtrace.first}"
-        debug_log '     Полный стек вызовов:'
-        e.backtrace.each { |line| debug_log "       #{line}" }
+        raise_log(e, 'Критическая ошибка')
         false
       end
+    end
+
+    def raise_log(e, msg)
+      debug_log " ❌ #{msg}:"
+      debug_log "    Тип: #{e.class}"
+      debug_log "    Сообщение: #{e.message}"
+      debug_log "    Место ошибки: #{e.backtrace.first}"
+      debug_log '    Полный стек вызовов:'
+      e.backtrace.each { |line| debug_log "       #{line}" }
     end
 
     def handle_timeout(thread)
@@ -484,39 +461,7 @@ module TestRunner
         log "- #{model}: #{colorize("#{percentage}%", percentage)}"
       end
     end
-
-    def display_detailed_console(tasks, models)
-      # Существующий код для детального отчета
-      rows = []
-      tasks.each do |task|
-        row = [task]
-        models.each do |model|
-          status = @results[task][model]
-          mark = status ? DONE_MARK : FAIL_MARK
-          row << mark
-        end
-        rows << row
-      end
-
-      # Создаем заголовок таблицы
-      header = ['Task'] + models.map { |m| m.gsub('_', "\n") }
-
-      # Создаем и выводим таблицу
-      table = Terminal::Table.new(
-        headings: header,
-        rows: rows,
-        style: {
-          border_x: '-',
-          border_y: '|',
-          border_i: '+',
-          alignment: :center
-        }
-      )
-
-      log "\nДетальные результаты:"
-      log table
-    end
-
+    
     def display_results(tasks, models)
       # Создаем отчеты через генератор отчетов
       generator = HumanEval::Reports::Generator.new(
@@ -531,11 +476,7 @@ module TestRunner
       generator.generate
 
       # Отображаем результаты в консоли в зависимости от опции report_total
-      if @options[:report_total]
-        display_total_console(tasks, models)
-      else
-        display_detailed_console(tasks, models)
-      end
+      display_total_console(tasks, models) if @options[:report]
     end
 
     def get_model_info(model_key)

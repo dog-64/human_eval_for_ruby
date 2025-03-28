@@ -1,0 +1,14 @@
+def monotonic?(arr)
+  return true if arr.size <= 1
+
+  increasing = true
+  decreasing = true
+
+  (1...arr.size).each do |i|
+    increasing = false if arr[i] < arr[i - 1]
+    decreasing = false if arr[i] > arr[i - 1]
+    break unless increasing || decreasing
+  end
+
+  increasing || decreasing
+end

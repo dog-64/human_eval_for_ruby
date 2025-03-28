@@ -14,9 +14,9 @@ module TestRunner
                  default: 'normal',
                  desc: 'Уровень логирования'
 
-    class_option :report_total,
+    class_option :report,
                  type: :boolean,
-                 default: false,
+                 default: true,
                  desc: 'Показать только сводный отчет по моделям'
 
     desc 'all', 'Запустить все тесты'
