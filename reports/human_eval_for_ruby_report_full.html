@@ -64,7 +64,7 @@
 </head>
 <body>
 <h1>Отчет о тестировании моделей</h1>
-<p>Дата: 2025-03-26 19:10:31</p>
+<p>Дата: 2025-03-28 18:02:53</p>
 <h2>Результаты по моделям</h2>
 <div class='model-results'>
 <table>
@@ -81,11 +81,13 @@
 <tr><td>google_gemini_flash_1_5</td><td>75%</td></tr>
 <tr><td>meta_llama_llama_3_1_70b_instruct</td><td>69%</td></tr>
 <tr><td>mistralai_mistral_small_3_1_24b_instruct</td><td>67%</td></tr>
+<tr><td>qwen_qwen2_5_vl_3b_instruct_free</td><td>41%</td></tr>
 <tr><td>microsoft_phi_4_multimodal_instruct</td><td>35%</td></tr>
 <tr><td>ollama_codellama</td><td>31%</td></tr>
 <tr><td>ollama_codellama_13b</td><td>27%</td></tr>
 <tr><td>ollama_llama3_2</td><td>25%</td></tr>
 <tr><td>ollama_codellama_34b</td><td>17%</td></tr>
+<tr><td>google_gemini_2_5_pro_exp_03_25_free</td><td>1%</td></tr>
 </table></div>
 <h2>Детальные результаты по задачам</h2>
 <div class='task-results'>
@@ -95,6 +97,7 @@
 <th>deepseek_deepseek_chat_free</th>
 <th>google_gemini_2_0_flash_001</th>
 <th>google_gemini_2_0_flash_lite_001</th>
+<th>google_gemini_2_5_pro_exp_03_25_free</th>
 <th>google_gemini_flash_1_5</th>
 <th>google_gemma_3_27b_it</th>
 <th>meta_llama_llama_3_1_70b_instruct</th>
@@ -107,9 +110,12 @@
 <th>ollama_llama3_2</th>
 <th>openai_gpt_4o_mini</th>
 <th>openai_o3_mini_high</th>
+<th>qwen_qwen2_5_vl_3b_instruct_free</th>
 <th>qwen_qwen_2_5_coder_32b_instruct</th>
 </tr>
 <tr><td>t0</td>
+<td class='success'>✓</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -146,6 +152,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t10</td>
 <td class='success'>✓</td>
@@ -164,6 +171,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='failure'>✗</td>
 </tr>
 <tr><td>t100</td>
@@ -184,6 +192,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t101</td>
 <td class='success'>✓</td>
@@ -201,6 +210,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
@@ -221,6 +231,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t103</td>
@@ -240,6 +251,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t104</td>
 <td class='success'>✓</td>
@@ -258,6 +270,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t105</td>
@@ -277,6 +290,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t106</td>
@@ -296,6 +310,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t107</td>
@@ -313,6 +328,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -335,6 +351,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t109</td>
 <td class='success'>✓</td>
@@ -353,6 +370,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t11</td>
@@ -372,6 +390,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t110</td>
@@ -389,6 +408,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
@@ -411,6 +431,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t112</td>
 <td class='failure'>✗</td>
@@ -429,6 +450,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t113</td>
@@ -446,6 +468,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -467,6 +490,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t115</td>
@@ -486,6 +510,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t116</td>
@@ -505,6 +530,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t117</td>
@@ -525,6 +551,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t118</td>
 <td class='failure'>✗</td>
@@ -543,6 +570,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t119</td>
@@ -562,6 +590,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='failure'>✗</td>
 </tr>
 <tr><td>t12</td>
@@ -578,6 +607,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -600,6 +630,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t121</td>
@@ -619,6 +650,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t122</td>
@@ -636,6 +668,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -658,6 +691,7 @@
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t124</td>
 <td class='success'>✓</td>
@@ -676,6 +710,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t125</td>
@@ -694,6 +729,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
@@ -715,6 +751,7 @@
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t127</td>
 <td class='success'>✓</td>
@@ -734,8 +771,10 @@
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t128</td>
+<td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
@@ -772,6 +811,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t13</td>
 <td class='success'>✓</td>
@@ -790,6 +830,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t130</td>
@@ -810,6 +851,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t131</td>
 <td class='success'>✓</td>
@@ -828,6 +870,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t132</td>
@@ -847,6 +890,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t133</td>
@@ -864,6 +908,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -886,6 +931,7 @@
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t135</td>
 <td class='failure'>✗</td>
@@ -903,6 +949,7 @@
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
 </tr>
@@ -924,8 +971,10 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t137</td>
+<td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
@@ -961,6 +1010,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t139</td>
@@ -978,6 +1028,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -1000,6 +1051,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t140</td>
 <td class='success'>✓</td>
@@ -1017,6 +1069,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
@@ -1037,6 +1090,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t142</td>
@@ -1054,6 +1108,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -1076,6 +1131,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t144</td>
 <td class='success'>✓</td>
@@ -1092,6 +1148,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -1114,6 +1171,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t146</td>
 <td class='success'>✓</td>
@@ -1132,6 +1190,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t147</td>
@@ -1152,6 +1211,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t148</td>
 <td class='success'>✓</td>
@@ -1170,6 +1230,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t149</td>
@@ -1186,6 +1247,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -1209,6 +1271,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t150</td>
 <td class='success'>✓</td>
@@ -1225,6 +1288,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -1247,6 +1311,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t152</td>
 <td class='success'>✓</td>
@@ -1265,6 +1330,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t153</td>
@@ -1285,6 +1351,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t154</td>
 <td class='failure'>✗</td>
@@ -1304,6 +1371,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t155</td>
 <td class='success'>✓</td>
@@ -1322,6 +1390,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t156</td>
@@ -1342,6 +1411,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t157</td>
 <td class='success'>✓</td>
@@ -1354,6 +1424,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -1379,6 +1450,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t159</td>
@@ -1398,6 +1470,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t16</td>
@@ -1414,6 +1487,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -1437,6 +1511,7 @@
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t161</td>
 <td class='success'>✓</td>
@@ -1454,6 +1529,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
@@ -1475,6 +1551,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t163</td>
 <td class='success'>✓</td>
@@ -1493,6 +1570,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t17</td>
@@ -1510,6 +1588,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -1532,6 +1611,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t19</td>
 <td class='success'>✓</td>
@@ -1551,6 +1631,7 @@
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t2</td>
 <td class='success'>✓</td>
@@ -1567,6 +1648,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -1588,6 +1670,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t21</td>
@@ -1604,6 +1687,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
@@ -1627,8 +1711,10 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t23</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -1665,6 +1751,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t25</td>
 <td class='success'>✓</td>
@@ -1683,6 +1770,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t26</td>
@@ -1702,6 +1790,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t27</td>
@@ -1722,6 +1811,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t28</td>
 <td class='success'>✓</td>
@@ -1737,6 +1827,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -1760,8 +1851,10 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t3</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -1798,6 +1891,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t31</td>
 <td class='success'>✓</td>
@@ -1813,6 +1907,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -1836,6 +1931,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t33</td>
 <td class='success'>✓</td>
@@ -1855,6 +1951,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t34</td>
 <td class='success'>✓</td>
@@ -1870,6 +1967,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -1893,6 +1991,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t36</td>
 <td class='success'>✓</td>
@@ -1912,6 +2011,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t37</td>
 <td class='success'>✓</td>
@@ -1930,6 +2030,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t38</td>
@@ -1942,6 +2043,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
@@ -1968,6 +2070,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t4</td>
@@ -1984,6 +2087,7 @@
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -2006,6 +2110,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t41</td>
@@ -2026,8 +2131,10 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t42</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -2064,6 +2171,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t44</td>
 <td class='failure'>✗</td>
@@ -2082,6 +2190,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t45</td>
@@ -2095,6 +2204,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
@@ -2121,6 +2231,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t47</td>
 <td class='failure'>✗</td>
@@ -2140,6 +2251,7 @@
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t48</td>
 <td class='success'>✓</td>
@@ -2155,6 +2267,7 @@
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -2178,6 +2291,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t5</td>
 <td class='success'>✓</td>
@@ -2194,6 +2308,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -2215,6 +2330,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t51</td>
@@ -2231,6 +2347,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -2254,8 +2371,10 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t53</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -2292,6 +2411,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t55</td>
 <td class='success'>✓</td>
@@ -2311,6 +2431,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t56</td>
 <td class='success'>✓</td>
@@ -2327,6 +2448,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -2348,6 +2470,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t58</td>
@@ -2367,6 +2490,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t59</td>
@@ -2386,6 +2510,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t6</td>
@@ -2405,9 +2530,11 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t60</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -2444,6 +2571,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t62</td>
 <td class='success'>✓</td>
@@ -2461,6 +2589,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 </tr>
@@ -2482,6 +2611,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t64</td>
 <td class='success'>✓</td>
@@ -2501,6 +2631,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t65</td>
 <td class='success'>✓</td>
@@ -2512,6 +2643,7 @@
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
@@ -2539,6 +2671,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t67</td>
 <td class='success'>✓</td>
@@ -2558,6 +2691,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t68</td>
 <td class='success'>✓</td>
@@ -2576,6 +2710,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t69</td>
@@ -2595,9 +2730,11 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t7</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -2633,6 +2770,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t71</td>
@@ -2652,6 +2790,7 @@
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t72</td>
@@ -2671,6 +2810,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t73</td>
@@ -2688,6 +2828,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -2710,6 +2851,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t75</td>
 <td class='success'>✓</td>
@@ -2728,6 +2870,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t76</td>
@@ -2748,6 +2891,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t77</td>
 <td class='failure'>✗</td>
@@ -2766,6 +2910,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t78</td>
@@ -2786,6 +2931,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t79</td>
 <td class='success'>✓</td>
@@ -2805,6 +2951,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t8</td>
 <td class='success'>✓</td>
@@ -2820,6 +2967,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -2843,6 +2991,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t81</td>
 <td class='failure'>✗</td>
@@ -2851,6 +3000,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
@@ -2881,6 +3031,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t83</td>
 <td class='failure'>✗</td>
@@ -2899,6 +3050,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t84</td>
@@ -2918,6 +3070,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t85</td>
@@ -2937,6 +3090,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t86</td>
@@ -2950,6 +3104,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
@@ -2975,6 +3130,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t88</td>
@@ -2994,6 +3150,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t89</td>
@@ -3014,6 +3171,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t9</td>
 <td class='success'>✓</td>
@@ -3032,6 +3190,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t90</td>
@@ -3051,6 +3210,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t91</td>
@@ -3071,6 +3231,7 @@
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t92</td>
 <td class='success'>✓</td>
@@ -3087,6 +3248,7 @@
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -3109,6 +3271,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t94</td>
 <td class='success'>✓</td>
@@ -3125,6 +3288,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
@@ -3147,6 +3311,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t96</td>
 <td class='success'>✓</td>
@@ -3165,6 +3330,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
+<td class='failure'>✗</td>
 <td class='success'>✓</td>
 </tr>
 <tr><td>t97</td>
@@ -3185,6 +3351,7 @@
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
+<td class='failure'>✗</td>
 </tr>
 <tr><td>t98</td>
 <td class='success'>✓</td>
@@ -3204,6 +3371,7 @@
 <td class='success'>✓</td>
 <td class='failure'>✗</td>
 <td class='success'>✓</td>
+<td class='success'>✓</td>
 </tr>
 <tr><td>t99</td>
 <td class='success'>✓</td>
@@ -3221,6 +3389,7 @@
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
 <td class='failure'>✗</td>
+<td class='success'>✓</td>
 <td class='success'>✓</td>
 <td class='success'>✓</td>
 </tr>

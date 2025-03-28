@@ -41,6 +41,12 @@ module HumanEval
       'microsoft_phi-4-multimodal-instruct' => { name: 'microsoft/phi-4-multimodal-instruct',
                                                  provider: 'openrouter.ai',
                                                  note: 'https://openrouter.ai/microsoft/phi-4-multimodal-instruct' },
+      'google_gemini-2_5-pro-exp-03-25_free' => { name: 'google/gemini-2.5-pro-exp-03-25:free',
+                                                 provider: 'openrouter.ai',
+                                                 note: 'https://openrouter.ai/google/gemini-2.5-pro-exp-03-25:free' },
+      'qwen_qwen2_5-vl-3b-instruct_free' => { name: 'qwen/qwen2.5-vl-3b-instruct:free',
+                                                 provider: 'openrouter.ai',
+                                                 note: 'https://openrouter.ai/google/gemini-2.5-pro-exp-03-25:free' },
 
       'ollama_llama3_2' => { name: 'llama3.2', provider: 'ollama' },
       'ollama_codellama' => { name: 'codellama', provider: 'ollama',

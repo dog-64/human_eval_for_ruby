@@ -12,8 +12,10 @@
 - google_gemini_flash_1_5: 75%
 - meta_llama_llama_3_1_70b_instruct: 69%
 - mistralai_mistral_small_3_1_24b_instruct: 67%
+- qwen_qwen2_5_vl_3b_instruct_free: 41%
 - microsoft_phi_4_multimodal_instruct: 35%
 - ollama_codellama: 31%
 - ollama_codellama_13b: 27%
 - ollama_llama3_2: 25%
 - ollama_codellama_34b: 17%
+- google_gemini_2_5_pro_exp_03_25_free: 1%
