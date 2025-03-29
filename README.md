@@ -40,8 +40,8 @@
 ## Установка
 
 ```bash
-git clone https://github.com/dog-64/human_watch_ruby
-cd human_watch_ruby
+git clone https://github.com/dog-64/human_eval_for_ruby
+cd human_eval_for_ruby
 bundle install
 ```
 
