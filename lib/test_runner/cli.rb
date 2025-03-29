@@ -8,15 +8,17 @@ module TestRunner
   class CLI < Thor
     package_name 'Test Runner'
 
-    class_option :all,
-                 type: :boolean,
-                 default: false,
-                 desc: 'Запуск всех тестов'
+    desc 'tests', 'Запустить тесты'
 
     class_option :task,
                  type: :string,
-                 default: false,
-                 desc: 'Запуск конкретного теста'
+                 default: '',
+                 desc: 'Запуск конкретного теста (например, T1, T2, T3)'
+
+    class_option :model,
+                 type: :string,
+                 default: '',
+                 desc: 'Запуск тестов для конкретной модели'
 
     class_option :log_level,
                  type: :string,
@@ -29,22 +31,17 @@ module TestRunner
                  default: true,
                  desc: 'Показать только сводный отчет по моделям'
 
-    desc 'all', 'Запустить все тесты'
-    def all
+    def tests
       runner = Runner.new(options)
-      runner.run_all_tests
-    end
-
-    desc 'task TASK_NUMBER', 'Запустить тесты для конкретной задачи'
-    def task(task_number)
-      runner = Runner.new(options)
-      runner.run_task_tests(task_number)
-    end
-
-    desc 'model TASK_NUMBER MODEL', 'Запустить тесты для конкретной задачи и модели'
-    def model(task_number, model)
-      runner = Runner.new(options)
-      runner.run_model_tests(task_number, model)
+      if !options[:task].to_s.empty? && !options[:model].to_s.empty?
+        runner.run_model_tests(options[:task], options[:model])
+      elsif !options[:task].to_s.empty?
+        runner.run_task_tests(options[:task])
+      elsif !options[:model].to_s.empty?
+        runner.run_model_tests('', options[:model])
+      else
+        runner.run_all_tests
+      end
     end
 
     def self.exit_on_failure?
