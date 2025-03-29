@@ -144,49 +144,51 @@ OLLAMA_BASE_URL=http://localhost:11434
 
 Вы можете добавить другие модели Ollama, загрузив их с помощью команды `ollama pull <model_name>` и используя идентификатор `ollama_<model_name>`.
 
-### Добавление новых моделей Ollama
+### Добавление новых моделей
 
-Чтобы добавить новую модель Ollama в проект:
+Конфигурация моделей хранится в файле `config/models.yml`. Чтобы добавить новую модель:
 
-1. Загрузите модель с помощью команды:
+1. Откройте файл `config/models.yml`
+
+2. Добавьте новую запись в следующем формате:
+   ```yaml
+   model_identifier:
+     name: 'actual_model_name'
+     provider: 'provider_name'  # openrouter.ai или ollama
+     note: 'дополнительная информация' # опционально
+   ```
+
+3. Пример добавления новой модели Ollama:
+   ```yaml
+   ollama_phi3:
+     name: phi3
+     provider: ollama
+     note: 'https://ollama.com/library/phi3'
+   ```
+
+4. Пример добавления новой модели OpenRouter.ai:
+   ```yaml
+   openai_gpt4_turbo:
+     name: openai/gpt-4-turbo
+     provider: openrouter.ai
+   ```
+
+5. Для использования модели Ollama необходимо предварительно загрузить её:
    ```bash
    ollama pull <model_name>
    ```
-   Например: `ollama pull llama3.2` или `ollama pull phi3`
+   Например: `ollama pull phi3`
 
-2. Добавьте модель в список `MODELS` в файле `lib/human_eval_solver.rb`:
-   ```ruby
-   'ollama_<model_id>' => { name: '<model_name>', provider: 'ollama' },
-   ```
-   Например: `'ollama_llama3_2' => { name: 'llama3.2', provider: 'ollama' },`
-
-3. Обновите список моделей в README.md, добавив новую модель в раздел "Локальные Ollama модели"
-
-4. Теперь вы можете использовать модель для решения задач:
+6. Теперь вы можете использовать модель для решения задач:
    ```bash
-   ./bin/human_eval_solver solve tasks --model "ollama_<model_id>" --log-level debug
+   ./bin/human_eval_solver solve tasks --model "model_identifier" --log-level debug
    ```
 
-5. Для тестирования модели вы можете запустить её напрямую:
+7. Для тестирования модели Ollama вы можете запустить её напрямую:
    ```bash
    ollama run <model_name>
    ```
    Это запустит интерактивный режим, где вы можете проверить работу модели.
-
-6. Для отладки и анализа ответов модели используйте команду с подробным логированием:
-   ```bash
-   ./bin/human_eval_solver solve tasks --task t2 --model "ollama_codellama" --log-level debug
-   ```
-   Эта команда покажет:
-   - Полный текст запроса к модели
-   - Полный ответ от модели
-   - Извлеченный код из ответа
-   - Сохраненное решение
-   
-   Это помогает понять, почему решения модели могут быть некорректными:
-   - Модель может возвращать код в неправильном формате
-   - Модель может добавлять лишние комментарии или пояснения
-   - Могут быть проблемы с извлечением кода из ответа
 
 ### Генерация отчетов
 
@@ -220,12 +222,16 @@ OLLAMA_BASE_URL=http://localhost:11434
     - `t*.md` - описания задач
     - `t*-assert.rb` - тесты для задач
     - `t*-MODEL_NAME.rb` - решения от моделей
+- `config/` - конфигурационные файлы
+    - `models.yml` - конфигурация моделей (имена, провайдеры)
 - `lib/` - исходный код
     - `human_eval_solver.rb` - основной класс для работы с моделями
     - `test_runner/` - система тестирования
         - `runner.rb` - запуск тестов
         - `assert.rb` - модуль для тестовых утверждений
     - `human_eval/` - основные компоненты
+        - `solver.rb` - класс для решения задач с использованием моделей
+        - `logger.rb` - модуль логирования
         - `reports/` - генерация отчетов
             - `generator.rb` - основной генератор отчетов
             - `cli.rb` - интерфейс командной строки для отчетов
