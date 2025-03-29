@@ -7,11 +7,11 @@ RSpec.describe HumanEval::Reports::CLI do
   let(:total_report) { File.join(output_dir, 'human_eval_for_ruby_report_total.html') }
   let(:full_report) { File.join(output_dir, 'human_eval_for_ruby_report_full.html') }
   let(:style_file) { File.join(output_dir, 'style.css') }
-  
+
   before(:each) do
     FileUtils.mkdir_p(output_dir)
     FileUtils.mkdir_p(File.dirname(results_file))
-    
+
     # Создаем тестовый файл с результатами
     File.write(results_file, {
       'results' => {
@@ -39,14 +39,14 @@ RSpec.describe HumanEval::Reports::CLI do
     context 'когда генерация проходит успешно' do
       it 'генерирует HTML отчеты и выводит сообщение об успехе' do
         cli.invoke(:generate, [], {
-          output_dir: output_dir,
-          results_file: results_file,
-          format: 'html'
-        })
+                     output_dir: output_dir,
+                     results_file: results_file,
+                     format: 'html'
+                   })
 
         expect(@stdout.string).to include("Отчеты сгенерированы в директории: #{output_dir}")
-        expect(@stdout.string).to include("Формат: html")
-        
+        expect(@stdout.string).to include('Формат: html')
+
         expect(File.exist?(total_report)).to be true
         expect(File.exist?(full_report)).to be true
         expect(File.exist?(style_file)).to be true
@@ -54,9 +54,9 @@ RSpec.describe HumanEval::Reports::CLI do
 
       it 'использует HTML формат по умолчанию' do
         cli.invoke(:generate, [], {
-          output_dir: output_dir,
-          results_file: results_file
-        })
+                     output_dir: output_dir,
+                     results_file: results_file
+                   })
 
         expect(File.exist?(total_report)).to be true
         expect(File.exist?(full_report)).to be true
@@ -66,25 +66,25 @@ RSpec.describe HumanEval::Reports::CLI do
 
     context 'когда возникают ошибки' do
       it 'выводит сообщение об ошибке при некорректном формате' do
-        expect {
+        expect do
           cli.invoke(:generate, [], {
-            output_dir: output_dir,
-            results_file: results_file,
-            format: 'invalid'
-          })
-        }.to raise_error(SystemExit)
+                       output_dir: output_dir,
+                       results_file: results_file,
+                       format: 'invalid'
+                     })
+        end.to raise_error(SystemExit)
 
         expect(@stdout.string).to include('Неподдерживаемый формат')
       end
 
       it 'выводит сообщение об ошибке при отсутствии файла с результатами' do
-        expect {
+        expect do
           cli.invoke(:generate, [], {
-            output_dir: output_dir,
-            results_file: 'non_existent.json',
-            format: 'html'
-          })
-        }.to raise_error(SystemExit)
+                       output_dir: output_dir,
+                       results_file: 'non_existent.json',
+                       format: 'html'
+                     })
+        end.to raise_error(SystemExit)
 
         expect(@stdout.string).to include('не существует')
       end
@@ -92,13 +92,13 @@ RSpec.describe HumanEval::Reports::CLI do
       it 'выводит сообщение об ошибке при некорректном JSON' do
         File.write(results_file, 'invalid json')
 
-        expect {
+        expect do
           cli.invoke(:generate, [], {
-            output_dir: output_dir,
-            results_file: results_file,
-            format: 'html'
-          })
-        }.to raise_error(SystemExit)
+                       output_dir: output_dir,
+                       results_file: results_file,
+                       format: 'html'
+                     })
+        end.to raise_error(SystemExit)
 
         expect(@stdout.string).to include('Ошибка при чтении файла результатов')
       end
@@ -114,4 +114,4 @@ RSpec.describe HumanEval::Reports::CLI do
       expect(@stdout.string).to include("Error: #{error_message}")
     end
   end
-end 
+end

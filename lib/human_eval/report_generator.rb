@@ -23,10 +23,10 @@ module HumanEval
 
     def save_json
       File.write(File.join(@reports_dir, 'test_results.json'), JSON.pretty_generate({
-        timestamp: Time.now.strftime('%Y-%m-%d %H:%M:%S'),
-        models: @results[:model_stats],
-        tasks: @results[:task_results]
-      }))
+                                                                                      timestamp: Time.now.strftime('%Y-%m-%d %H:%M:%S'),
+                                                                                      models: @results[:model_stats],
+                                                                                      tasks: @results[:task_results]
+                                                                                    }))
     end
 
     def create_html_reports
@@ -46,10 +46,11 @@ module HumanEval
     def update_readme
       readme_path = File.join(@reports_dir, 'README.md')
       return unless File.exist?(readme_path)
+
       readme = File.read(readme_path)
       new_content = readme.sub(
         /## Рейтинг.*?(?=##|\z)/m,
-        File.read(File.join(@reports_dir, 'total.md')) + "\n"
+        "#{File.read(File.join(@reports_dir, 'total.md'))}\n"
       )
       File.write(readme_path, new_content)
     end
@@ -59,8 +60,8 @@ module HumanEval
     end
 
     def find_solution_files(task = nil)
-      pattern = task ? "#{task}_solution.rb" : "*_solution.rb"
-      Dir.glob(File.join(@reports_dir, 'solutions', "**", pattern)).sort
+      pattern = task ? "#{task}_solution.rb" : '*_solution.rb'
+      Dir.glob(File.join(@reports_dir, 'solutions', '**', pattern))
     end
 
     def generate_html_header
@@ -153,7 +154,7 @@ module HumanEval
         file.puts html_header
         file.puts '<h1>Отчет о тестировании моделей</h1>'
         file.puts "<p>Дата: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}</p>"
-        
+
         # Результаты по моделям
         file.puts '<h2>Результаты по моделям</h2>'
         file.puts "<div class='model-results'>"
@@ -168,7 +169,7 @@ module HumanEval
         file.puts '<h2>Детальные результаты по задачам</h2>'
         file.puts "<div class='task-results'>"
         file.puts '<table>'
-        
+
         # Заголовок таблицы с задачами
         models = @results[:task_results].values.first&.keys || []
         file.puts '<tr><th>Задача</th>'
@@ -180,16 +181,16 @@ module HumanEval
         # Данные по задачам
         @results[:task_results].each do |task, results|
           file.puts "<tr><td>#{task}</td>"
-          results.each do |_, success|
+          results.each_value do |success|
             status = success ? '✓' : '✗'
             css_class = success ? 'success' : 'failure'
             file.puts "<td class='#{css_class}'>#{status}</td>"
           end
           file.puts '</tr>'
         end
-        
+
         file.puts '</table></div></body></html>'
       end
     end
   end
-end 
+end

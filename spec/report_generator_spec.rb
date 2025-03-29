@@ -10,13 +10,13 @@ RSpec.describe HumanEval::ReportGenerator do
 
   before(:each) do
     FileUtils.mkdir_p(test_reports_dir)
-    
+
     # Мокаем методы работы с README.md
     allow_any_instance_of(HumanEval::ReportGenerator).to receive(:update_readme)
   end
 
   after(:each) do
-    FileUtils.remove_entry(test_reports_dir) if Dir.exist?(test_reports_dir)
+    FileUtils.rm_rf(test_reports_dir)
   end
 
   describe '#generate_all' do
@@ -81,7 +81,7 @@ RSpec.describe HumanEval::ReportGenerator do
       FileUtils.mkdir_p(test_reports_dir)
       File.write(readme_path, "# Test\n\n## Рейтинг\nold_model: 0%\n\n## Other section\nsome content")
       File.write(total_path, "model1: 100%\nmodel2: 50%")
-      
+
       allow(File).to receive(:exist?).with(readme_path).and_return(true)
       allow(File).to receive(:exist?).with(total_path).and_return(true)
       allow(File).to receive(:read).with(any_args) do |path|
@@ -93,10 +93,10 @@ RSpec.describe HumanEval::ReportGenerator do
       end
       allow(File).to receive(:write).with(any_args) do |path, content|
         if path == readme_path
-          expect(content).to include("model1: 100%")
-          expect(content).to include("model2: 50%")
-          expect(content).not_to include("old_model: 0%")
-          expect(content).to include("## Рейтинг")
+          expect(content).to include('model1: 100%')
+          expect(content).to include('model2: 50%')
+          expect(content).not_to include('old_model: 0%')
+          expect(content).to include('## Рейтинг')
         end
       end
     end
@@ -109,4 +109,4 @@ RSpec.describe HumanEval::ReportGenerator do
       generator.generate_all
     end
   end
-end 
+end

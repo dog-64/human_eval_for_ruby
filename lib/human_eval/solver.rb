@@ -458,10 +458,10 @@ module HumanEval
     def extract_and_join_code_blocks(input)
       # Проверяем наличие блоков кода в разных форматах
       has_code_blocks = input.include?('```ruby') ||
-        input.include?('```rb') ||
-        input.include?('```python') ||
-        input.include?('```') ||
-        input.include?('```md')
+                        input.include?('```rb') ||
+                        input.include?('```python') ||
+                        input.include?('```') ||
+                        input.include?('```md')
 
       return input unless has_code_blocks
 
@@ -476,7 +476,7 @@ module HumanEval
       return input if code_blocks.empty?
 
       # Объединяем найденные блоки в один результат с переводами строк.
-      code_blocks.map { |block| block.strip + "\n" }.join
+      code_blocks.map { |block| "#{block.strip}\n" }.join
     end
 
     # Проверяет окружение и наличие необходимых переменных
@@ -516,8 +516,10 @@ module HumanEval
 
       # Фильтруем только модели Ollama
       models_to_use = ollama_models
-      raise 'Нет доступных локальных моделей Ollama. Установите OPENROUTER_API_KEY для использования моделей ' \
-              'OpenRouter.ai' if models_to_use.empty?
+      if models_to_use.empty?
+        raise 'Нет доступных локальных моделей Ollama. Установите OPENROUTER_API_KEY для использования моделей ' \
+              'OpenRouter.ai'
+      end
 
       log "Используются только локальные модели Ollama: #{models_to_use.join(', ')}"
     end

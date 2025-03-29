@@ -10,7 +10,7 @@ module HumanEval
     # Класс для генерации отчетов
     class Generator
       AVAILABLE_FORMATS = %w[html markdown all].freeze
-      RESULTS_FILE = 'reports/results.json'
+      RESULTS_FILE = 'reports/results.json'.freeze
 
       def initialize(options = {})
         @options = options
@@ -40,9 +40,9 @@ module HumanEval
         base_dir = File.expand_path('.')
         output_path = File.expand_path(@output_dir)
 
-        unless output_path.start_with?(base_dir)
-          raise Error, 'Директория для отчетов должна находиться внутри текущего проекта'
-        end
+        return if output_path.start_with?(base_dir)
+
+        raise Error, 'Директория для отчетов должна находиться внутри текущего проекта'
       end
 
       def validate_options!
@@ -94,12 +94,12 @@ module HumanEval
           model_stats = calculate_model_stats(results)
           model_stats.sort_by { |_, percentage| -percentage }.each do |model, percentage|
             color_class = if percentage == 100
-                           'success'
-                         elsif percentage.zero?
-                           'failure'
-                         else
-                           ''
-                         end
+                            'success'
+                          elsif percentage.zero?
+                            'failure'
+                          else
+                            ''
+                          end
             file.puts "<tr><td>#{model}</td><td class='#{color_class}'>#{percentage}%</td></tr>"
           end
 
@@ -175,12 +175,12 @@ module HumanEval
         tasks = @tasks.empty? ? results.keys : @tasks
         models = @models.empty? ? results.values.flat_map(&:keys).uniq : @models
 
-        models.map do |model|
+        models.to_h do |model|
           total_tasks = tasks.size
           passed_tasks = tasks.count { |task| results[task][model] }
           percentage = (passed_tasks * 100.0 / total_tasks).round
           [model, percentage]
-        end.to_h
+        end
       end
 
       def generate_html_header
@@ -302,4 +302,4 @@ module HumanEval
       end
     end
   end
-end 
+end

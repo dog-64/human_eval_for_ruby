@@ -43,33 +43,33 @@ RSpec.describe HumanEval::Reports::Formatters::Base do
 
     context 'когда не указаны обязательные параметры' do
       it 'вызывает ошибку при отсутствии output_dir' do
-        expect {
+        expect do
           described_class.new(
             task_results: task_results,
             model_stats: model_stats,
             timestamp: timestamp
           )
-        }.to raise_error(ArgumentError, /output_dir/)
+        end.to raise_error(ArgumentError, /output_dir/)
       end
 
       it 'вызывает ошибку при отсутствии task_results' do
-        expect {
+        expect do
           described_class.new(
             output_dir: output_dir,
             model_stats: model_stats,
             timestamp: timestamp
           )
-        }.to raise_error(ArgumentError, /task_results/)
+        end.to raise_error(ArgumentError, /task_results/)
       end
 
       it 'вызывает ошибку при отсутствии model_stats' do
-        expect {
+        expect do
           described_class.new(
             output_dir: output_dir,
             task_results: task_results,
             timestamp: timestamp
           )
-        }.to raise_error(ArgumentError, /model_stats/)
+        end.to raise_error(ArgumentError, /model_stats/)
       end
     end
   end
@@ -92,15 +92,15 @@ RSpec.describe HumanEval::Reports::Formatters::Base do
 
     it 'проверяет, что output_dir находится внутри spec' do
       unsafe_paths.each do |unsafe_path|
-        expect {
+        expect do
           described_class.new(
             output_dir: unsafe_path,
             task_results: task_results,
             model_stats: model_stats,
             timestamp: timestamp
           )
-        }.to raise_error(ArgumentError, /должен находиться внутри каталога spec/)
+        end.to raise_error(ArgumentError, /должен находиться внутри каталога spec/)
       end
     end
   end
-end 
+end

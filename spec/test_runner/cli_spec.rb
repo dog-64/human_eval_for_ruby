@@ -42,4 +42,4 @@ RSpec.describe TestRunner::CLI do
       end
     end
   end
-end 
+end

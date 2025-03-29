@@ -32,7 +32,7 @@ RSpec.describe HumanEval::SolverClass do
   end
 
   after(:each) do
-    FileUtils.rm_rf(tasks_dir) if Dir.exist?(tasks_dir)
+    FileUtils.rm_rf(tasks_dir)
   end
 
   describe 'initialization' do
@@ -105,7 +105,7 @@ RSpec.describe HumanEval::SolverClass do
     end
 
     before do
-      stub_request(:post, "http://localhost:11434/api/chat")
+      stub_request(:post, 'http://localhost:11434/api/chat')
         .with(
           headers: {
             'Content-Type' => 'application/json'
@@ -314,7 +314,7 @@ RSpec.describe HumanEval::SolverClass do
     end
 
     it 'returns original text when no code blocks found' do
-      input = "Just some text without code blocks"
+      input = 'Just some text without code blocks'
       expect(described_class.new(tasks_dir).send(:extract_and_join_code_blocks, input)).to eq(input)
     end
 

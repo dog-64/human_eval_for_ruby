@@ -6,7 +6,7 @@ RSpec.describe TestRunner::Runner do
   let(:runner) { described_class.new(log_level: 'none') }
   let(:solution1_content) { "def add(a, b)\n  a + b\nend" }
   let(:solution2_content) { "def add(a, b)\n  a - b\nend" }
-  let(:test_content) { "assert_equal(add(2, 3), 5)" }
+  let(:test_content) { 'assert_equal(add(2, 3), 5)' }
   let(:total_md_content) { "## Рейтинг\n\n- model1: 100%\n- model2: 0%\n" }
 
   before(:each) do
@@ -222,7 +222,7 @@ RSpec.describe TestRunner::Runner do
       error = {
         class: 'RuntimeError',
         message: 'test error',
-        backtrace: ['line1', 'line2']
+        backtrace: %w[line1 line2]
       }
 
       expect(runner).to receive(:debug_log).with('  ❌ Тест не пройден:')
@@ -255,7 +255,7 @@ RSpec.describe TestRunner::Runner do
     let(:error) { StandardError.new('test error') }
 
     before do
-      allow(error).to receive(:backtrace).and_return(['line1', 'line2'])
+      allow(error).to receive(:backtrace).and_return(%w[line1 line2])
     end
 
     it 'логирует ошибку с полным стеком вызовов' do
@@ -269,7 +269,6 @@ RSpec.describe TestRunner::Runner do
 
       runner.send(:raise_log, error, 'test message')
     end
-
   end
 
   describe '#get_display_model_name' do
@@ -286,27 +285,29 @@ RSpec.describe TestRunner::Runner do
     end
 
     it 'добавляет заметку к имени модели' do
-      allow(runner).to receive(:get_model_info).and_return({ name: 'test_model', provider: 'unknown', note: 'test note' })
+      allow(runner).to receive(:get_model_info).and_return({ name: 'test_model', provider: 'unknown',
+                                                             note: 'test note' })
       expect(runner.send(:get_display_model_name, 'test_model')).to eq('test_model - test note')
     end
 
     it 'добавляет и провайдера, и заметку к имени модели' do
-      allow(runner).to receive(:get_model_info).and_return({ name: 'test_model', provider: 'openai', note: 'test note' })
+      allow(runner).to receive(:get_model_info).and_return({ name: 'test_model', provider: 'openai',
+                                                             note: 'test note' })
       expect(runner.send(:get_display_model_name, 'test_model')).to eq('test_model (openai) - test note')
     end
   end
 
   describe '#display_total_console' do
     let(:runner) { described_class.new }
-    let(:tasks) { ['t1', 't2', 't3'] }
-    let(:models) { ['model1', 'model2'] }
+    let(:tasks) { %w[t1 t2 t3] }
+    let(:models) { %w[model1 model2] }
 
     before do
       runner.instance_variable_set(:@results, {
-        't1' => { 'model1' => true, 'model2' => false },
-        't2' => { 'model1' => true, 'model2' => true },
-        't3' => { 'model1' => true, 'model2' => false }
-      })
+                                     't1' => { 'model1' => true, 'model2' => false },
+                                     't2' => { 'model1' => true, 'model2' => true },
+                                     't3' => { 'model1' => true, 'model2' => false }
+                                   })
     end
 
     it 'выводит статистику для каждой модели в правильном порядке' do
@@ -316,7 +317,6 @@ RSpec.describe TestRunner::Runner do
 
       runner.send(:display_total_console, tasks, models)
     end
-
   end
 
   describe '#models' do
@@ -324,16 +324,16 @@ RSpec.describe TestRunner::Runner do
 
     before do
       allow(Dir).to receive(:glob).with('tasks/t*-*.rb').and_return([
-        'tasks/t1-model1.rb',
-        'tasks/t1-model2.rb',
-        'tasks/t2-model1.rb',
-        'tasks/t1-assert.rb',
-        'tasks/t2-model2.rb'
-      ])
+                                                                      'tasks/t1-model1.rb',
+                                                                      'tasks/t1-model2.rb',
+                                                                      'tasks/t2-model1.rb',
+                                                                      'tasks/t1-assert.rb',
+                                                                      'tasks/t2-model2.rb'
+                                                                    ])
     end
 
     it 'возвращает отсортированный список уникальных моделей' do
-      expect(runner.send(:models)).to eq(['model1', 'model2'])
+      expect(runner.send(:models)).to eq(%w[model1 model2])
     end
 
     it 'исключает файлы с тестами' do
@@ -352,29 +352,29 @@ RSpec.describe TestRunner::Runner do
     before do
       # Подменяем поиск файлов для тестов
       allow(Dir).to receive(:glob).with('tasks/t*-*.rb').and_return([
-        'tasks/t1-model1.rb',
-        'tasks/t1-model2.rb',
-        'tasks/t2-model1.rb',
-        'tasks/t2-model2.rb',
-        'tasks/t1-assert.rb',
-        'tasks/t2-assert.rb'
-      ])
+                                                                      'tasks/t1-model1.rb',
+                                                                      'tasks/t1-model2.rb',
+                                                                      'tasks/t2-model1.rb',
+                                                                      'tasks/t2-model2.rb',
+                                                                      'tasks/t1-assert.rb',
+                                                                      'tasks/t2-assert.rb'
+                                                                    ])
     end
 
     context 'когда есть результаты тестов' do
       before do
         runner.instance_variable_set(:@results, {
-          't1' => { 'model1' => true, 'model2' => false },
-          't2' => { 'model1' => true, 'model2' => true }
-        })
+                                       't1' => { 'model1' => true, 'model2' => false },
+                                       't2' => { 'model1' => true, 'model2' => true }
+                                     })
       end
 
       it 'возвращает корректную статистику для всех моделей' do
         stats = runner.get_model_stats
         expect(stats).to eq([
-          ['model1', 100], # 2 из 2 задач пройдены
-          ['model2', 50]   # 1 из 2 задач пройдена
-        ])
+                              ['model1', 100], # 2 из 2 задач пройдены
+                              ['model2', 50] # 1 из 2 задач пройдена
+                            ])
       end
 
       it 'сортирует результаты по убыванию процента успешных тестов' do
@@ -406,9 +406,9 @@ RSpec.describe TestRunner::Runner do
     context 'когда есть только файлы с тестами' do
       before do
         allow(Dir).to receive(:glob).with('tasks/t*-*.rb').and_return([
-          'tasks/t1-assert.rb',
-          'tasks/t2-assert.rb'
-        ])
+                                                                        'tasks/t1-assert.rb',
+                                                                        'tasks/t2-assert.rb'
+                                                                      ])
       end
 
       it 'возвращает пустой массив' do
@@ -419,34 +419,34 @@ RSpec.describe TestRunner::Runner do
     context 'когда есть частичные результаты' do
       before do
         runner.instance_variable_set(:@results, {
-          't1' => { 'model1' => true },
-          't2' => { 'model2' => true }
-        })
+                                       't1' => { 'model1' => true },
+                                       't2' => { 'model2' => true }
+                                     })
       end
 
       it 'корректно обрабатывает отсутствующие результаты' do
         stats = runner.get_model_stats
         expect(stats).to eq([
-          ['model1', 100], # 1 из 1 задачи пройдена
-          ['model2', 100]  # 1 из 1 задачи пройдена
-        ])
+                              ['model1', 100], # 1 из 1 задачи пройдена
+                              ['model2', 100] # 1 из 1 задачи пройдена
+                            ])
       end
     end
 
     context 'когда все тесты провалены' do
       before do
         runner.instance_variable_set(:@results, {
-          't1' => { 'model1' => false, 'model2' => false },
-          't2' => { 'model1' => false, 'model2' => false }
-        })
+                                       't1' => { 'model1' => false, 'model2' => false },
+                                       't2' => { 'model1' => false, 'model2' => false }
+                                     })
       end
 
       it 'возвращает нулевой процент для всех моделей' do
         stats = runner.get_model_stats
         expect(stats).to eq([
-          ['model1', 0], # 0 из 2 задач пройдены
-          ['model2', 0]  # 0 из 2 задач пройдены
-        ])
+                              ['model1', 0], # 0 из 2 задач пройдены
+                              ['model2', 0] # 0 из 2 задач пройдены
+                            ])
       end
     end
   end
@@ -514,5 +514,3 @@ RSpec.describe TestRunner::Runner do
     end
   end
 end
-
-

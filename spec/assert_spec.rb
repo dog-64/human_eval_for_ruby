@@ -75,7 +75,7 @@ RSpec.describe HumanEval::Assert do
           test_object.assert(1 / 0)
         rescue ZeroDivisionError => e
           raise HumanEval::Assert::AssertionError.new(
-            "Error: divided by 0",
+            'Error: divided by 0',
             true,
             nil,
             "assert(...) - #{e.class}"
@@ -245,4 +245,4 @@ RSpec.describe HumanEval::Assert do
         .to output(/debug_assert\(true, test message\)/).to_stdout
     end
   end
-end 
+end

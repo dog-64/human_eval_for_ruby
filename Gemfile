@@ -1,28 +1,27 @@
 source 'https://rubygems.org'
 
-gem 'thor', '~> 1.3'
-gem 'terminal-table', '~> 3.0'
+gem 'bundle-audit'
 gem 'dotenv', '~> 2.8'
-gem "pry"
-gem "pry-byebug"
-gem "ostruct"
-gem "numo-narray"
-gem "standard", ">= 1.35.1"
-gem "bundle-audit"
-gem "prime"
+gem 'numo-narray'
+gem 'ostruct'
+gem 'prime'
+gem 'pry'
+gem 'pry-byebug'
+gem 'standard', '>= 1.35.1'
+gem 'terminal-table', '~> 3.0'
+gem 'thor', '~> 1.3'
 
 group :test do
   gem 'rspec', '~> 3.12'
-  gem 'webmock', '~> 3.19'
-  gem 'vcr', '~> 6.2'
+  gem 'rspec-collection_matchers'
+  gem 'rspec-core'
+  gem 'rspec-expectations'
   gem 'rspec-its', '~> 1.3'
-  gem "rspec-collection_matchers" 
-  gem "rspec-expectations"
-  gem "rspec-mocks"
-  gem "rspec-support"
-  gem "rspec-core"
+  gem 'rspec-mocks'
+  gem 'rspec-support'
+  gem 'rubocop'
+  gem 'rubocop-rspec'
   gem 'simplecov', '~> 0.22.0', require: false
-  gem "rubocop"
-  gem "rubocop-rspec"
+  gem 'vcr', '~> 6.2'
+  gem 'webmock', '~> 3.19'
 end
-

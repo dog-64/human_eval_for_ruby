@@ -103,4 +103,4 @@ RSpec.describe HumanEval::Reports::Generator do
       end
     end
   end
-end 
+end

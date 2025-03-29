@@ -151,4 +151,4 @@ RSpec.describe HumanEval::CLI do
       expect(described_class.exit_on_failure?).to be true
     end
   end
-end 
+end

@@ -59,7 +59,7 @@ module HumanEval
           nil,
           "assert(...) - #{e.class}"
         )
-      rescue StandardError => e
+      rescue => e
         debug_log "Error in assert: #{e.class} - #{e.message}"
         debug_log "Backtrace: #{e.backtrace&.join("\n")}"
         raise AssertionError.new(
@@ -140,7 +140,7 @@ module HumanEval
       rescue exception_class => e
         debug_log "Expected exception raised: #{e.class} - #{e.message}"
         return e
-      rescue StandardError => e
+      rescue => e
         debug_log "Unexpected exception raised: #{e.class} - #{e.message}"
         raise AssertionError.new(
           "Expected #{exception_class} but got #{e.class}",
@@ -150,7 +150,7 @@ module HumanEval
         )
       end
 
-      debug_log "No exception raised"
+      debug_log 'No exception raised'
       raise AssertionError.new(
         "Expected #{exception_class} but nothing was raised",
         exception_class,
@@ -165,14 +165,12 @@ module HumanEval
         succ_idx = result.index(succ)
         next unless pred_idx && succ_idx
 
-        unless pred_idx < succ_idx
-          raise AssertionError.new('Неверный порядок сортировки')
-        end
+        raise AssertionError, 'Неверный порядок сортировки' unless pred_idx < succ_idx
       end
     end
 
     def debug_assert(condition, message = nil)
-      message_str = message.nil? ? "nil" : message
+      message_str = message.nil? ? 'nil' : message
       puts "debug_assert(#{condition.inspect}, #{message_str})"
       assert(condition, message)
     end

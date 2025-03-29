@@ -84,7 +84,7 @@ class HumanEvalConverter
         debug "Создаем test файл в #{test_path}"
         create_assertions(@output_dir, task, task_number, description)
       end
-    rescue StandardError => e
+    rescue => e
       error "Ошибка при создании дополнительных файлов для #{task_id}: #{e.message}"
       error "Исходные данные сохранены в: #{jsonl_path} и #{json_path}"
     end

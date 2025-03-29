@@ -6,7 +6,7 @@ RSpec.describe HumanEvalConverter do
   let(:output_dir) { 'output' }
   let(:api_key) { 'test_key' }
   let(:converter) { described_class.new(input_file, output_dir, log_level: 'none') }
-  
+
   let(:task1_data) do
     {
       'task_id' => 'HumanEval/1',
@@ -15,7 +15,7 @@ RSpec.describe HumanEvalConverter do
       'test' => 'assert add(2, 3) == 5'
     }
   end
-  
+
   let(:task2_data) do
     {
       'task_id' => 'HumanEval/2',
@@ -25,9 +25,9 @@ RSpec.describe HumanEvalConverter do
     }
   end
 
-  let(:llm_response_description1) { "Функция add принимает два числа и возвращает их сумму" }
-  let(:llm_response_description2) { "Функция multiply принимает два числа и возвращает их произведение" }
-  
+  let(:llm_response_description1) { 'Функция add принимает два числа и возвращает их сумму' }
+  let(:llm_response_description2) { 'Функция multiply принимает два числа и возвращает их произведение' }
+
   let(:llm_response_tests1) { "assert_equal(add(2, 3), 5)\nassert_equal(add(-1, 1), 0)" }
   let(:llm_response_tests2) { "assert_equal(multiply(2, 3), 6)\nassert_equal(multiply(-2, 3), -6)" }
 
@@ -40,13 +40,13 @@ RSpec.describe HumanEvalConverter do
     allow(File).to receive(:read).with(input_file).and_return("#{task1_data.to_json}\n#{task2_data.to_json}")
     allow(File).to receive(:read).with('rules/description_prompt.txt').and_return('Опиши задачу')
     allow(File).to receive(:read).with('rules/test_prompt.txt').and_return('Создай тесты')
-    
+
     # Мокаем запись файлов
     allow(File).to receive(:write).with(any_args).and_return(true)
     allow(FileUtils).to receive(:mkdir_p).with(any_args)
-    
+
     # Мокаем API ответы для описаний
-    stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
+    stub_request(:post, 'https://openrouter.ai/api/v1/chat/completions')
       .with(
         headers: { 'Authorization' => "Bearer #{api_key}" },
         body: hash_including(
@@ -57,7 +57,7 @@ RSpec.describe HumanEvalConverter do
       )
       .to_return(status: 200, body: { choices: [{ message: { content: llm_response_description1 } }] }.to_json)
 
-    stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
+    stub_request(:post, 'https://openrouter.ai/api/v1/chat/completions')
       .with(
         headers: { 'Authorization' => "Bearer #{api_key}" },
         body: hash_including(
@@ -69,7 +69,7 @@ RSpec.describe HumanEvalConverter do
       .to_return(status: 200, body: { choices: [{ message: { content: llm_response_description2 } }] }.to_json)
 
     # Мокаем API ответы для тестов
-    stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
+    stub_request(:post, 'https://openrouter.ai/api/v1/chat/completions')
       .with(
         headers: { 'Authorization' => "Bearer #{api_key}" },
         body: hash_including(
@@ -80,7 +80,7 @@ RSpec.describe HumanEvalConverter do
       )
       .to_return(status: 200, body: { choices: [{ message: { content: llm_response_tests1 } }] }.to_json)
 
-    stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
+    stub_request(:post, 'https://openrouter.ai/api/v1/chat/completions')
       .with(
         headers: { 'Authorization' => "Bearer #{api_key}" },
         body: hash_including(
@@ -96,13 +96,13 @@ RSpec.describe HumanEvalConverter do
     context 'when processing all tasks' do
       it 'processes both tasks' do
         expect(FileUtils).to receive(:mkdir_p).with(output_dir)
-        
+
         # Проверяем сохранение файлов для задачи 1
         expect(File).to receive(:write).with("#{output_dir}/t1.jsonl", task1_data.to_json)
         expect(File).to receive(:write).with("#{output_dir}/t1.json", JSON.pretty_generate(task1_data))
         expect(File).to receive(:write).with("#{output_dir}/t1.md", /#{llm_response_description1}/)
         expect(File).to receive(:write).with("#{output_dir}/t1-assert.rb", llm_response_tests1)
-        
+
         # Проверяем сохранение файлов для задачи 2
         expect(File).to receive(:write).with("#{output_dir}/t2.jsonl", task2_data.to_json)
         expect(File).to receive(:write).with("#{output_dir}/t2.json", JSON.pretty_generate(task2_data))
@@ -118,13 +118,13 @@ RSpec.describe HumanEvalConverter do
 
       it 'processes only specified task' do
         expect(FileUtils).to receive(:mkdir_p).with(output_dir)
-        
+
         # Проверяем сохранение файлов только для задачи 1
         expect(File).to receive(:write).with("#{output_dir}/t1.jsonl", task1_data.to_json)
         expect(File).to receive(:write).with("#{output_dir}/t1.json", JSON.pretty_generate(task1_data))
         expect(File).to receive(:write).with("#{output_dir}/t1.md", /#{llm_response_description1}/)
         expect(File).to receive(:write).with("#{output_dir}/t1-assert.rb", llm_response_tests1)
-        
+
         # Проверяем что файлы задачи 2 не создаются
         expect(File).not_to receive(:write).with("#{output_dir}/t2.jsonl", anything)
         expect(File).not_to receive(:write).with("#{output_dir}/t2.json", anything)
@@ -162,7 +162,7 @@ RSpec.describe HumanEvalConverter do
   describe 'error handling' do
     context 'when API returns error' do
       before do
-        stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
+        stub_request(:post, 'https://openrouter.ai/api/v1/chat/completions')
           .with(headers: { 'Authorization' => "Bearer #{api_key}" })
           .to_return(status: 500, body: 'Internal Server Error')
       end
@@ -174,7 +174,7 @@ RSpec.describe HumanEvalConverter do
 
     context 'when API returns empty response' do
       before do
-        stub_request(:post, "https://openrouter.ai/api/v1/chat/completions")
+        stub_request(:post, 'https://openrouter.ai/api/v1/chat/completions')
           .with(headers: { 'Authorization' => "Bearer #{api_key}" })
           .to_return(status: 200, body: { choices: [{ message: { content: '' } }] }.to_json)
       end
@@ -184,4 +184,4 @@ RSpec.describe HumanEvalConverter do
       end
     end
   end
-end 
+end

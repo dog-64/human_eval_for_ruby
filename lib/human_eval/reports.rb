@@ -35,16 +35,16 @@ module HumanEval
       def validate_path_safety!(path)
         absolute_path = File.expand_path(path)
         spec_dir = File.expand_path('spec')
-        
-        unless absolute_path.start_with?(spec_dir)
-          raise ArgumentError, "Путь #{path} должен находиться внутри каталога spec"
-        end
+
+        return if absolute_path.start_with?(spec_dir)
+
+        raise ArgumentError, "Путь #{path} должен находиться внутри каталога spec"
       end
 
       def validate_results_file!(file_path)
-        unless File.exist?(file_path)
-          raise ArgumentError, "Файл с результатами #{file_path} не существует"
-        end
+        return if File.exist?(file_path)
+
+        raise ArgumentError, "Файл с результатами #{file_path} не существует"
       end
 
       def load_results(file_path)
@@ -53,8 +53,8 @@ module HumanEval
 
       def calculate_model_stats(results)
         stats = Hash.new { |h, k| h[k] = { total: 0, success: 0 } }
-        
-        results.each do |_task, model_results|
+
+        results.each_value do |model_results|
           model_results.each do |model, success|
             stats[model][:total] += 1
             stats[model][:success] += 1 if success
@@ -80,4 +80,4 @@ module HumanEval
       end
     end
   end
-end 
+end
