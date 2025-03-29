@@ -1,0 +1,101 @@
+---
+# Модели для решения задач HumanEval
+# Поддерживаются провайдеры OpenRouter.ai и Ollama
+
+deepseek_deepseek_chat:
+  name: deepseek/deepseek-chat
+  provider: openrouter.ai
+
+deepseek_deepseek_chat_free:
+  name: deepseek/deepseek-chat:free
+  provider: openrouter.ai
+
+google_gemini_2_0_flash_001:
+  name: google/gemini-2.0-flash-001
+  provider: openrouter.ai
+
+google_gemini_2_0_flash_lite_001:
+  name: google/gemini-2.0-flash-lite-001
+  provider: openrouter.ai
+
+google_gemini_flash_1_5:
+  name: google/gemini-flash-1.5
+  provider: openrouter.ai
+
+meta_llama_llama_3_1_70b_instruct:
+  name: meta-llama/llama-3.1-70b-instruct
+  provider: openrouter.ai
+
+qwen_qwen_2_5_coder_32b:
+  name: qwen/qwen-2.5-coder-32b
+  provider: openrouter.ai
+
+qwen_qwen_2_5_coder_32b_instruct:
+  name: qwen/qwen-2.5-coder-32b-instruct:free
+  provider: openrouter.ai
+
+mistralai_codestral_2501:
+  name: mistralai/codestral-2501
+  provider: openrouter.ai
+
+openai_gpt_4o_mini:
+  name: openai/gpt-4o-mini
+  provider: openrouter.ai
+
+openai_o3_mini_high:
+  name: openai/o3-mini-high
+  provider: openrouter.ai
+  note: 'дорогой, медленный'
+
+anthropic_claude_3_5_sonnet:
+  name: anthropic/claude-3.5-sonnet
+  provider: openrouter.ai
+
+mistralai_mistral-small-3_1-24b-instruct:
+  name: mistralai/mistral-small-3.1-24b-instruct
+  provider: openrouter.ai
+  note: '32b https://openrouter.ai/mistralai/mistral-small-3.1-24b-instruct-2503'
+
+google_gemma-3-27b-it:
+  name: google/gemma-3-27b-it
+  provider: openrouter.ai
+  note: 'https://openrouter.ai/google/gemma-3-27b-it'
+
+microsoft_phi-4-multimodal-instruct:
+  name: microsoft/phi-4-multimodal-instruct
+  provider: openrouter.ai
+  note: 'https://openrouter.ai/microsoft/phi-4-multimodal-instruct'
+
+google_gemini-2_5-pro-exp-03-25_free:
+  name: google/gemini-2.5-pro-exp-03-25:free
+  provider: openrouter.ai
+  note: 'https://openrouter.ai/google/gemini-2.5-pro-exp-03-25:free'
+
+qwen_qwen2_5-vl-3b-instruct_free:
+  name: qwen/qwen2.5-vl-3b-instruct:free
+  provider: openrouter.ai
+  note: 'https://openrouter.ai/google/gemini-2.5-pro-exp-03-25:free'
+
+deepseek_deepseek-chat-v3-0324:
+  name: deepseek/deepseek-chat-v3-0324
+  provider: openrouter.ai
+  note: 'https://openrouter.ai/deepseek/deepseek-chat-v3-0324'
+
+ollama_llama3_2:
+  name: llama3.2
+  provider: ollama
+
+ollama_codellama:
+  name: codellama
+  provider: ollama
+  note: 'CodeLlama 7B https://ollama.com/library/codellama'
+
+ollama_codellama:13b:
+  name: codellama:13b
+  provider: ollama
+  note: 'CodeLlama 13bB https://ollama.com/library/codellama:13b'
+
+ollama_codellama:34b:
+  name: codellama:34b
+  provider: ollama
+  note: 'CodeLlama 13bB https://ollama.com/library/codellama:34b' 

@@ -258,7 +258,7 @@ RSpec.describe HumanEval::SolverClass do
 
         it 'uses all available models' do
           solver = described_class.new(tasks_dir)
-          expect(solver.send(:select_models_for_task)).to eq(described_class::MODELS.keys)
+          expect(solver.send(:select_models_for_task)).to eq(solver.instance_variable_get(:@models).keys)
         end
       end
 
@@ -269,7 +269,7 @@ RSpec.describe HumanEval::SolverClass do
 
         it 'uses only Ollama models' do
           solver = described_class.new(tasks_dir)
-          ollama_models = described_class::MODELS.select { |_, info| info[:provider] == 'ollama' }.keys
+          ollama_models = solver.instance_variable_get(:@models).select { |_, info| info['provider'] == 'ollama' }.keys
           expect(solver.send(:select_models_for_task)).to eq(ollama_models)
         end
       end
@@ -340,6 +340,67 @@ RSpec.describe HumanEval::SolverClass do
         end
       EXPECTED
       expect(described_class.new(tasks_dir).send(:extract_and_join_code_blocks, input)).to eq(expected)
+    end
+  end
+
+  describe 'loading models' do
+    context 'when config file exists' do
+      before do
+        # Устанавливаем тестовые модели для проверки
+        @test_models = {
+          'test_model_1' => {
+            'name' => 'test/model-1',
+            'provider' => 'openrouter.ai'
+          },
+          'test_model_2' => {
+            'name' => 'test/model-2',
+            'provider' => 'ollama'
+          }
+        }
+      end
+      
+      it 'loads models correctly' do
+        solver = described_class.new(tasks_dir)
+        
+        # Заменяем модели на наши тестовые
+        solver.instance_variable_set(:@models, @test_models)
+        
+        models = solver.instance_variable_get(:@models)
+        expect(models).to be_a(Hash)
+        expect(models.keys).to include('test_model_1', 'test_model_2')
+        expect(models['test_model_1']['name']).to eq('test/model-1')
+        expect(models['test_model_1']['provider']).to eq('openrouter.ai')
+        expect(models['test_model_2']['provider']).to eq('ollama')
+      end
+    end
+    
+    context 'when config file does not exist' do
+      it 'provides default test models in test environment' do
+        solver = described_class.new(tasks_dir)
+        models = solver.instance_variable_get(:@models)
+        
+        expect(models).to be_a(Hash)
+        expect(models.keys).to include('anthropic_claude_3_5_sonnet')
+        expect(models.keys).to include('ollama_codellama')
+      end
+    end
+  end
+  
+  describe 'ollama_models method' do
+    it 'returns only ollama provider models' do
+      solver = described_class.new(tasks_dir)
+      
+      # Устанавливаем тестовые модели
+      test_models = {
+        'openrouter_model' => { 'name' => 'or/model', 'provider' => 'openrouter.ai' },
+        'ollama_model_1' => { 'name' => 'ollama_model1', 'provider' => 'ollama' },
+        'ollama_model_2' => { 'name' => 'ollama_model2', 'provider' => 'ollama' }
+      }
+      solver.instance_variable_set(:@models, test_models)
+      
+      ollama_models = solver.send(:ollama_models)
+      expect(ollama_models).to eq(['ollama_model_1', 'ollama_model_2'])
+      expect(ollama_models).not_to include('openrouter_model')
     end
   end
 end

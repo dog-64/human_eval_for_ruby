@@ -1,0 +1,7 @@
+---
+test_model_1:
+  name: test/model-1
+  provider: openrouter.ai
+test_model_2:
+  name: test/model-2
+  provider: ollama
