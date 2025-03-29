@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'terminal-table'
 require 'timeout'
 require_relative '../human_eval/logger'

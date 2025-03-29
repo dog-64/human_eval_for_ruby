@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module HumanEval
   module Reports
     module Formatters

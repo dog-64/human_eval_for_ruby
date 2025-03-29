@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'spec_helper'
 require 'fileutils'
 require_relative '../lib/test_runner/runner'
@@ -19,7 +17,7 @@ RSpec.describe TestRunner::Runner do
     # Подменяем чтение файлов
     allow(File).to receive(:exist?).and_return(true)
     allow(File).to receive(:exist?).with('tasks/t1-assert.rb').and_return(true)
-    allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return(solution1_content)
+    allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  a + b\nend")
     allow(File).to receive(:read).with('tasks/t1-model2.rb').and_return(solution2_content)
     allow(File).to receive(:read).with('tasks/t1-assert.rb').and_return(test_content)
     allow(File).to receive(:read).with('reports/total.md').and_return(total_md_content)
@@ -89,7 +87,7 @@ RSpec.describe TestRunner::Runner do
     end
 
     it 'handles syntax errors' do
-      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  a + b # missing end")
+      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  syntax_error")
       results = runner.run_tests(task: 't1', model: 'model1')
       expect(results['t1']['model1']).to be false
     end

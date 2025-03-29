@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'json'
 require_relative 'reports/formatters/html'
 require_relative 'reports/cli'

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'spec_helper'
 require_relative '../lib/human_eval/cli'
 require_relative '../lib/human_eval/converter'

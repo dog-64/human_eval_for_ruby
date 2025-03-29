@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module HumanEval
   module Solver
     # Модуль Help предоставляет методы для отображения справочной информации
