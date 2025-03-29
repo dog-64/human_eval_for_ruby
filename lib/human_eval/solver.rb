@@ -40,7 +40,7 @@ module HumanEval
     def models
       @models ||= begin
         loaded_models = {}
-        config = YAML.load_file(MODELS_CONFIG_PATH)
+        config = YAML.load_file(models_config_path)
 
         # Загружаем модели OpenRouter
         config['openrouter'].each do |key, value|
@@ -55,11 +55,17 @@ module HumanEval
         loaded_models
       end
     rescue Errno::ENOENT
-      error "Файл конфигурации моделей не найден: #{MODELS_CONFIG_PATH}"
-      raise "Конфигурационный файл не найден: #{MODELS_CONFIG_PATH}"
+      error "Файл конфигурации моделей не найден: #{models_config_path}"
+      raise "Конфигурационный файл не найден: #{models_config_path}"
     rescue => e
       error "Ошибка при загрузке конфигурации моделей: #{e.message}"
       raise "Ошибка при загрузке конфигурации моделей: #{e.message}"
+    end
+
+    # Возвращает путь к файлу конфигурации моделей
+    # @return [String] путь к файлу
+    def models_config_path
+      MODELS_CONFIG_PATH
     end
 
     # Обрабатывает все задачи в директории
