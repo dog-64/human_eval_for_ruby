@@ -1,3 +1,5 @@
+require_relative '../../models'
+
 module HumanEval
   module Solver
     # Модуль Help предоставляет методы для отображения справочной информации
@@ -49,18 +51,20 @@ module HumanEval
       # Отображает список моделей OpenRouter.ai
       def show_openrouter_models
         puts 'OpenRouter.ai модели:'
-        SolverClass::MODELS.select { |_, info| info[:provider] == 'openrouter.ai' }.each do |key, info|
-          note = info[:note] ? " (#{info[:note]})" : ''
-          puts "  #{key}: #{info[:name]}#{note}"
+        models_manager = Models.new
+        models_manager.all.select { |_, info| info['provider'] == 'openrouter.ai' }.each do |key, info|
+          note = info['note'] ? " (#{info['note']})" : ''
+          puts "  #{key}: #{info['name']}#{note}"
         end
       end
 
       # Отображает список локальных моделей Ollama
       def show_ollama_models
         puts "\nЛокальные Ollama модели:"
-        SolverClass::MODELS.select { |_, info| info[:provider] == 'ollama' }.each do |key, info|
-          note = info[:note] ? " (#{info[:note]})" : ''
-          puts "  #{key}: #{info[:name]}#{note}"
+        models_manager = Models.new
+        models_manager.all.select { |_, info| info['provider'] == 'ollama' }.each do |key, info|
+          note = info['note'] ? " (#{info['note']})" : ''
+          puts "  #{key}: #{info['name']}#{note}"
         end
       end
 

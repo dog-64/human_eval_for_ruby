@@ -282,7 +282,7 @@ RSpec.describe HumanEval::SolverClass do
       @config_path = File.join('spec', 'tmp', 'test_models.yml')
       config_dir = File.dirname(@config_path)
       FileUtils.mkdir_p(config_dir)
-      
+
       test_config = {
         'openrouter' => {
           'test_model1' => {
@@ -298,52 +298,54 @@ RSpec.describe HumanEval::SolverClass do
           }
         }
       }
-      
+
       File.write(@config_path, test_config.to_yaml)
     end
-    
+
     after do
       # Удаляем временный файл
-      FileUtils.rm(@config_path) if File.exist?(@config_path)
+      FileUtils.rm_f(@config_path)
     end
 
     it 'загружает модели из YAML файла' do
       solver = described_class.new(tasks_dir)
-      # Подменяем путь к файлу конфигурации для теста
-      allow(solver).to receive(:models_config_path).and_return(@config_path)
-      
-      models = solver.send(:models)
-      
+      # Подменяем модели для теста
+      custom_models = Models.new(@config_path)
+      solver.instance_variable_set(:@models_manager, custom_models)
+
+      models = solver.models
+
       expect(models).to be_a(Hash)
       expect(models.keys).to include('test_model1', 'test_ollama_model')
       expect(models['test_model1']).to eq({
-        'name' => 'test/model1',
-        'provider' => 'openrouter.ai'
-      })
+                                            'name' => 'test/model1',
+                                            'provider' => 'openrouter.ai'
+                                          })
       expect(models['test_ollama_model']).to eq({
-        'name' => 'test_ollama',
-        'provider' => 'ollama',
-        'note' => 'тестовая модель'
-      })
+                                                  'name' => 'test_ollama',
+                                                  'provider' => 'ollama',
+                                                  'note' => 'тестовая модель'
+                                                })
     end
-    
+
     it 'кэширует результат загрузки моделей' do
       solver = described_class.new(tasks_dir)
-      allow(solver).to receive(:models_config_path).and_return(@config_path)
-      
+      custom_models = Models.new(@config_path)
+      solver.instance_variable_set(:@models_manager, custom_models)
+
       # При первом вызове должен загрузить из файла
       expect(YAML).to receive(:load_file).once.and_call_original
-      
-      solver.send(:models)
+
+      solver.models
       # При повторном вызове должен использовать кэш
-      solver.send(:models)
+      solver.models
     end
-    
+
     it 'генерирует ошибку при отсутствии файла конфигурации' do
-      solver = described_class.new(tasks_dir)
-      allow(solver).to receive(:models_config_path).and_return('non_existent_file.yml')
-      
-      expect { solver.send(:models) }.to raise_error(/Конфигурационный файл не найден/)
+      # Создаем инстанс Models напрямую с несуществующим файлом
+      models = Models.new('non_existent_file.yml')
+      # Ошибка возникает при обращении к all, а не при создании объекта
+      expect { models.all }.to raise_error(/Конфигурационный файл не найден/)
     end
   end
 

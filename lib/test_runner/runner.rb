@@ -452,19 +452,23 @@ module TestRunner
     end
 
     def get_model_info(model_key)
-      # Проверяем доступность константы MODELS
-      if defined?(HumanEval::SolverClass::MODELS)
-        HumanEval::SolverClass::MODELS[model_key] || { name: model_key, provider: 'unknown' }
-      else
-        { name: model_key, provider: 'unknown' }
+      # Используем класс Models для получения информации о модели
+      begin
+        require_relative '../models'
+        models_manager = Models.new
+        model_info = models_manager.get(model_key)
+        model_info || { 'name' => model_key, 'provider' => 'unknown' }
+      rescue => e
+        # В случае ошибки возвращаем базовую информацию
+        { 'name' => model_key, 'provider' => 'unknown' }
       end
     end
 
     def get_display_model_name(model_key)
       model_info = get_model_info(model_key)
-      name = model_info[:name]
-      provider = model_info[:provider]
-      note = model_info[:note]
+      name = model_info['name']
+      provider = model_info['provider']
+      note = model_info['note']
 
       display_name = name.dup
       display_name << " (#{provider})" if provider != 'unknown'

@@ -6,6 +6,7 @@ require 'uri'
 require 'dotenv'
 require 'yaml'
 require_relative 'logger'
+require_relative '../models'
 require 'strscan'
 
 module HumanEval
@@ -13,8 +14,6 @@ module HumanEval
   # Поддерживает как модели OpenRouter.ai, так и локальные модели Ollama
   class SolverClass
     include HumanEval::Logger
-
-    MODELS_CONFIG_PATH = File.join(File.dirname(__FILE__), '..', '..', 'config', 'models.yml')
 
     Dotenv.load
     OLLAMA_BASE_URL = ENV['OLLAMA_BASE_URL'] || 'http://localhost:11434'
@@ -32,40 +31,20 @@ module HumanEval
       @task_number = options[:task]
       @keep_existing = options[:keep_existing]
       self.log_level = options[:log_level] || :normal
+      @models_manager = Models.new
       validate_environment
     end
 
-    # Загружает модели из конфигурационного файла
-    # @return [Hash] хеш с моделями
-    def models
-      @models ||= begin
-        loaded_models = {}
-        config = YAML.load_file(models_config_path)
-
-        # Загружаем модели OpenRouter
-        config['openrouter'].each do |key, value|
-          loaded_models[key] = value
-        end
-
-        # Загружаем модели Ollama
-        config['ollama'].each do |key, value|
-          loaded_models[key] = value
-        end
-
-        loaded_models
-      end
-    rescue Errno::ENOENT
-      error "Файл конфигурации моделей не найден: #{models_config_path}"
-      raise "Конфигурационный файл не найден: #{models_config_path}"
-    rescue => e
-      error "Ошибка при загрузке конфигурации моделей: #{e.message}"
-      raise "Ошибка при загрузке конфигурации моделей: #{e.message}"
+    # Доступ к менеджеру моделей
+    # @return [Models] объект для работы с моделями
+    def models_manager
+      @models_manager
     end
 
-    # Возвращает путь к файлу конфигурации моделей
-    # @return [String] путь к файлу
-    def models_config_path
-      MODELS_CONFIG_PATH
+    # Возвращает список всех моделей
+    # @return [Hash] хеш с моделями
+    def models
+      @models_manager.all
     end
 
     # Обрабатывает все задачи в директории
@@ -85,13 +64,13 @@ module HumanEval
     # Возвращает список моделей Ollama
     # @return [Array<String>] список ключей моделей Ollama
     def ollama_models
-      models.select { |_, info| info['provider'] == 'ollama' }.keys
+      @models_manager.ollama
     end
 
     # Возвращает API ключ для OpenRouter.ai
     # @return [String] API ключ
     def openrouter_api_key
-      ENV.fetch('OPENROUTER_API_KEY', nil)
+      @models_manager.openrouter_api_key
     end
 
     # Находит файлы задач для обработки
@@ -137,10 +116,10 @@ module HumanEval
     def select_models_for_task
       if @model
         [@model]
-      elsif openrouter_api_key
+      elsif @models_manager.openrouter_available?
         models.keys
       else
-        models_list = models.select { |_, info| info['provider'] == 'ollama' }.keys
+        models_list = ollama_models
         log "Используются только локальные модели Ollama: #{models_list.join(', ')}"
         models_list
       end
@@ -473,7 +452,6 @@ module HumanEval
     # Проверяет окружение и наличие необходимых переменных
     def validate_environment
       raise "Каталог #{@tasks_dir} не найден" unless Dir.exist?(@tasks_dir)
-      raise "Файл конфигурации #{MODELS_CONFIG_PATH} не найден" unless File.exist?(MODELS_CONFIG_PATH)
 
       validate_model_environment
     end
