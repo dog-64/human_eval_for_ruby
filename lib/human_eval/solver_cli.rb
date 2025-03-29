@@ -18,7 +18,7 @@ module HumanEval
     desc 'solve TASKS_DIR', 'Solve tasks from TASKS_DIR using AI models'
     method_option :model,
                   type: :string,
-                  desc: "Use specific model (#{SolverClass::MODELS.keys.join(', ')})"
+                  desc: "Use specific model (используйте 'commands' для просмотра списка моделей)"
     method_option :task,
                   type: :string,
                   desc: 'Решить конкретную задачу (можно указать как номер, так и имя, например: 1 или t1)'

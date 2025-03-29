@@ -23,9 +23,9 @@
 - qwen_qwen2_5_vl_3b_instruct_free: 41%
 - microsoft_phi_4_multimodal_instruct: 35%
 - ollama_codellama: 31%
-- ollama_codellama_13b: 27%
+- ollama_codellama:13b: 27%
 - ollama_llama3_2: 25%
-- ollama_codellama_34b: 17%
+- ollama_codellama:34b: 17%
 - google_gemini_2_5_pro_exp_03_25_free: 1%
 
 ## Возможности
@@ -135,12 +135,10 @@ OLLAMA_BASE_URL=http://localhost:11434
 
 #### Локальные Ollama модели:
 
-- ollama_llama3 (llama3)
 - ollama_llama3_2 (llama3.2)
 - ollama_codellama (codellama)
-- ollama_mistral (mistral)
-- ollama_phi3 (phi3)
-- ollama_gemma (gemma)
+- ollama_codellama:13b (codellama:13b)
+- ollama_codellama:34b (codellama:34b)
 
 Вы можете добавить другие модели Ollama, загрузив их с помощью команды `ollama pull <model_name>` и используя идентификатор `ollama_<model_name>`.
 
@@ -154,11 +152,20 @@ OLLAMA_BASE_URL=http://localhost:11434
    ```
    Например: `ollama pull llama3.2` или `ollama pull phi3`
 
-2. Добавьте модель в список `MODELS` в файле `lib/human_eval_solver.rb`:
-   ```ruby
-   'ollama_<model_id>' => { name: '<model_name>', provider: 'ollama' },
+2. Добавьте модель в файл конфигурации `config/models.yml` в раздел `ollama`:
+   ```yaml
+   ollama_<model_id>:
+     name: <model_name>
+     provider: ollama
+     note: дополнительное описание модели (опционально)
    ```
-   Например: `'ollama_llama3_2' => { name: 'llama3.2', provider: 'ollama' },`
+   Например:
+   ```yaml
+   ollama_llama3_2:
+     name: llama3.2
+     provider: ollama
+     note: Llama 3.2 8B https://ollama.com/library/llama3.2
+   ```
 
 3. Обновите список моделей в README.md, добавив новую модель в раздел "Локальные Ollama модели"
 
@@ -221,7 +228,10 @@ OLLAMA_BASE_URL=http://localhost:11434
     - `t*-assert.rb` - тесты для задач
     - `t*-MODEL_NAME.rb` - решения от моделей
 - `lib/` - исходный код
-    - `human_eval_solver.rb` - основной класс для работы с моделями
+    - `human_eval/` - основные компоненты
+        - `solver.rb` - основной класс для работы с моделями
+        - `solver_cli.rb` - интерфейс командной строки
+        - `logger.rb` - модуль логирования
     - `test_runner/` - система тестирования
         - `runner.rb` - запуск тестов
         - `assert.rb` - модуль для тестовых утверждений
@@ -233,6 +243,8 @@ OLLAMA_BASE_URL=http://localhost:11434
                 - `base.rb` - базовый класс форматтера
                 - `html.rb` - HTML форматтер
                 - `markdown.rb` - Markdown форматтер
+- `config/` - конфигурационные файлы
+    - `models.yml` - конфигурация моделей
 - `rules/` - правила и промпты для моделей
 - `bin/` - исполняемые скрипты
     - `human_eval_solver` - работа с моделями

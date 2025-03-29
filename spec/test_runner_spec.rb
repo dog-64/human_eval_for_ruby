@@ -275,24 +275,24 @@ RSpec.describe TestRunner::Runner do
     let(:runner) { described_class.new }
 
     it 'возвращает базовое имя модели без дополнительной информации' do
-      allow(runner).to receive(:get_model_info).and_return({ name: 'test_model', provider: 'unknown' })
+      allow(runner).to receive(:get_model_info).and_return({ 'name' => 'test_model', 'provider' => 'unknown' })
       expect(runner.send(:get_display_model_name, 'test_model')).to eq('test_model')
     end
 
     it 'добавляет провайдера к имени модели' do
-      allow(runner).to receive(:get_model_info).and_return({ name: 'test_model', provider: 'openai' })
+      allow(runner).to receive(:get_model_info).and_return({ 'name' => 'test_model', 'provider' => 'openai' })
       expect(runner.send(:get_display_model_name, 'test_model')).to eq('test_model (openai)')
     end
 
     it 'добавляет заметку к имени модели' do
-      allow(runner).to receive(:get_model_info).and_return({ name: 'test_model', provider: 'unknown',
-                                                             note: 'test note' })
+      allow(runner).to receive(:get_model_info).and_return({ 'name' => 'test_model', 'provider' => 'unknown',
+                                                             'note' => 'test note' })
       expect(runner.send(:get_display_model_name, 'test_model')).to eq('test_model - test note')
     end
 
     it 'добавляет и провайдера, и заметку к имени модели' do
-      allow(runner).to receive(:get_model_info).and_return({ name: 'test_model', provider: 'openai',
-                                                             note: 'test note' })
+      allow(runner).to receive(:get_model_info).and_return({ 'name' => 'test_model', 'provider' => 'openai',
+                                                             'note' => 'test note' })
       expect(runner.send(:get_display_model_name, 'test_model')).to eq('test_model (openai) - test note')
     end
   end
