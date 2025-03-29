@@ -258,7 +258,7 @@ RSpec.describe HumanEval::SolverClass do
 
         it 'uses all available models' do
           solver = described_class.new(tasks_dir)
-          expect(solver.send(:select_models_for_task)).to eq(solver.send(:models).keys)
+          expect(solver.send(:select_models_for_task)).to eq(solver.models.keys)
         end
       end
 
@@ -269,7 +269,7 @@ RSpec.describe HumanEval::SolverClass do
 
         it 'uses only Ollama models' do
           solver = described_class.new(tasks_dir)
-          ollama_models = solver.send(:models).select { |_, info| info['provider'] == 'ollama' }.keys
+          ollama_models = solver.models.select { |_, info| info['provider'] == 'ollama' }.keys
           expect(solver.send(:select_models_for_task)).to eq(ollama_models)
         end
       end
