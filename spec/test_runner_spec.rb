@@ -453,6 +453,69 @@ RSpec.describe TestRunner::Runner do
       end
     end
   end
+
+  describe '#handle_timeout' do
+    let(:runner) { described_class.new(timeout: 5, log_level: 'none') }
+    let(:thread) { double('thread') }
+
+    before do
+      allow(thread).to receive(:kill)
+      allow(thread).to receive(:join).with(1)
+      allow(runner).to receive(:error)
+    end
+
+    it 'убивает поток' do
+      expect(thread).to receive(:kill)
+      runner.send(:handle_timeout, thread)
+    end
+
+    it 'ждет завершения потока в течение 1 секунды' do
+      expect(thread).to receive(:join).with(1)
+      runner.send(:handle_timeout, thread)
+    end
+
+    it 'выводит сообщение об ошибке с указанием таймаута' do
+      expect(runner).to receive(:error).with('  ❌ Превышен лимит времени выполнения (5 секунд)')
+      expect(runner).to receive(:error).with('     Возможно, в решении есть бесконечный цикл')
+      runner.send(:handle_timeout, thread)
+    end
+
+    it 'возвращает false' do
+      expect(runner.send(:handle_timeout, thread)).to be false
+    end
+
+    context 'когда поток равен nil' do
+      it 'не вызывает методы kill и join' do
+        expect(thread).not_to receive(:kill)
+        expect(thread).not_to receive(:join)
+        runner.send(:handle_timeout, nil)
+      end
+
+      it 'все равно выводит сообщение об ошибке' do
+        expect(runner).to receive(:error).with('  ❌ Превышен лимит времени выполнения (5 секунд)')
+        expect(runner).to receive(:error).with('     Возможно, в решении есть бесконечный цикл')
+        runner.send(:handle_timeout, nil)
+      end
+
+      it 'возвращает false' do
+        expect(runner.send(:handle_timeout, nil)).to be false
+      end
+    end
+
+    context 'когда таймаут установлен в другое значение' do
+      let(:runner) { described_class.new(timeout: 10, log_level: 'none') }
+
+      before do
+        allow(runner).to receive(:error)
+      end
+
+      it 'выводит сообщение с правильным значением таймаута' do
+        expect(runner).to receive(:error).with('  ❌ Превышен лимит времени выполнения (10 секунд)')
+        expect(runner).to receive(:error).with('     Возможно, в решении есть бесконечный цикл')
+        runner.send(:handle_timeout, thread)
+      end
+    end
+  end
 end
 
 

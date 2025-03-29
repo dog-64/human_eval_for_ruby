@@ -436,8 +436,8 @@ module TestRunner
     end
 
     def handle_timeout(thread)
-      thread.kill
-      thread.join(1) # Даем потоку секунду на завершение
+      thread&.kill
+      thread&.join(1) # Даем потоку секунду на завершение
       error "  ❌ Превышен лимит времени выполнения (#{@timeout} секунд)"
       error '     Возможно, в решении есть бесконечный цикл'
       false
