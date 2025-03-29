@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require_relative 'base'
 require 'fileutils'
 
@@ -47,11 +45,11 @@ module HumanEval
         def generate_model_stats_table
           content = "<div class='model-results'><table>"
           content += '<tr><th>Модель</th><th>Успешность</th></tr>'
-          
+
           model_stats.each do |model, percentage|
             content += "<tr><td>#{model}</td><td>#{percentage}%</td></tr>"
           end
-          
+
           content += '</table></div>'
           content
         end
@@ -59,23 +57,23 @@ module HumanEval
         def generate_task_results_table
           content = "<div class='task-results'><table>"
           content += '<tr><th>Задача</th>'
-          
+
           models = task_results.values.first&.keys || []
           models.each do |model|
             content += "<th>#{model}</th>"
           end
           content += '</tr>'
-          
+
           task_results.each do |task, results|
             content += "<tr><td>#{task}</td>"
-            results.each do |_, success|
+            results.each_value do |success|
               status = success ? '✅' : '❌'
               css_class = success ? 'success' : 'failure'
               content += "<td class='#{css_class}'>#{status}</td>"
             end
             content += '</tr>'
           end
-          
+
           content += '</table></div>'
           content
         end
@@ -123,4 +121,4 @@ module HumanEval
       end
     end
   end
-end 
+end

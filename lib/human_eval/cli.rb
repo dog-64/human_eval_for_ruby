@@ -1,10 +1,11 @@
-# frozen_string_literal: true
-
 require 'thor'
 require 'fileutils'
 require_relative 'converter'
 
 module HumanEval
+  # Класс CLI предоставляет интерфейс командной строки для работы с инструментом Human Eval
+  # Основан на Thor и позволяет конвертировать задачи из формата human-eval в отдельные файлы,
+  # управлять параметрами конвертации и логированием
   class CLI < Thor
     package_name 'Human Eval Converter'
     class_option :help, aliases: '-h', type: :boolean, desc: 'Display usage information'

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'json'
 require 'fileutils'
 require 'timeout'
@@ -92,6 +90,12 @@ module HumanEval
     end
 
     private
+
+    # Возвращает список моделей Ollama
+    # @return [Array<String>] список ключей моделей Ollama
+    def ollama_models
+      MODELS.select { |_, info| info[:provider] == 'ollama' }.keys
+    end
 
     # Возвращает API ключ для OpenRouter.ai
     # @return [String] API ключ
@@ -454,10 +458,10 @@ module HumanEval
     def extract_and_join_code_blocks(input)
       # Проверяем наличие блоков кода в разных форматах
       has_code_blocks = input.include?('```ruby') ||
-        input.include?('```rb') ||
-        input.include?('```python') ||
-        input.include?('```') ||
-        input.include?('```md')
+                        input.include?('```rb') ||
+                        input.include?('```python') ||
+                        input.include?('```') ||
+                        input.include?('```md')
 
       return input unless has_code_blocks
 
@@ -472,7 +476,7 @@ module HumanEval
       return input if code_blocks.empty?
 
       # Объединяем найденные блоки в один результат с переводами строк.
-      code_blocks.join("\n")
+      code_blocks.map { |block| "#{block.strip}\n" }.join
     end
 
     # Проверяет окружение и наличие необходимых переменных
@@ -504,18 +508,20 @@ module HumanEval
     # Проверяет окружение для моделей по умолчанию
     def validate_default_models
       # Если модель не указана, проверяем наличие ключа OpenRouter.ai,
-      # так как по умолчанию будут использоваться все модели, включая OpenRouter.ai
+      # так как по умолчанию будут использоваться все модели, включая OpenRouter.ai˝
       return if openrouter_api_key
 
       log 'ВНИМАНИЕ: Переменная OPENROUTER_API_KEY не установлена в файле .env'
       log 'Будут использоваться только локальные модели Ollama'
 
       # Фильтруем только модели Ollama
-      models_to_use = MODELS.select { |_, info| info[:provider] == 'ollama' }
-      return unless models_to_use.empty?
-
-      raise 'Нет доступных локальных моделей Ollama. Установите OPENROUTER_API_KEY для использования моделей ' \
+      models_to_use = ollama_models
+      if models_to_use.empty?
+        raise 'Нет доступных локальных моделей Ollama. Установите OPENROUTER_API_KEY для использования моделей ' \
               'OpenRouter.ai'
+      end
+
+      log "Используются только локальные модели Ollama: #{models_to_use.join(', ')}"
     end
   end
 end

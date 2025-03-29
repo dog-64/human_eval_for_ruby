@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'spec_helper'
 require 'webmock/rspec'
 require 'tmpdir'
@@ -34,7 +32,7 @@ RSpec.describe HumanEval::SolverClass do
   end
 
   after(:each) do
-    FileUtils.rm_rf(tasks_dir) if Dir.exist?(tasks_dir)
+    FileUtils.rm_rf(tasks_dir)
   end
 
   describe 'initialization' do
@@ -107,7 +105,7 @@ RSpec.describe HumanEval::SolverClass do
     end
 
     before do
-      stub_request(:post, "http://localhost:11434/api/chat")
+      stub_request(:post, 'http://localhost:11434/api/chat')
         .with(
           headers: {
             'Content-Type' => 'application/json'
@@ -176,6 +174,172 @@ RSpec.describe HumanEval::SolverClass do
       it 'handles empty responses gracefully' do
         expect { solver.process }.to raise_error(RuntimeError, 'Пустой ответ от API')
       end
+    end
+  end
+
+  describe 'validation' do
+    context 'when validating default models' do
+      context 'when OPENROUTER_API_KEY is set' do
+        before do
+          ENV['OPENROUTER_API_KEY'] = 'test_key'
+        end
+
+        it 'does not raise error' do
+          solver = described_class.new(tasks_dir)
+          expect { solver.send(:validate_default_models) }.not_to raise_error
+        end
+      end
+
+      context 'when OPENROUTER_API_KEY is not set' do
+        before do
+          ENV['OPENROUTER_API_KEY'] = nil
+        end
+
+        it 'raises error when no Ollama models available' do
+          solver = described_class.new(tasks_dir)
+          allow(solver).to receive(:ollama_models).and_return([])
+          expect { solver.send(:validate_default_models) }
+            .to raise_error(/Нет доступных локальных моделей Ollama/)
+        end
+
+        it 'does not raise error when Ollama models available' do
+          solver = described_class.new(tasks_dir)
+          allow(solver).to receive(:ollama_models).and_return(['ollama_model'])
+          expect { solver.send(:validate_default_models) }.not_to raise_error
+        end
+      end
+    end
+
+    context 'when validating specific model' do
+      context 'when model is OpenRouter model' do
+        before do
+          ENV['OPENROUTER_API_KEY'] = nil
+        end
+
+        it 'raises error when OPENROUTER_API_KEY is not set' do
+          expect { described_class.new(tasks_dir, model: 'anthropic_claude_3_5_sonnet') }
+            .to raise_error(/Установите переменную OPENROUTER_API_KEY/)
+        end
+
+        it 'does not raise error when OPENROUTER_API_KEY is set' do
+          ENV['OPENROUTER_API_KEY'] = 'test_key'
+          expect { described_class.new(tasks_dir, model: 'anthropic_claude_3_5_sonnet') }
+            .not_to raise_error
+        end
+      end
+
+      context 'when model is Ollama model' do
+        it 'does not raise error regardless of OPENROUTER_API_KEY' do
+          ENV['OPENROUTER_API_KEY'] = nil
+          expect { described_class.new(tasks_dir, model: 'ollama_codellama') }
+            .not_to raise_error
+
+          ENV['OPENROUTER_API_KEY'] = 'test_key'
+          expect { described_class.new(tasks_dir, model: 'ollama_codellama') }
+            .not_to raise_error
+        end
+      end
+    end
+  end
+
+  describe 'model selection' do
+    context 'when specific model is provided' do
+      it 'uses only specified model' do
+        solver = described_class.new(tasks_dir, model: 'anthropic_claude_3_5_sonnet')
+        expect(solver.send(:select_models_for_task)).to eq(['anthropic_claude_3_5_sonnet'])
+      end
+    end
+
+    context 'when no specific model is provided' do
+      context 'when OPENROUTER_API_KEY is set' do
+        before do
+          ENV['OPENROUTER_API_KEY'] = 'test_key'
+        end
+
+        it 'uses all available models' do
+          solver = described_class.new(tasks_dir)
+          expect(solver.send(:select_models_for_task)).to eq(described_class::MODELS.keys)
+        end
+      end
+
+      context 'when OPENROUTER_API_KEY is not set' do
+        before do
+          ENV['OPENROUTER_API_KEY'] = nil
+        end
+
+        it 'uses only Ollama models' do
+          solver = described_class.new(tasks_dir)
+          ollama_models = described_class::MODELS.select { |_, info| info[:provider] == 'ollama' }.keys
+          expect(solver.send(:select_models_for_task)).to eq(ollama_models)
+        end
+      end
+    end
+  end
+
+  describe 'code extraction' do
+    it 'extracts code from ruby blocks' do
+      input = <<~INPUT
+        Some text
+        ```ruby
+        def test
+          puts "test"
+        end
+        ```
+        More text
+      INPUT
+      expected = <<~EXPECTED
+        def test
+          puts "test"
+        end
+      EXPECTED
+      expect(described_class.new(tasks_dir).send(:extract_and_join_code_blocks, input)).to eq(expected)
+    end
+
+    it 'extracts code from rb blocks' do
+      input = <<~INPUT
+        Some text
+        ```rb
+        def test
+          puts "test"
+        end
+        ```
+        More text
+      INPUT
+      expected = <<~EXPECTED
+        def test
+          puts "test"
+        end
+      EXPECTED
+      expect(described_class.new(tasks_dir).send(:extract_and_join_code_blocks, input)).to eq(expected)
+    end
+
+    it 'returns original text when no code blocks found' do
+      input = 'Just some text without code blocks'
+      expect(described_class.new(tasks_dir).send(:extract_and_join_code_blocks, input)).to eq(input)
+    end
+
+    it 'joins multiple code blocks' do
+      input = <<~INPUT
+        ```ruby
+        def test1
+          puts "test1"
+        end
+        ```
+        ```ruby
+        def test2
+          puts "test2"
+        end
+        ```
+      INPUT
+      expected = <<~EXPECTED
+        def test1
+          puts "test1"
+        end
+        def test2
+          puts "test2"
+        end
+      EXPECTED
+      expect(described_class.new(tasks_dir).send(:extract_and_join_code_blocks, input)).to eq(expected)
     end
   end
 end

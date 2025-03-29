@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'spec_helper'
 require 'fileutils'
 require 'json'
@@ -105,4 +103,4 @@ RSpec.describe HumanEval::Reports::Generator do
       end
     end
   end
-end 
+end

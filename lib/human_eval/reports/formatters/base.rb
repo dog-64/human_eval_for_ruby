@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module HumanEval
   module Reports
     module Formatters
@@ -23,7 +21,7 @@ module HumanEval
         private
 
         def validate_required_options!(options)
-          required_options = [:output_dir, :task_results, :model_stats]
+          required_options = %i[output_dir task_results model_stats]
           missing_options = required_options.select { |opt| options[opt].nil? }
           return if missing_options.empty?
 
@@ -33,12 +31,12 @@ module HumanEval
         def validate_output_dir_safety!(path)
           absolute_path = File.expand_path(path)
           spec_dir = File.expand_path('spec')
-          
-          unless absolute_path.start_with?(spec_dir)
-            raise ArgumentError, "Путь #{path} должен находиться внутри каталога spec"
-          end
+
+          return if absolute_path.start_with?(spec_dir)
+
+          raise ArgumentError, "Путь #{path} должен находиться внутри каталога spec"
         end
       end
     end
   end
-end 
+end

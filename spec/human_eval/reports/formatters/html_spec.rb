@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'spec_helper'
 require 'fileutils'
 
@@ -121,4 +119,4 @@ RSpec.describe HumanEval::Reports::Formatters::HTML do
       expect(header).to include('<title>Отчет о тестировании моделей</title>')
     end
   end
-end 
+end

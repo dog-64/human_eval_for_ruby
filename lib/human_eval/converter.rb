@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'json'
 require 'fileutils'
 require 'net/http'
@@ -8,6 +6,9 @@ require 'dotenv'
 require 'pry'
 require_relative 'logger'
 
+# Класс HumanEvalConverter предназначен для конвертации задач из формата human-eval в отдельные файлы
+# Выполняет чтение исходных данных, создание описаний и тестов с использованием языковых моделей
+# через API OpenRouter, и сохранение результатов в указанный каталог
 class HumanEvalConverter
   include HumanEval::Logger
 
@@ -83,7 +84,7 @@ class HumanEvalConverter
         debug "Создаем test файл в #{test_path}"
         create_assertions(@output_dir, task, task_number, description)
       end
-    rescue StandardError => e
+    rescue => e
       error "Ошибка при создании дополнительных файлов для #{task_id}: #{e.message}"
       error "Исходные данные сохранены в: #{jsonl_path} и #{json_path}"
     end

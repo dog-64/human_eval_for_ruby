@@ -27,3 +27,13 @@ Metrics/BlockLength:
 Metrics/ClassLength:
   Exclude:
     - 'lib/human_eval_solver.rb' 
+
+Style/RescueStandardError:
+  Enabled: true
+  EnforcedStyle: implicit
+  
+Style/RedundantBegin:
+  Enabled: false 
+  
+Style/FrozenStringLiteralComment:
+  Enabled: false 

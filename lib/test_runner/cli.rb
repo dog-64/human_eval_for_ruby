@@ -1,22 +1,25 @@
-# frozen_string_literal: true
-
 require 'thor'
 require 'fileutils'
 require_relative 'runner'
 
 module TestRunner
+  # Класс CLI предоставляет интерфейс командной строки для запуска тестов
+  # Построен на базе Thor и позволяет запускать тесты для конкретных задач и моделей,
+  # управлять уровнем логирования и генерацией отчетов
   class CLI < Thor
     package_name 'Test Runner'
 
-    class_option :all,
-                 type: :boolean,
-                 default: false,
-                 desc: 'Запуск всех тестов'
+    desc 'tests', 'Запустить тесты'
 
     class_option :task,
                  type: :string,
-                 default: false,
-                 desc: 'Запуск конкретного теста'
+                 default: '',
+                 desc: 'Запуск конкретного теста (например, T1, T2, T3)'
+
+    class_option :model,
+                 type: :string,
+                 default: '',
+                 desc: 'Запуск тестов для конкретной модели'
 
     class_option :log_level,
                  type: :string,
@@ -29,24 +32,19 @@ module TestRunner
                  default: true,
                  desc: 'Показать только сводный отчет по моделям'
 
-    desc 'all', 'Запустить все тесты'
-    def all
+    # Запускает тесты с заданными параметрами командной строки
+    # Использует основной класс Runner для запуска тестов
+    # и обработки результатов
+    def tests
       runner = Runner.new(options)
-      runner.run_all_tests
+      runner.run_tests(
+        task: options[:task].to_s.empty? ? nil : options[:task],
+        model: options[:model].to_s.empty? ? nil : options[:model]
+      )
     end
 
-    desc 'task TASK_NUMBER', 'Запустить тесты для конкретной задачи'
-    def task(task_number)
-      runner = Runner.new(options)
-      runner.run_task_tests(task_number)
-    end
-
-    desc 'model TASK_NUMBER MODEL', 'Запустить тесты для конкретной задачи и модели'
-    def model(task_number, model)
-      runner = Runner.new(options)
-      runner.run_model_tests(task_number, model)
-    end
-
+    # Определяет поведение при ошибке выполнения команды
+    # @return [Boolean] true - выход при ошибке, false - продолжение выполнения
     def self.exit_on_failure?
       true
     end

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'spec_helper'
 require_relative '../lib/human_eval/cli'
 require_relative '../lib/human_eval/converter'
@@ -153,4 +151,4 @@ RSpec.describe HumanEval::CLI do
       expect(described_class.exit_on_failure?).to be true
     end
   end
-end 
+end

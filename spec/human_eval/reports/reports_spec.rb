@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'spec_helper'
 require 'fileutils'
 require 'json'
@@ -39,25 +37,25 @@ RSpec.describe HumanEval::Reports do
 
       it 'не позволяет генерировать отчеты за пределами spec' do
         unsafe_paths.each do |unsafe_path|
-          expect {
+          expect do
             described_class.generate_reports(
               results_file: test_results_file,
               output_dir: unsafe_path,
               format: 'html'
             )
-          }.to raise_error(ArgumentError, /должен находиться внутри каталога spec/)
+          end.to raise_error(ArgumentError, /должен находиться внутри каталога spec/)
         end
       end
 
       it 'не позволяет читать файл с результатами за пределами spec' do
         unsafe_paths.each do |unsafe_path|
-          expect {
+          expect do
             described_class.generate_reports(
               results_file: unsafe_path,
               output_dir: test_reports_dir,
               format: 'html'
             )
-          }.to raise_error(ArgumentError, /должен находиться внутри каталога spec/)
+          end.to raise_error(ArgumentError, /должен находиться внутри каталога spec/)
         end
       end
     end
@@ -78,36 +76,36 @@ RSpec.describe HumanEval::Reports do
 
     context 'обработка ошибок' do
       it 'вызывает ошибку при отсутствии файла с результатами' do
-        expect {
+        expect do
           described_class.generate_reports(
             results_file: 'spec/fixtures/non_existent.json',
             output_dir: test_reports_dir,
             format: 'html'
           )
-        }.to raise_error(ArgumentError, /не существует/)
+        end.to raise_error(ArgumentError, /не существует/)
       end
 
       it 'вызывает ошибку при некорректном JSON в файле результатов' do
         File.write(test_results_file, 'invalid json')
 
-        expect {
+        expect do
           described_class.generate_reports(
             results_file: test_results_file,
             output_dir: test_reports_dir,
             format: 'html'
           )
-        }.to raise_error(JSON::ParserError)
+        end.to raise_error(JSON::ParserError)
       end
 
       it 'вызывает ошибку при неподдерживаемом формате' do
-        expect {
+        expect do
           described_class.generate_reports(
             results_file: test_results_file,
             output_dir: test_reports_dir,
             format: 'invalid'
           )
-        }.to raise_error(ArgumentError, /Неподдерживаемый формат/)
+        end.to raise_error(ArgumentError, /Неподдерживаемый формат/)
       end
     end
   end
-end 
+end

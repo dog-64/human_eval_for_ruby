@@ -1,10 +1,11 @@
-# frozen_string_literal: true
-
 require 'terminal-table'
 require 'pry'
 require 'timeout'
 
 module HumanEval
+  # Модуль Logger предоставляет базовую функциональность логирования
+  # Поддерживает различные уровни логирования (none, error, normal, debug)
+  # и форматирование сообщений в зависимости от уровня
   module Logger
     LOG_LEVELS = {
       none: 0,
