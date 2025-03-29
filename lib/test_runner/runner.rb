@@ -78,12 +78,12 @@ module TestRunner
         solutions.each do |solution|
           begin
             current_model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
-            debug_log "Testing solution #{solution} for model #{current_model}"
+            normal_log "Testing solution #{solution} for model #{current_model}"
             success = test_solution(current_task, solution)
             debug_log "Test result for #{current_model}: #{success}"
             @results[current_task][current_model] = success
           rescue StandardError => e
-            error "Ошибка при тестировании #{solution}: #{e.message}"
+            debug_log "Ошибка при тестировании #{solution}: #{e.message}"
             @results[current_task][current_model] = false
           end
         end
