@@ -8,15 +8,25 @@ module TestRunner
   class CLI < Thor
     package_name 'Test Runner'
 
+    class_option :all,
+                 type: :boolean,
+                 default: false,
+                 desc: 'Запуск всех тестов'
+
+    class_option :task,
+                 type: :string,
+                 default: false,
+                 desc: 'Запуск конкретного теста'
+
     class_option :log_level,
                  type: :string,
                  enum: %w[none normal debug],
                  default: 'normal',
                  desc: 'Уровень логирования'
 
-    class_option :report_total,
+    class_option :report,
                  type: :boolean,
-                 default: false,
+                 default: true,
                  desc: 'Показать только сводный отчет по моделям'
 
     desc 'all', 'Запустить все тесты'

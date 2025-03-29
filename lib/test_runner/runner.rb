@@ -26,28 +26,11 @@ module TestRunner
       @timeout = @options[:timeout] || 5 # Таймаут по умолчанию 5 секунд
     end
 
-    def colorize(text, percentage)
-      color = case percentage
-              when 0..33 then "\e[31m" # Красный
-              when 34..66 then "\e[33m" # Желтый
-              else "\e[32m" # Зеленый
-              end
-      "#{color}#{text}\e[0m"
-    end
-
     def run_all_tests
-      tasks = find_solution_files.map { |f| File.basename(f) }.map { |f| f.gsub(/-.*$/, '') }.uniq.sort
       if tasks.empty?
         error 'Ошибка: Не найдены файлы с решениями'
         return {}
       end
-
-      models = find_solution_files.map do |f|
-        filename = File.basename(f)
-        next if filename.end_with?('_asserts.rb')
-
-        filename.split('-')[1..].join('-').sub('.rb', '')
-      end.compact.uniq.sort
 
       @results = Hash.new { |h, k| h[k] = {} }
 
@@ -65,16 +48,14 @@ module TestRunner
       end
 
       debug_log "Final results: #{@results.inspect}"
-      
-      # Генерируем отчеты
+
       report_data = {
         model_stats: get_model_stats,
         task_results: @results
       }
-      
       HumanEval::ReportGenerator.new(report_data).generate_all
-      
-      display_total_console(tasks, models)
+
+      display_total_console(tasks, models) if @options[:report]
       @results
     end
 
@@ -95,7 +76,6 @@ module TestRunner
         return {}
       end
 
-      models = solutions.map { |s| File.basename(s).split('-')[1..].join('-').sub('.rb', '') }
       @results = Hash.new { |h, k| h[k] = {} }
 
       solutions.each do |solution|
@@ -104,7 +84,7 @@ module TestRunner
         @results[task][model] = success
       end
 
-      display_results([task], models)
+      display_total_console(tasks, models) if @options[:report] && !@options[:all]
       @results
     end
 
@@ -134,15 +114,9 @@ module TestRunner
       begin
         success = test_solution(task, solution)
         @results[task][model] = success || false
-      rescue Interrupt => e
+      rescue Interrupt
         error "Тест прерван для задачи #{task} модели #{model}"
         @results[task][model] = false
-      end
-
-      begin
-        display_results([task], [model])
-      rescue Interrupt
-        error "Отображение результатов прервано для задачи #{task} модели #{model}"
       end
 
       @results
@@ -186,17 +160,24 @@ module TestRunner
       end
     end
 
-    # Этот метод больше не используется, так как функционал отчетов
-    # был перенесен в отдельный модуль. Метод оставлен для обратной
-    # совместимости и будет удален в следующих версиях.
-    #
-    # @deprecated Используйте ReportGenerator вместо этого метода
-    def create_reports(tasks, models)
-      warn "DEPRECATED: Метод create_reports устарел и будет удален. Используйте ReportGenerator."
-      # Оставляем пустую реализацию
+    private
+
+    def models
+      find_solution_files.map do |f|
+        filename = File.basename(f)
+        next if filename.end_with?('_asserts.rb')
+
+        filename.split('-')[1..].join('-').sub('.rb', '')
+      end.compact.uniq.sort
     end
 
-    private
+    def tasks
+      find_solution_files
+        .map { |f| File.basename(f) }
+        .map { |f| f.gsub(/-.*$/, '') }
+        .uniq
+        .sort
+    end
 
     def test_solution(task, solution_file)
       test_file = "tasks/#{task}-assert.rb"
@@ -226,44 +207,29 @@ module TestRunner
         temp_context.module_eval(solution_content)
         debug_log '  ✅ Синтаксис решения корректен'
       rescue SyntaxError => e
-        error '  ❌ Ошибка синтаксиса в решении:'
-        error "     #{e.message}"
+        debug_log '  ❌ Ошибка синтаксиса в решении:'
+        debug_log "     #{e.message}"
         return false
       rescue StandardError => e
-        # Если в решении есть посторонний код, который вызывает ошибку,
-        # логируем ошибку, но продолжаем выполнение
-        warn '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при проверке синтаксиса:'
-        warn "     #{e.class}: #{e.message}"
-        warn '     Тесты могут не пройти из-за отсутствия необходимых методов'
+       debug_log '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при проверке синтаксиса:'
+        debug_log "     #{e.class}: #{e.message}"
+        debug_log '     Тесты могут не пройти из-за отсутствия необходимых методов'
       end
 
       test_context = Module.new do
         include HumanEval::Assert
         include HumanEval::LogLevels
+        include HumanEval::Logger
 
         # Загружаем стандартные библиотеки Ruby с обработкой ошибок
         %w[prime set json date time base64 digest securerandom pathname].each do |lib|
-          begin
-            require lib
-          rescue LoadError => e
-            warn "  ⚠️ Библиотека #{lib} недоступна: #{e.message}"
-          end
+          require lib
+        rescue LoadError => e
+          debug_log "  ⚠️ Библиотека #{lib} недоступна: #{e.message}"
         end
 
         class << self
-          attr_writer :log_level
-        end
-
-        class << self
-          attr_reader :log_level
-        end
-
-        class << self
-          attr_writer :options
-        end
-
-        class << self
-          attr_reader :options
+          attr_accessor :log_level, :options
         end
 
         def self.handle_error(e)
@@ -282,11 +248,8 @@ module TestRunner
         begin
           module_eval(solution_content)
         rescue StandardError => e
-          # Если в решении есть посторонний код, который вызывает ошибку,
-          # логируем ошибку, но продолжаем выполнение тестов
           warn '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при загрузке в контекст тестов:'
           warn "     #{e.class}: #{e.message}"
-          warn '     Тесты могут не пройти из-за отсутствия необходимых методов'
         end
 
         extend self
@@ -310,21 +273,10 @@ module TestRunner
           test_context = Module.new do
             include HumanEval::Assert
             include HumanEval::LogLevels
+            include HumanEval::Logger
 
             class << self
-              attr_writer :log_level
-            end
-
-            class << self
-              attr_reader :log_level
-            end
-
-            class << self
-              attr_writer :options
-            end
-
-            class << self
-              attr_reader :options
+              attr_accessor :log_level, :options
             end
 
             def self.handle_error(e)
@@ -341,7 +293,14 @@ module TestRunner
             end
           end
 
-          test_context.module_eval(solution_content)
+          begin
+            test_context.module_eval(solution_content)
+          rescue StandardError => e
+            debug_log '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при загрузке в контекст тестов:'
+            debug_log "     #{e.class}: #{e.message}"
+            debug_log '     Тесты могут не пройти из-за отсутствия необходимых методов'
+          end
+
           test_context.extend(test_context)
           test_context.log_level = @options[:log_level] || :normal
           test_context.options = @options.dup # Добавляем .dup чтобы избежать проблем с разделяемыми объектами
@@ -429,8 +388,8 @@ module TestRunner
         rescue Timeout::Error
           thread.kill
           thread.join(1) # Даем потоку секунду на завершение
-          error "  ❌ Превышен лимит времени выполнения (#{@timeout} секунд)"
-          error '     Возможно, в решении есть бесконечный цикл'
+          debug_log "  ❌ Превышен лимит времени выполнения (#{@timeout} секунд)"
+          debug_log '     Возможно, в решении есть бесконечный цикл'
           false
         ensure
           thread.kill unless thread.nil? || !thread.alive?
@@ -440,22 +399,21 @@ module TestRunner
         debug_log "  📍 Место прерывания: #{e.backtrace.first}"
         false
       rescue StandardError => e
-        error '  ❌ Неожиданная ошибка:'
-        error "     Тип: #{e.class}"
-        error "     Сообщение: #{e.message}"
-        debug_log "     Место ошибки: #{e.backtrace.first}"
-        debug_log '     Полный стек вызовов:'
-        e.backtrace.each { |line| debug_log "       #{line}" }
+        raise_log(e, 'Неожиданная ошибка')
         false
       rescue Exception => e
-        error '  ❌ Критическая ошибка:'
-        error "     Тип: #{e.class}"
-        error "     Сообщение: #{e.message}"
-        debug_log "     Место ошибки: #{e.backtrace.first}"
-        debug_log '     Полный стек вызовов:'
-        e.backtrace.each { |line| debug_log "       #{line}" }
+        raise_log(e, 'Критическая ошибка')
         false
       end
+    end
+
+    def raise_log(e, msg)
+      debug_log " ❌ #{msg}:"
+      debug_log "    Тип: #{e.class}"
+      debug_log "    Сообщение: #{e.message}"
+      debug_log "    Место ошибки: #{e.backtrace.first}"
+      debug_log '    Полный стек вызовов:'
+      e.backtrace.each { |line| debug_log "       #{line}" }
     end
 
     def handle_timeout(thread)
@@ -485,36 +443,13 @@ module TestRunner
       end
     end
 
-    def display_detailed_console(tasks, models)
-      # Существующий код для детального отчета
-      rows = []
-      tasks.each do |task|
-        row = [task]
-        models.each do |model|
-          status = @results[task][model]
-          mark = status ? DONE_MARK : FAIL_MARK
-          row << mark
-        end
-        rows << row
-      end
-
-      # Создаем заголовок таблицы
-      header = ['Task'] + models.map { |m| m.gsub('_', "\n") }
-
-      # Создаем и выводим таблицу
-      table = Terminal::Table.new(
-        headings: header,
-        rows: rows,
-        style: {
-          border_x: '-',
-          border_y: '|',
-          border_i: '+',
-          alignment: :center
-        }
-      )
-
-      log "\nДетальные результаты:"
-      log table
+    def colorize(text, percentage)
+      color = case percentage
+              when 0..33 then "\e[31m" # Красный
+              when 34..66 then "\e[33m" # Желтый
+              else "\e[32m" # Зеленый
+              end
+      "#{color}#{text}\e[0m"
     end
 
     def display_results(tasks, models)
@@ -531,11 +466,7 @@ module TestRunner
       generator.generate
 
       # Отображаем результаты в консоли в зависимости от опции report_total
-      if @options[:report_total]
-        display_total_console(tasks, models)
-      else
-        display_detailed_console(tasks, models)
-      end
+      display_total_console(tasks, models) if @options[:report]
     end
 
     def get_model_info(model_key)

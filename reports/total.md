@@ -16,7 +16,7 @@
 - qwen_qwen2_5_vl_3b_instruct_free: 41%
 - microsoft_phi_4_multimodal_instruct: 35%
 - ollama_codellama: 31%
-- ollama_codellama_13b: 27%
+- ollama_codellama_13b: 30%
 - ollama_llama3_2: 25%
 - ollama_codellama_34b: 17%
 - google_gemini_2_5_pro_exp_03_25_free: 1%

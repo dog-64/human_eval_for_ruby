@@ -50,9 +50,6 @@ module HumanEval
       'deepseek_deepseek-chat-v3-0324' => { name: 'deepseek/deepseek-chat-v3-0324',
                                             provider: 'openrouter.ai',
                                             note: 'https://openrouter.ai/deepseek/deepseek-chat-v3-0324' },
-      'qwen_qwen2_5-vl-32b-instruct_free' => { name: 'qwen/qwen2.5-vl-32b-instruct:free',
-                                               provider: 'openrouter.ai',
-                                               note: 'https://openrouter.ai/qwen/qwen2.5-vl-32b-instruct:free' },
 
       'ollama_llama3_2' => { name: 'llama3.2', provider: 'ollama' },
       'ollama_codellama' => { name: 'codellama', provider: 'ollama',

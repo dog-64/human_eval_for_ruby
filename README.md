@@ -1,6 +1,8 @@
-# Human Watch Ruby
+# Human Eval Ruby
 
-Инструмент для решения задач из набора HumanEval с помощью различных языковых моделей через OpenRouter.ai и локальную Ollama.
+Инструмент для решения задач из набора [HumanEval](https://github.com/openai/human-eval) с помощью различных языковых моделей через OpenRouter.ai и локальную Ollama на языке Ruby.
+
+Что полезно для оценки качества работы LLM именно для Ruby и промптов на русском. 
 
 ## Рейтинг
 
@@ -28,7 +30,7 @@
 
 ## Возможности
 
-- Решение задач тестовых задачь Ргьфт Цфеср с помощью различных языковых моделей
+- Решение задач тестовых задач Human Eval с помощью различных языковых моделей
 - Поддержка моделей через OpenRouter.ai и локальную Ollama
 - Автоматическое тестирование решений
 - Сравнительный анализ эффективности моделей
@@ -38,8 +40,8 @@
 ## Установка
 
 ```bash
-git clone https://github.com/dog-64/human_watch_ruby
-cd human_watch_ruby
+git clone https://github.com/dog-64/human_eval_for_ruby
+cd human_eval_for_ruby
 bundle install
 ```
 

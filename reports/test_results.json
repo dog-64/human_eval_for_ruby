@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-03-28 21:13:43",
+  "timestamp": "2025-03-29 13:55:39",
   "models": [
     [
       "google_gemini_2_0_flash_001",
@@ -67,7 +67,7 @@
     ],
     [
       "ollama_codellama_13b",
-      27
+      30
     ],
     [
       "ollama_llama3_2",
@@ -202,7 +202,7 @@
       "mistralai_codestral_2501": true,
       "mistralai_mistral_small_3_1_24b_instruct": true,
       "ollama_codellama": true,
-      "ollama_codellama_13b": false,
+      "ollama_codellama_13b": true,
       "ollama_codellama_34b": false,
       "ollama_llama3_2": true,
       "openai_gpt_4o_mini": true,
@@ -1755,7 +1755,7 @@
       "mistralai_codestral_2501": true,
       "mistralai_mistral_small_3_1_24b_instruct": true,
       "ollama_codellama": true,
-      "ollama_codellama_13b": false,
+      "ollama_codellama_13b": true,
       "ollama_codellama_34b": true,
       "ollama_llama3_2": true,
       "openai_gpt_4o_mini": true,
@@ -2049,7 +2049,7 @@
       "mistralai_codestral_2501": true,
       "mistralai_mistral_small_3_1_24b_instruct": true,
       "ollama_codellama": true,
-      "ollama_codellama_13b": false,
+      "ollama_codellama_13b": true,
       "ollama_codellama_34b": false,
       "ollama_llama3_2": false,
       "openai_gpt_4o_mini": true,
@@ -2154,7 +2154,7 @@
       "mistralai_codestral_2501": true,
       "mistralai_mistral_small_3_1_24b_instruct": true,
       "ollama_codellama": true,
-      "ollama_codellama_13b": false,
+      "ollama_codellama_13b": true,
       "ollama_codellama_34b": false,
       "ollama_llama3_2": true,
       "openai_gpt_4o_mini": true,
@@ -2343,7 +2343,7 @@
       "mistralai_codestral_2501": true,
       "mistralai_mistral_small_3_1_24b_instruct": true,
       "ollama_codellama": true,
-      "ollama_codellama_13b": false,
+      "ollama_codellama_13b": true,
       "ollama_codellama_34b": false,
       "ollama_llama3_2": true,
       "openai_gpt_4o_mini": true,
