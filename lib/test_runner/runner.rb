@@ -35,27 +35,38 @@ module TestRunner
       @results = Hash.new { |h, k| h[k] = {} }
 
       tasks.each do |task|
+        test_file = "tasks/#{task}-assert.rb"
+        unless File.exist?(test_file)
+          error "Файл с тестами #{test_file} не найден"
+          next
+        end
+
         task_solutions = find_solution_files(task)
         debug_log "Processing task #{task} with solutions: #{task_solutions.inspect}"
 
         task_solutions.each do |solution|
-          model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
-          debug_log "Testing solution #{solution} for model #{model}"
-          success = test_solution(task, solution)
-          debug_log "Test result for #{model}: #{success}"
-          @results[task][model] = success
+          begin
+            model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
+            debug_log "Testing solution #{solution} for model #{model}"
+            success = test_solution(task, solution)
+            debug_log "Test result for #{model}: #{success}"
+            @results[task][model] = success
+          rescue StandardError => e
+            error "Ошибка при тестировании #{solution}: #{e.message}"
+            @results[task][model] = false
+          end
         end
       end
 
-      debug_log "Final results: #{@results.inspect}"
+      if @options[:report]
+        report_data = {
+          model_stats: get_model_stats,
+          task_results: @results
+        }
+        HumanEval::ReportGenerator.new(report_data).generate_all
+        display_total_console(tasks, models)
+      end
 
-      report_data = {
-        model_stats: get_model_stats,
-        task_results: @results
-      }
-      HumanEval::ReportGenerator.new(report_data).generate_all
-
-      display_total_console(tasks, models) if @options[:report]
       @results
     end
 
@@ -79,9 +90,14 @@ module TestRunner
       @results = Hash.new { |h, k| h[k] = {} }
 
       solutions.each do |solution|
-        model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
-        success = test_solution(task, solution)
-        @results[task][model] = success
+        begin
+          model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
+          success = test_solution(task, solution)
+          @results[task][model] = success
+        rescue StandardError => e
+          error "Ошибка при тестировании #{solution}: #{e.message}"
+          @results[task][model] = false
+        end
       end
 
       display_total_console(tasks, models) if @options[:report] && !@options[:all]
@@ -134,13 +150,17 @@ module TestRunner
         filename.split('-')[1..].join('-').sub('.rb', '')
       end.compact.uniq.sort
 
+      return [] if models.empty? || tasks.empty? || @results.empty?
+
       # Подсчитываем статистику для каждой модели
       model_stats = models.map do |model|
-        total_tasks = tasks.size
+        total_tasks = tasks.count { |task| @results[task]&.key?(model) }
+        next [model, 0] if total_tasks.zero?
+
         passed_tasks = tasks.count { |task| @results[task][model] }
         percentage = (passed_tasks * 100.0 / total_tasks).round
         [model, percentage]
-      end
+      end.compact
 
       # Сортируем по убыванию процента успешных тестов
       model_stats.sort_by! { |_, percentage| -percentage }
@@ -151,7 +171,8 @@ module TestRunner
 
     def log_error_details(error)
       debug_log '  ❌ Тест не пройден:'
-      debug_log "     #{error[:class]}: #{error[:message]}"
+      error_class = error[:class] || 'Unknown error'
+      debug_log "     #{error_class}: #{error[:message]}"
       debug_log '     Стек вызовов:'
       if error[:backtrace]&.any?
         error[:backtrace].each { |line| debug_log "       #{line}" }
@@ -179,29 +200,30 @@ module TestRunner
         .sort
     end
 
+    def file_exists?(file)
+      return true if File.exist?(file)
+      error "\nРешение #{File.basename(file)}:"
+      error "  ❌ Файл не найден: #{file}"
+      false
+    end
+
     def test_solution(task, solution_file)
       test_file = "tasks/#{task}-assert.rb"
 
-      unless File.exist?(solution_file)
-        error "\nРешение #{File.basename(solution_file)}:"
-        error "  ❌ Файл решения не найден: #{solution_file}"
-        return false
-      end
-
-      unless File.exist?(test_file)
-        error "\nРешение #{File.basename(solution_file)}:"
-        error "  ❌ Файл тестов не найден: #{test_file}"
-        return false
-      end
-
-      # Проверяем на пустой файл
-      solution_content = File.read(solution_file)
-      if solution_content.strip.empty?
-        error '  ❌ Файл решения пуст'
-        return false
-      end
+      return false unless file_exists?(solution_file)
+      return false unless file_exists?(test_file)
 
       begin
+        test_content = File.read(test_file)
+        test_lines = test_content.lines.map(&:strip).reject { |line| line.empty? || line.start_with?('#') }
+        
+        if test_lines.empty?
+          debug_log '  ❌ Тест файл пуст или содержит только комментарии'
+          return false
+        end
+
+        solution_content = File.read(solution_file)
+        
         debug_log '  📝 Анализ синтаксиса решения...'
         temp_context = Module.new
         temp_context.module_eval(solution_content)
@@ -211,7 +233,7 @@ module TestRunner
         debug_log "     #{e.message}"
         return false
       rescue StandardError => e
-       debug_log '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при проверке синтаксиса:'
+        debug_log '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при проверке синтаксиса:'
         debug_log "     #{e.class}: #{e.message}"
         debug_log '     Тесты могут не пройти из-за отсутствия необходимых методов'
       end
@@ -248,8 +270,7 @@ module TestRunner
         begin
           module_eval(solution_content)
         rescue StandardError => e
-          warn '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при загрузке в контекст тестов:'
-          warn "     #{e.class}: #{e.message}"
+          log_solution_load_error(e)
         end
 
         extend self
@@ -296,9 +317,7 @@ module TestRunner
           begin
             test_context.module_eval(solution_content)
           rescue StandardError => e
-            debug_log '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при загрузке в контекст тестов:'
-            debug_log "     #{e.class}: #{e.message}"
-            debug_log '     Тесты могут не пройти из-за отсутствия необходимых методов'
+            log_solution_load_error(e)
           end
 
           test_context.extend(test_context)

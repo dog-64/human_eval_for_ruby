@@ -272,6 +272,7 @@ RSpec.describe TestRunner::Runner do
 
       runner.send(:raise_log, error, 'test message')
     end
+
   end
 
   describe '#get_display_model_name' do
@@ -318,6 +319,7 @@ RSpec.describe TestRunner::Runner do
 
       runner.send(:display_total_console, tasks, models)
     end
+
   end
 
   describe '#models' do
@@ -346,4 +348,111 @@ RSpec.describe TestRunner::Runner do
       expect(runner.send(:models)).to eq([])
     end
   end
+
+  describe '#get_model_stats' do
+    let(:runner) { described_class.new(log_level: 'none') }
+
+    before do
+      # Подменяем поиск файлов для тестов
+      allow(Dir).to receive(:glob).with('tasks/t*-*.rb').and_return([
+        'tasks/t1-model1.rb',
+        'tasks/t1-model2.rb',
+        'tasks/t2-model1.rb',
+        'tasks/t2-model2.rb',
+        'tasks/t1-assert.rb',
+        'tasks/t2-assert.rb'
+      ])
+    end
+
+    context 'когда есть результаты тестов' do
+      before do
+        runner.instance_variable_set(:@results, {
+          't1' => { 'model1' => true, 'model2' => false },
+          't2' => { 'model1' => true, 'model2' => true }
+        })
+      end
+
+      it 'возвращает корректную статистику для всех моделей' do
+        stats = runner.get_model_stats
+        expect(stats).to eq([
+          ['model1', 100], # 2 из 2 задач пройдены
+          ['model2', 50]   # 1 из 2 задач пройдена
+        ])
+      end
+
+      it 'сортирует результаты по убыванию процента успешных тестов' do
+        stats = runner.get_model_stats
+        expect(stats.map(&:last)).to eq([100, 50])
+      end
+    end
+
+    context 'когда нет результатов тестов' do
+      before do
+        runner.instance_variable_set(:@results, {})
+      end
+
+      it 'возвращает пустой массив' do
+        expect(runner.get_model_stats).to eq([])
+      end
+    end
+
+    context 'когда нет файлов с решениями' do
+      before do
+        allow(Dir).to receive(:glob).with('tasks/t*-*.rb').and_return([])
+      end
+
+      it 'возвращает пустой массив' do
+        expect(runner.get_model_stats).to eq([])
+      end
+    end
+
+    context 'когда есть только файлы с тестами' do
+      before do
+        allow(Dir).to receive(:glob).with('tasks/t*-*.rb').and_return([
+          'tasks/t1-assert.rb',
+          'tasks/t2-assert.rb'
+        ])
+      end
+
+      it 'возвращает пустой массив' do
+        expect(runner.get_model_stats).to eq([])
+      end
+    end
+
+    context 'когда есть частичные результаты' do
+      before do
+        runner.instance_variable_set(:@results, {
+          't1' => { 'model1' => true },
+          't2' => { 'model2' => true }
+        })
+      end
+
+      it 'корректно обрабатывает отсутствующие результаты' do
+        stats = runner.get_model_stats
+        expect(stats).to eq([
+          ['model1', 100], # 1 из 1 задачи пройдена
+          ['model2', 100]  # 1 из 1 задачи пройдена
+        ])
+      end
+    end
+
+    context 'когда все тесты провалены' do
+      before do
+        runner.instance_variable_set(:@results, {
+          't1' => { 'model1' => false, 'model2' => false },
+          't2' => { 'model1' => false, 'model2' => false }
+        })
+      end
+
+      it 'возвращает нулевой процент для всех моделей' do
+        stats = runner.get_model_stats
+        expect(stats).to eq([
+          ['model1', 0], # 0 из 2 задач пройдены
+          ['model2', 0]  # 0 из 2 задач пройдены
+        ])
+      end
+    end
+  end
 end
+
+
