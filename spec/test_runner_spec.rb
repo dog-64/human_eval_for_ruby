@@ -47,12 +47,96 @@ RSpec.describe TestRunner::Runner do
     allow_any_instance_of(HumanEval::ReportGenerator).to receive(:update_readme)
   end
 
-  describe '#run_all_tests' do
+  describe '#run_tests' do
     it 'runs tests only for mock solutions' do
-      results = runner.run_all_tests
+      results = runner.run_tests
       expect(results['t1'].keys).to contain_exactly('model1', 'model2')
       expect(results['t1']['model1']).to be true
       expect(results['t1']['model2']).to be false
+    end
+
+    it 'runs tests only for mock solutions of specific task' do
+      results = runner.run_tests(task: 't1')
+      expect(results['t1'].keys).to contain_exactly('model1', 'model2')
+      expect(results['t1']['model1']).to be true
+      expect(results['t1']['model2']).to be false
+    end
+
+    it 'returns empty hash for invalid task format' do
+      results = runner.run_tests(task: 'invalid')
+      expect(results).to eq({})
+    end
+
+    it 'returns empty hash when test file missing' do
+      allow(File).to receive(:exist?).with('tasks/t1-assert.rb').and_return(false)
+      results = runner.run_tests(task: 't1')
+      expect(results).to eq({})
+    end
+
+    it 'runs test for correct solution' do
+      results = runner.run_tests(task: 't1', model: 'model1')
+      expect(results['t1']['model1']).to be true
+    end
+
+    it 'detects incorrect solution' do
+      results = runner.run_tests(task: 't1', model: 'model2')
+      expect(results['t1']['model2']).to be false
+    end
+
+    it 'returns empty hash for missing solution' do
+      results = runner.run_tests(task: 't1', model: 'nonexistent')
+      expect(results).to eq({})
+    end
+
+    it 'handles syntax errors' do
+      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  a + b # missing end")
+      results = runner.run_tests(task: 't1', model: 'model1')
+      expect(results['t1']['model1']).to be false
+    end
+
+    it 'handles timeouts' do
+      runner = described_class.new(timeout: 1, log_level: 'none')
+      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  while true; end\n  a + b\nend")
+      results = runner.run_tests(task: 't1', model: 'model1')
+      expect(results['t1']['model1']).to be false
+    end
+
+    it 'handles empty solution files' do
+      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("   \n  \n  ")
+      results = runner.run_tests(task: 't1', model: 'model1')
+      expect(results['t1']['model1']).to be false
+    end
+
+    it 'handles missing solution files' do
+      allow(File).to receive(:exist?).with('tasks/t1-assert.rb').and_return(true)
+      allow(File).to receive(:exist?).with('tasks/t1-model1.rb').and_return(false)
+      allow(Dir).to receive(:glob).with('tasks/t1-model1.rb').and_return([])
+      allow(runner).to receive(:find_solution_files).with('t1').and_return([])
+      results = runner.run_tests(task: 't1', model: 'model1')
+      expect(results).to eq({})
+    end
+
+    it 'handles runtime errors in solution' do
+      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  raise 'Runtime error'\nend")
+      results = runner.run_tests(task: 't1', model: 'model1')
+      expect(results['t1']['model1']).to be false
+    end
+
+    it 'handles invalid task format' do
+      results = runner.run_tests(task: 'invalid', model: 'model1')
+      expect(results).to eq({})
+    end
+
+    it 'handles invalid model name format' do
+      results = runner.run_tests(task: 't1', model: 'invalid/model')
+      expect(results).to eq({})
+    end
+
+    it 'handles interrupts gracefully' do
+      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  a + b\nend")
+      allow(runner).to receive(:test_solution).and_return(false)
+      results = runner.run_tests(task: 't1', model: 'model1')
+      expect(results['t1']['model1']).to be false
     end
   end
 
@@ -113,91 +197,6 @@ RSpec.describe TestRunner::Runner do
       it 'корректно обрабатывает граничные значения' do
         expect(subject).to eq("\e[32mtext\e[0m")
       end
-    end
-  end
-
-  describe '#run_task_tests' do
-    it 'runs tests only for mock solutions of specific task' do
-      results = runner.run_task_tests('t1')
-      expect(results['t1'].keys).to contain_exactly('model1', 'model2')
-      expect(results['t1']['model1']).to be true
-      expect(results['t1']['model2']).to be false
-    end
-
-    it 'returns empty hash for invalid task format' do
-      results = runner.run_task_tests('invalid')
-      expect(results).to eq({})
-    end
-
-    it 'returns empty hash when test file missing' do
-      allow(File).to receive(:exist?).with('tasks/t1-assert.rb').and_return(false)
-      results = runner.run_task_tests('t1')
-      expect(results).to eq({})
-    end
-  end
-
-  describe '#run_model_tests' do
-    it 'runs test for correct solution' do
-      results = runner.run_model_tests('t1', 'model1')
-      expect(results['t1']['model1']).to be true
-    end
-
-    it 'detects incorrect solution' do
-      results = runner.run_model_tests('t1', 'model2')
-      expect(results['t1']['model2']).to be false
-    end
-
-    it 'returns empty hash for missing solution' do
-      results = runner.run_model_tests('t1', 'nonexistent')
-      expect(results).to eq({})
-    end
-
-    it 'handles syntax errors' do
-      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  a + b # missing end")
-      results = runner.run_model_tests('t1', 'model1')
-      expect(results['t1']['model1']).to be false
-    end
-
-    it 'handles timeouts' do
-      runner = described_class.new(timeout: 1, log_level: 'none')
-      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  while true; end\n  a + b\nend")
-      results = runner.run_model_tests('t1', 'model1')
-      expect(results['t1']['model1']).to be false
-    end
-
-    it 'handles empty solution files' do
-      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("   \n  \n  ")
-      results = runner.run_model_tests('t1', 'model1')
-      expect(results['t1']['model1']).to be false
-    end
-
-    it 'handles missing solution files' do
-      allow(File).to receive(:exist?).with('tasks/t1-model1.rb').and_return(false)
-      results = runner.run_model_tests('t1', 'model1')
-      expect(results).to eq({})
-    end
-
-    it 'handles runtime errors in solution' do
-      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  raise 'Runtime error'\nend")
-      results = runner.run_model_tests('t1', 'model1')
-      expect(results['t1']['model1']).to be false
-    end
-
-    it 'handles invalid task format' do
-      results = runner.run_model_tests('invalid', 'model1')
-      expect(results).to eq({})
-    end
-
-    it 'handles invalid model name format' do
-      results = runner.run_model_tests('t1', 'invalid/model')
-      expect(results).to eq({})
-    end
-
-    it 'handles interrupts gracefully' do
-      allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  a + b\nend")
-      allow(runner).to receive(:test_solution).and_raise(Interrupt)
-      results = runner.run_model_tests('t1', 'model1')
-      expect(results['t1']['model1']).to be false
     end
   end
 

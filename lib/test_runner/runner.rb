@@ -26,37 +26,71 @@ module TestRunner
       @timeout = @options[:timeout] || 5 # Таймаут по умолчанию 5 секунд
     end
 
-    def run_all_tests
-      if tasks.empty?
+    def run_tests(task: nil, model: nil)
+      # Валидация параметров
+      if task && !task.to_s.match?(/^t\d+$/)
+        error "Ошибка: Неверный формат задачи. Ожидается формат 't<число>' (например, 't1')"
+        return {}
+      end
+
+      if model && !model.to_s.match?(/^[a-zA-Z0-9_-]+$/)
+        error 'Ошибка: Неверный формат названия модели'
+        return {}
+      end
+
+      # Определяем список задач для тестирования
+      tasks_to_run = if task
+        [task]
+      else
+        find_solution_files.map { |f| File.basename(f).gsub(/-.*$/, '') }.uniq.sort
+      end
+
+      if tasks_to_run.empty?
         error 'Ошибка: Не найдены файлы с решениями'
         return {}
       end
 
       @results = Hash.new { |h, k| h[k] = {} }
+      has_solutions = false
 
-      tasks.each do |task|
-        test_file = "tasks/#{task}-assert.rb"
+      tasks_to_run.each do |current_task|
+        test_file = "tasks/#{current_task}-assert.rb"
         unless File.exist?(test_file)
           error "Файл с тестами #{test_file} не найден"
           next
         end
 
-        task_solutions = find_solution_files(task)
-        debug_log "Processing task #{task} with solutions: #{task_solutions.inspect}"
+        # Определяем список решений для тестирования
+        solutions = if model
+          solution = Dir.glob("tasks/#{current_task}-#{model}.rb").first
+          solution ? [solution] : []
+        else
+          find_solution_files(current_task)
+        end
 
-        task_solutions.each do |solution|
+        if solutions.empty?
+          error "Решения для задачи #{current_task} не найдены"
+          next
+        end
+
+        has_solutions = true
+
+        solutions.each do |solution|
           begin
-            model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
-            debug_log "Testing solution #{solution} for model #{model}"
-            success = test_solution(task, solution)
-            debug_log "Test result for #{model}: #{success}"
-            @results[task][model] = success
+            current_model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
+            debug_log "Testing solution #{solution} for model #{current_model}"
+            success = test_solution(current_task, solution)
+            debug_log "Test result for #{current_model}: #{success}"
+            @results[current_task][current_model] = success
           rescue StandardError => e
             error "Ошибка при тестировании #{solution}: #{e.message}"
-            @results[task][model] = false
+            @results[current_task][current_model] = false
           end
         end
       end
+
+      # Если не было найдено ни одного решения, возвращаем пустой хэш
+      return {} unless has_solutions
 
       if @options[:report]
         report_data = {
@@ -64,75 +98,7 @@ module TestRunner
           task_results: @results
         }
         HumanEval::ReportGenerator.new(report_data).generate_all
-        display_total_console(tasks, models)
-      end
-
-      @results
-    end
-
-    def run_task_tests(task)
-      unless task.to_s.match?(/^t\d+$/)
-        error "Ошибка: Неверный формат задачи. Ожидается формат 't<число>' (например, 't1')"
-        return {}
-      end
-      test_file = "tasks/#{task}-assert.rb"
-      unless File.exist?(test_file)
-        error "Файл с тестами #{test_file} не найден"
-        return {}
-      end
-
-      solutions = find_solution_files(task)
-      if solutions.empty?
-        error "Решения для задачи #{task} не найдены"
-        return {}
-      end
-
-      @results = Hash.new { |h, k| h[k] = {} }
-
-      solutions.each do |solution|
-        begin
-          model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
-          success = test_solution(task, solution)
-          @results[task][model] = success
-        rescue StandardError => e
-          error "Ошибка при тестировании #{solution}: #{e.message}"
-          @results[task][model] = false
-        end
-      end
-
-      display_total_console(tasks, models) if @options[:report] && !@options[:all]
-      @results
-    end
-
-    def run_model_tests(task, model)
-      unless task.to_s.match?(/^t\d+$/)
-        error "Ошибка: Неверный формат задачи. Ожидается формат 't<число>' (например, 't1')"
-        return {}
-      end
-
-      unless model.to_s.match?(/^[a-zA-Z0-9_-]+$/)
-        error 'Ошибка: Неверный формат названия модели'
-        return {}
-      end
-      solution = Dir.glob("tasks/#{task}-#{model}.rb").first
-
-      if solution.nil?
-        error "Решение для задачи #{task} модели #{model} не найдено"
-        return {}
-      end
-
-      unless File.exist?(solution)
-        error "Решение для задачи #{task} модели #{model} не найдено"
-        return {}
-      end
-
-      @results = Hash.new { |h, k| h[k] = {} }
-      begin
-        success = test_solution(task, solution)
-        @results[task][model] = success || false
-      rescue Interrupt
-        error "Тест прерван для задачи #{task} модели #{model}"
-        @results[task][model] = false
+        display_total_console(tasks_to_run, models)
       end
 
       @results

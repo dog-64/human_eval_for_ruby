@@ -9,15 +9,13 @@ RSpec.describe TestRunner::CLI do
 
     before do
       allow(TestRunner::Runner).to receive(:new).and_return(runner)
-      allow(runner).to receive(:run_all_tests)
-      allow(runner).to receive(:run_task_tests)
-      allow(runner).to receive(:run_model_tests)
+      allow(runner).to receive(:run_tests)
     end
 
     context 'когда не указаны опции' do
       it 'запускает все тесты' do
         cli = described_class.new([], {})
-        expect(runner).to receive(:run_all_tests)
+        expect(runner).to receive(:run_tests).with(task: nil, model: nil)
         cli.tests
       end
     end
@@ -25,7 +23,7 @@ RSpec.describe TestRunner::CLI do
     context 'когда указана опция --task' do
       it 'запускает тесты для конкретной задачи' do
         cli = described_class.new([], { task: 'T1' })
-        expect(runner).to receive(:run_task_tests).with('T1')
+        expect(runner).to receive(:run_tests).with(task: 'T1', model: nil)
         cli.tests
       end
     end
@@ -33,7 +31,7 @@ RSpec.describe TestRunner::CLI do
     context 'когда указаны опции --task и --model' do
       it 'запускает тесты для конкретной модели в задаче' do
         cli = described_class.new([], { task: 'T1', model: 'model1' })
-        expect(runner).to receive(:run_model_tests).with('T1', 'model1')
+        expect(runner).to receive(:run_tests).with(task: 'T1', model: 'model1')
         cli.tests
       end
     end
@@ -41,7 +39,7 @@ RSpec.describe TestRunner::CLI do
     context 'когда указана только опция --model' do
       it 'запускает тесты для конкретной модели' do
         cli = described_class.new([], { model: 'model1' })
-        expect(runner).to receive(:run_model_tests).with('', 'model1')
+        expect(runner).to receive(:run_tests).with(task: nil, model: 'model1')
         cli.tests
       end
     end

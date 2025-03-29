@@ -33,15 +33,10 @@ module TestRunner
 
     def tests
       runner = Runner.new(options)
-      if !options[:task].to_s.empty? && !options[:model].to_s.empty?
-        runner.run_model_tests(options[:task], options[:model])
-      elsif !options[:task].to_s.empty?
-        runner.run_task_tests(options[:task])
-      elsif !options[:model].to_s.empty?
-        runner.run_model_tests('', options[:model])
-      else
-        runner.run_all_tests
-      end
+      runner.run_tests(
+        task: options[:task].to_s.empty? ? nil : options[:task],
+        model: options[:model].to_s.empty? ? nil : options[:model]
+      )
     end
 
     def self.exit_on_failure?
