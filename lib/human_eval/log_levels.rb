@@ -1,4 +1,7 @@
 module HumanEval
+  # Модуль LogLevels предоставляет методы для логирования сообщений различного уровня важности
+  # Позволяет управлять выводом сообщений в зависимости от установленного уровня логирования
+  # Поддерживает уровни: debug, normal, error
   module LogLevels
     def debug_log(message)
       return unless log_level?(:debug)

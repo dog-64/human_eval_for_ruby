@@ -4,6 +4,9 @@ require_relative 'reports/cli'
 require 'fileutils'
 
 module HumanEval
+  # Модуль Reports предоставляет функциональность для генерации отчетов о результатах тестирования
+  # Поддерживает различные форматы (HTML) и обеспечивает безопасную обработку
+  # и представление результатов тестирования моделей
   module Reports
     AVAILABLE_FORMATS = %w[html].freeze
 

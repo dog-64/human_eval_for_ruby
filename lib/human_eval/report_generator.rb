@@ -2,6 +2,9 @@ require 'json'
 require 'fileutils'
 
 module HumanEval
+  # Класс ReportGenerator создает отчеты о результатах тестирования в различных форматах
+  # Генерирует HTML и Markdown отчеты, сохраняет результаты в JSON,
+  # обновляет README и создает сводные и детальные представления результатов
   class ReportGenerator
     def initialize(results, reports_dir: 'reports')
       @results = results

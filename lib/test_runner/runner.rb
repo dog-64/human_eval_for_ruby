@@ -7,12 +7,15 @@ require_relative '../human_eval/report_generator'
 require_relative '../human_eval/reports/generator'
 
 module TestRunner
+  # Класс Runner отвечает за запуск и обработку тестов для решений задач
+  # Позволяет запускать тесты для конкретной задачи или модели, собирать результаты
+  # и генерировать отчеты о производительности различных моделей
   class Runner
     include HumanEval::Logger
     include HumanEval::LogLevels
 
-    DONE_MARK = "\e[32m✓\e[0m" # Зеленый цвет
-    FAIL_MARK = "\e[31m✗\e[0m" # Красный цвет
+    DONE_MARK = "\e[32m✓\e[0m".freeze # Зеленый цвет
+    FAIL_MARK = "\e[31m✗\e[0m".freeze # Красный цвет
 
     def initialize(options = {})
       @options = options
@@ -35,10 +38,10 @@ module TestRunner
 
       # Определяем список задач для тестирования
       tasks_to_run = if task
-        [task]
-      else
-        find_solution_files.map { |f| File.basename(f).gsub(/-.*$/, '') }.uniq.sort
-      end
+                       [task]
+                     else
+                       find_solution_files.map { |f| File.basename(f).gsub(/-.*$/, '') }.uniq.sort
+                     end
 
       if tasks_to_run.empty?
         error 'Ошибка: Не найдены файлы с решениями'
@@ -57,11 +60,11 @@ module TestRunner
 
         # Определяем список решений для тестирования
         solutions = if model
-          solution = Dir.glob("tasks/#{current_task}-#{model}.rb").first
-          solution ? [solution] : []
-        else
-          find_solution_files(current_task)
-        end
+                      solution = Dir.glob("tasks/#{current_task}-#{model}.rb").first
+                      solution ? [solution] : []
+                    else
+                      find_solution_files(current_task)
+                    end
 
         if solutions.empty?
           error "Решения для задачи #{current_task} не найдены"
@@ -71,16 +74,14 @@ module TestRunner
         has_solutions = true
 
         solutions.each do |solution|
-          begin
-            current_model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
-            normal_log "Testing solution #{solution} for model #{current_model}"
-            success = test_solution(current_task, solution)
-            debug_log "Test result for #{current_model}: #{success}"
-            @results[current_task][current_model] = success
-          rescue StandardError => e
-            debug_log "Ошибка при тестировании #{solution}: #{e.message}"
-            @results[current_task][current_model] = false
-          end
+          current_model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
+          normal_log "Testing solution #{solution} for model #{current_model}"
+          success = test_solution(current_task, solution)
+          debug_log "Test result for #{current_model}: #{success}"
+          @results[current_task][current_model] = success
+        rescue => e
+          debug_log "Ошибка при тестировании #{solution}: #{e.message}"
+          @results[current_task][current_model] = false
         end
       end
 
@@ -163,6 +164,7 @@ module TestRunner
 
     def file_exists?(file)
       return true if File.exist?(file)
+
       error "\nРешение #{File.basename(file)}:"
       error "  ❌ Файл не найден: #{file}"
       false
@@ -177,14 +179,14 @@ module TestRunner
       begin
         test_content = File.read(test_file)
         test_lines = test_content.lines.map(&:strip).reject { |line| line.empty? || line.start_with?('#') }
-        
+
         if test_lines.empty?
           debug_log '  ❌ Тест файл пуст или содержит только комментарии'
           return false
         end
 
         solution_content = File.read(solution_file)
-        
+
         debug_log '  📝 Анализ синтаксиса решения...'
         temp_context = Module.new
         temp_context.module_eval(solution_content)
@@ -193,7 +195,7 @@ module TestRunner
         debug_log '  ❌ Ошибка синтаксиса в решении:'
         debug_log "     #{e.message}"
         return false
-      rescue StandardError => e
+      rescue => e
         debug_log '  ⚠️ Предупреждение: в решении есть код, вызывающий ошибку при проверке синтаксиса:'
         debug_log "     #{e.class}: #{e.message}"
         debug_log '     Тесты могут не пройти из-за отсутствия необходимых методов'
@@ -230,7 +232,7 @@ module TestRunner
 
         begin
           module_eval(solution_content)
-        rescue StandardError => e
+        rescue => e
           log_solution_load_error(e)
         end
 
@@ -277,7 +279,7 @@ module TestRunner
 
           begin
             test_context.module_eval(solution_content)
-          rescue StandardError => e
+          rescue => e
             log_solution_load_error(e)
           end
 
@@ -330,7 +332,7 @@ module TestRunner
 
             debug_log '  ✅ Тесты выполнены успешно'
             result.push({ status: :success })
-          rescue StandardError => e
+          rescue => e
             debug_log "  ❌ Ошибка при выполнении тестов: #{e.class} - #{e.message}"
             debug_log "  ❌ Ошибка: #{e.message || 'Unknown error'}"
             result.push(test_context.handle_error(e))
@@ -378,7 +380,7 @@ module TestRunner
         error "\n  ⚠️  Тест прерван пользователем (Ctrl+C)"
         debug_log "  📍 Место прерывания: #{e.backtrace.first}"
         false
-      rescue StandardError => e
+      rescue => e
         raise_log(e, 'Неожиданная ошибка')
         false
       rescue Exception => e

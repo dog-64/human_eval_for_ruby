@@ -3,6 +3,9 @@ require 'fileutils'
 require_relative 'runner'
 
 module TestRunner
+  # Класс CLI предоставляет интерфейс командной строки для запуска тестов
+  # Построен на базе Thor и позволяет запускать тесты для конкретных задач и моделей,
+  # управлять уровнем логирования и генерацией отчетов
   class CLI < Thor
     package_name 'Test Runner'
 
@@ -29,6 +32,9 @@ module TestRunner
                  default: true,
                  desc: 'Показать только сводный отчет по моделям'
 
+    # Запускает тесты с заданными параметрами командной строки
+    # Использует основной класс Runner для запуска тестов
+    # и обработки результатов
     def tests
       runner = Runner.new(options)
       runner.run_tests(
@@ -37,6 +43,8 @@ module TestRunner
       )
     end
 
+    # Определяет поведение при ошибке выполнения команды
+    # @return [Boolean] true - выход при ошибке, false - продолжение выполнения
     def self.exit_on_failure?
       true
     end
