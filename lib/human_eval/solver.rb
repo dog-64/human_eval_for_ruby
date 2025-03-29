@@ -4,6 +4,7 @@ require 'timeout'
 require 'net/http'
 require 'uri'
 require 'dotenv'
+require 'yaml'
 require_relative 'logger'
 require 'strscan'
 
@@ -13,50 +14,7 @@ module HumanEval
   class SolverClass
     include HumanEval::Logger
 
-    MODELS = {
-      'deepseek_deepseek_chat' => { name: 'deepseek/deepseek-chat', provider: 'openrouter.ai' },
-      'deepseek_deepseek_chat_free' => { name: 'deepseek/deepseek-chat:free', provider: 'openrouter.ai' },
-      'google_gemini_2_0_flash_001' => { name: 'google/gemini-2.0-flash-001', provider: 'openrouter.ai' },
-      'google_gemini_2_0_flash_lite_001' => { name: 'google/gemini-2.0-flash-lite-001', provider: 'openrouter.ai' },
-      'google_gemini_flash_1_5' => { name: 'google/gemini-flash-1.5', provider: 'openrouter.ai' },
-      'meta_llama_llama_3_1_70b_instruct' => { name: 'meta-llama/llama-3.1-70b-instruct', provider: 'openrouter.ai' },
-      'qwen_qwen_2_5_coder_32b' => { name: 'qwen/qwen-2.5-coder-32b', provider: 'openrouter.ai' },
-      'qwen_qwen_2_5_coder_32b_instruct' => { name: 'qwen/qwen-2.5-coder-32b-instruct:free',
-                                              provider: 'openrouter.ai' },
-      'mistralai_codestral_2501' => { name: 'mistralai/codestral-2501', provider: 'openrouter.ai' },
-      'openai_gpt_4o_mini' => { name: 'openai/gpt-4o-mini', provider: 'openrouter.ai' },
-      'openai_o3_mini_high' => { name: 'openai/o3-mini-high',
-                                 provider: 'openrouter.ai',
-                                 note: 'дорогой, медленный' },
-
-      'anthropic_claude_3_5_sonnet' => { name: 'anthropic/claude-3.5-sonnet', provider: 'openrouter.ai' },
-      'mistralai_mistral-small-3_1-24b-instruct' => { name: 'mistralai/mistral-small-3.1-24b-instruct',
-                                                      provider: 'openrouter.ai',
-                                                      note: '32b https://openrouter.ai/mistralai/mistral-small-3.1-24b-instruct-2503' },
-      'google_gemma-3-27b-it' => { name: 'google/gemma-3-27b-it',
-                                   provider: 'openrouter.ai',
-                                   note: 'https://openrouter.ai/google/gemma-3-27b-it' },
-      'microsoft_phi-4-multimodal-instruct' => { name: 'microsoft/phi-4-multimodal-instruct',
-                                                 provider: 'openrouter.ai',
-                                                 note: 'https://openrouter.ai/microsoft/phi-4-multimodal-instruct' },
-      'google_gemini-2_5-pro-exp-03-25_free' => { name: 'google/gemini-2.5-pro-exp-03-25:free',
-                                                  provider: 'openrouter.ai',
-                                                  note: 'https://openrouter.ai/google/gemini-2.5-pro-exp-03-25:free' },
-      'qwen_qwen2_5-vl-3b-instruct_free' => { name: 'qwen/qwen2.5-vl-3b-instruct:free',
-                                              provider: 'openrouter.ai',
-                                              note: 'https://openrouter.ai/google/gemini-2.5-pro-exp-03-25:free' },
-      'deepseek_deepseek-chat-v3-0324' => { name: 'deepseek/deepseek-chat-v3-0324',
-                                            provider: 'openrouter.ai',
-                                            note: 'https://openrouter.ai/deepseek/deepseek-chat-v3-0324' },
-
-      'ollama_llama3_2' => { name: 'llama3.2', provider: 'ollama' },
-      'ollama_codellama' => { name: 'codellama', provider: 'ollama',
-                              note: 'CodeLlama 7B https://ollama.com/library/codellama' },
-      'ollama_codellama:13b' => { name: 'codellama:13b', provider: 'ollama',
-                                  note: 'CodeLlama 13bB https://ollama.com/library/codellama:13b' },
-      'ollama_codellama:34b' => { name: 'codellama:34b', provider: 'ollama',
-                                  note: 'CodeLlama 13bB https://ollama.com/library/codellama:34b' }
-    }.freeze
+    MODELS_CONFIG_PATH = File.join(File.dirname(__FILE__), '..', '..', 'config', 'models.yml')
 
     Dotenv.load
     OLLAMA_BASE_URL = ENV['OLLAMA_BASE_URL'] || 'http://localhost:11434'
@@ -77,6 +35,33 @@ module HumanEval
       validate_environment
     end
 
+    # Загружает модели из конфигурационного файла
+    # @return [Hash] хеш с моделями
+    def models
+      @models ||= begin
+        loaded_models = {}
+        config = YAML.load_file(MODELS_CONFIG_PATH)
+
+        # Загружаем модели OpenRouter
+        config['openrouter'].each do |key, value|
+          loaded_models[key] = value
+        end
+
+        # Загружаем модели Ollama
+        config['ollama'].each do |key, value|
+          loaded_models[key] = value
+        end
+
+        loaded_models
+      end
+    rescue Errno::ENOENT
+      error "Файл конфигурации моделей не найден: #{MODELS_CONFIG_PATH}"
+      raise "Конфигурационный файл не найден: #{MODELS_CONFIG_PATH}"
+    rescue => e
+      error "Ошибка при загрузке конфигурации моделей: #{e.message}"
+      raise "Ошибка при загрузке конфигурации моделей: #{e.message}"
+    end
+
     # Обрабатывает все задачи в директории
     def process
       debug 'Начинаем обработку задач'
@@ -94,7 +79,7 @@ module HumanEval
     # Возвращает список моделей Ollama
     # @return [Array<String>] список ключей моделей Ollama
     def ollama_models
-      MODELS.select { |_, info| info[:provider] == 'ollama' }.keys
+      models.select { |_, info| info['provider'] == 'ollama' }.keys
     end
 
     # Возвращает API ключ для OpenRouter.ai
@@ -132,11 +117,11 @@ module HumanEval
       debug "Детали задачи #{task_number}:"
 
       content = File.read(file)
-      models = select_models_for_task
+      models_to_use = select_models_for_task
 
-      models.each_with_index do |model_key, index|
-        model_info = MODELS[model_key] || { name: model_key, provider: 'openrouter.ai' }
-        log "  Модель #{index + 1}/#{models.size}: #{model_key} (#{model_info[:name]})"
+      models_to_use.each_with_index do |model_key, index|
+        model_info = models[model_key] || { 'name' => model_key, 'provider' => 'openrouter.ai' }
+        log "  Модель #{index + 1}/#{models_to_use.size}: #{model_key} (#{model_info['name']})"
         solve_with_model(task_number, content, model_key)
       end
     end
@@ -147,11 +132,11 @@ module HumanEval
       if @model
         [@model]
       elsif openrouter_api_key
-        MODELS.keys
+        models.keys
       else
-        models = MODELS.select { |_, info| info[:provider] == 'ollama' }.keys
-        log "Используются только локальные модели Ollama: #{models.join(', ')}"
-        models
+        models_list = models.select { |_, info| info['provider'] == 'ollama' }.keys
+        log "Используются только локальные модели Ollama: #{models_list.join(', ')}"
+        models_list
       end
     end
 
@@ -160,9 +145,9 @@ module HumanEval
     # @param content [String] содержимое задачи
     # @param model_key [String] ключ модели
     def solve_with_model(task_number, content, model_key)
-      model_info = MODELS[model_key] || { name: model_key, provider: 'openrouter.ai' }
-      model_name = model_info[:name]
-      provider = model_info[:provider]
+      model_info = models[model_key] || { 'name' => model_key, 'provider' => 'openrouter.ai' }
+      model_name = model_info['name']
+      provider = model_info['provider']
 
       output_file = prepare_output_file(task_number, model_key)
       return if @keep_existing && File.exist?(output_file)
@@ -275,8 +260,8 @@ module HumanEval
     # @param model_key [String] ключ модели
     # @return [String] ответ модели
     def call_openrouter(prompt, model_key)
-      model_info = MODELS[model_key] || { name: model_key, provider: 'openrouter.ai' }
-      model_name = model_info[:name]
+      model_info = models[model_key] || { 'name' => model_key, 'provider' => 'openrouter.ai' }
+      model_name = model_info['name']
 
       debug "Вызов OpenRouter API с моделью #{model_name}"
       uri = URI('https://openrouter.ai/api/v1/chat/completions')
@@ -356,8 +341,8 @@ module HumanEval
     # @param model_key [String] ключ модели
     # @return [String] ответ модели
     def call_ollama(prompt, model_key)
-      model_info = MODELS[model_key] || { name: model_key, provider: 'ollama' }
-      model_name = model_info[:name]
+      model_info = models[model_key] || { 'name' => model_key, 'provider' => 'ollama' }
+      model_name = model_info['name']
 
       debug "Вызов Ollama API с моделью #{model_name}"
       uri = URI("#{OLLAMA_BASE_URL}/api/chat")
@@ -482,6 +467,7 @@ module HumanEval
     # Проверяет окружение и наличие необходимых переменных
     def validate_environment
       raise "Каталог #{@tasks_dir} не найден" unless Dir.exist?(@tasks_dir)
+      raise "Файл конфигурации #{MODELS_CONFIG_PATH} не найден" unless File.exist?(MODELS_CONFIG_PATH)
 
       validate_model_environment
     end
@@ -497,8 +483,8 @@ module HumanEval
 
     # Проверяет окружение для конкретной модели
     def validate_specific_model
-      model_info = MODELS[@model] || { name: @model, provider: 'openrouter.ai' }
-      provider = model_info[:provider]
+      model_info = models[@model] || { 'name' => @model, 'provider' => 'openrouter.ai' }
+      provider = model_info['provider']
 
       return unless provider == 'openrouter.ai' && !openrouter_api_key
 
