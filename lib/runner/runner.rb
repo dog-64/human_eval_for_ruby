@@ -2,7 +2,7 @@ require 'timeout'
 require_relative '../logger'
 require_relative '../human_eval/assert'
 require_relative '../solver'
-require_relative '../human_eval/report_generator'
+require_relative '../report/generator'
 require_relative '../model/to_path'
 require_relative '../models'
 require_relative 'report'
@@ -108,7 +108,7 @@ module Runner
           model_stats: get_model_stats,
           task_results: @results
         }
-        HumanEval::ReportGenerator.new(report_data).generate_all
+        Report::Generator.new(report_data).generate_all
       end
       
       # Всегда выводим итоговую статистику в консоль
@@ -435,7 +435,7 @@ module Runner
           model_stats: get_model_stats,
           task_results: @results
         }
-        HumanEval::ReportGenerator.new(report_data).generate_all
+        Report::Generator.new(report_data).generate_all
       end
 
       # Короткий отчет по результатам прогона - всегда отображаем

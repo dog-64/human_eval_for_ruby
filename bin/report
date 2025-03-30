@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# Инициализируем rbenv и запускаем report_helper
+cd "$(dirname "$0")/.." && \
+  eval "$(rbenv init -)" && \
+  bundle exec ruby -I lib bin/report_helper "$@"

@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require_relative '../lib/report'
+
+# # Имитируем запуск через файл report вместо report_helper
+# $0 = File.join(File.dirname($0), 'report')
+
+Report::CLI.start(ARGV) 
