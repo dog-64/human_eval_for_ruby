@@ -101,19 +101,19 @@ OLLAMA_BASE_URL=http://localhost:11434
 
 ```bash
 # Решение всех задач конкретной моделью
-./bin/human_eval_solver solve tasks --model "MODEL_NAME"
+./bin/solver solve tasks --model "MODEL_NAME"
 
 # Решение конкретной задачи
-./bin/human_eval_solver solve tasks --task t1 --model "MODEL_NAME"
+./bin/solver solve tasks --task t1 --model "MODEL_NAME"
 
 # Сохранение промежуточных результатов
-./bin/human_eval_solver solve tasks --model "MODEL_NAME" --keep-existing
+./bin/solver solve tasks --model "MODEL_NAME" --keep-existing
 
 # Включение подробного логирования
-./bin/human_eval_solver solve tasks --model "MODEL_NAME" --log-level debug
+./bin/solver solve tasks --model "MODEL_NAME" --log-level debug
 
 # Вывод всех доступных команд и опций
-./bin/human_eval_solver
+./bin/solver
 ```
 
 Доступные модели:
@@ -171,7 +171,7 @@ OLLAMA_BASE_URL=http://localhost:11434
 
 4. Теперь вы можете использовать модель для решения задач:
    ```bash
-   ./bin/human_eval_solver solve tasks --model "ollama_<model_id>" --log-level debug
+   ./bin/solver solve tasks --model "ollama_<model_id>" --log-level debug
    ```
 
 5. Для тестирования модели вы можете запустить её напрямую:
@@ -182,7 +182,7 @@ OLLAMA_BASE_URL=http://localhost:11434
 
 6. Для отладки и анализа ответов модели используйте команду с подробным логированием:
    ```bash
-   ./bin/human_eval_solver solve tasks --task t2 --model "ollama_codellama" --log-level debug
+   ./bin/solver solve tasks --task t2 --model "ollama_codellama" --log-level debug
    ```
    Эта команда покажет:
    - Полный текст запроса к модели
@@ -228,26 +228,27 @@ OLLAMA_BASE_URL=http://localhost:11434
     - `t*-assert.rb` - тесты для задач
     - `t*-MODEL_NAME.rb` - решения от моделей
 - `lib/` - исходный код
-    - `human_eval/` - основные компоненты
-        - `solver.rb` - основной класс для работы с моделями
-        - `solver_cli.rb` - интерфейс командной строки
+    - `solver/` - основной компонент для решения задач
+        - `runner.rb` - основной класс для работы с моделями
+        - `cli.rb` - интерфейс командной строки
+        - `help.rb` - модуль справки для CLI
+    - `human_eval/` - вспомогательные компоненты
         - `logger.rb` - модуль логирования
-    - `test_runner/` - система тестирования
-        - `runner.rb` - запуск тестов
         - `assert.rb` - модуль для тестовых утверждений
-    - `human_eval/` - основные компоненты
-        - `reports/` - генерация отчетов
-            - `generator.rb` - основной генератор отчетов
-            - `cli.rb` - интерфейс командной строки для отчетов
-            - `formatters/` - форматтеры отчетов
-                - `base.rb` - базовый класс форматтера
-                - `html.rb` - HTML форматтер
-                - `markdown.rb` - Markdown форматтер
+    - `runner/` - система тестирования
+        - `runner.rb` - запуск тестов
+    - `human_eval/reports/` - генерация отчетов
+        - `generator.rb` - основной генератор отчетов
+        - `cli.rb` - интерфейс командной строки для отчетов
+        - `formatters/` - форматтеры отчетов
+            - `base.rb` - базовый класс форматтера
+            - `html.rb` - HTML форматтер
+            - `markdown.rb` - Markdown форматтер
 - `config/` - конфигурационные файлы
     - `models.yml` - конфигурация моделей
 - `rules/` - правила и промпты для моделей
 - `bin/` - исполняемые скрипты
-    - `human_eval_solver` - работа с моделями
+    - `solver` - работа с моделями
     - `run_tests` - запуск тестов
     - `reports` - генерация отчетов
 - `reports/` - сгенерированные отчеты

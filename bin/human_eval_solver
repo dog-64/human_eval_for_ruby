@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-# Инициализируем rbenv и запускаем через bundle exec
-eval "$(rbenv init -)" && bundle exec ruby "$(dirname "$0")/human_eval_solver_helper.rb" "$@" 

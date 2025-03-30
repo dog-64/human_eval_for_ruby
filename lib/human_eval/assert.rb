@@ -1,13 +1,11 @@
-require_relative 'logger'
-require_relative 'log_levels'
+require_relative '../logger'
 
 module HumanEval
   # Модуль Assert предоставляет набор методов для проверки условий и генерации ошибок
   # при невыполнении этих условий. Используется для написания тестов и проверки корректности
   # работы кода.
   module Assert
-    include Logger
-    include LogLevels
+    include ::Logger
 
     # Исключение, генерируемое при нарушении условия проверки
     # Содержит информацию об ожидаемом и фактическом значениях,

@@ -18,7 +18,7 @@ require 'pry'
 require 'pry-byebug'
 require 'fileutils'
 
-require_relative '../lib/human_eval/solver'
+require_relative '../lib/solver'
 require_relative '../lib/runner/runner'
 require_relative '../lib/human_eval/assert'
 require_relative '../lib/human_eval/converter'

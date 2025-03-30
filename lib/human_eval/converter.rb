@@ -4,13 +4,13 @@ require 'net/http'
 require 'uri'
 require 'dotenv'
 require 'pry'
-require_relative 'logger'
+require_relative '../logger'
 
 # Класс HumanEvalConverter предназначен для конвертации задач из формата human-eval в отдельные файлы
 # Выполняет чтение исходных данных, создание описаний и тестов с использованием языковых моделей
 # через API OpenRouter, и сохранение результатов в указанный каталог
 class HumanEvalConverter
-  include HumanEval::Logger
+  include Logger
 
   # Загружаем переменные окружения из .env файла
   Dotenv.load

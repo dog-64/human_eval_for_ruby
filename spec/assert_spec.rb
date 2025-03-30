@@ -1,14 +1,15 @@
 require 'spec_helper'
 require_relative '../lib/human_eval/assert'
+require_relative '../lib/logger'
 
 RSpec.describe HumanEval::Assert do
   let(:test_class) do
     Class.new do
       include HumanEval::Assert
-      include HumanEval::Logger
+      include Logger
       def initialize
         @options = { log_level: :debug }
-        @log_level = HumanEval::Logger::LOG_LEVELS[:debug]
+        @log_level = Logger::LOG_LEVELS[:debug]
       end
     end
   end

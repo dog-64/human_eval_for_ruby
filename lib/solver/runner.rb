@@ -5,7 +5,7 @@ require 'net/http'
 require 'uri'
 require 'dotenv'
 require 'yaml'
-require_relative '../human_eval/logger'
+require_relative '../logger'
 require_relative '../models'
 require 'strscan'
 
@@ -13,7 +13,7 @@ module Solver
   # Класс для решения задач HumanEval с использованием различных языковых моделей
   # Поддерживает как модели OpenRouter.ai, так и локальные модели Ollama
   class Runner
-    include HumanEval::Logger
+    include Logger
 
     Dotenv.load
     OLLAMA_BASE_URL = ENV['OLLAMA_BASE_URL'] || 'http://localhost:11434'

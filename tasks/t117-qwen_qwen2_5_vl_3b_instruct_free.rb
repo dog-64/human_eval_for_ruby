@@ -1,3 +1,2 @@
-def select_words(s, n)
-  s.split(' ').select { |word| word.match(/[aeiouAEIOU]/).count == n }
-end
+# timeout - решение не было получено из-за ошибки
+# Ошибка запроса к API: Ошибка API при вызове модели qwen_qwen2_5_vl_3b_instruct_free

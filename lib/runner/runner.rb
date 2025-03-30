@@ -1,8 +1,7 @@
 require 'timeout'
-require_relative '../human_eval/logger'
+require_relative '../logger'
 require_relative '../human_eval/assert'
-require_relative '../human_eval/log_levels'
-require_relative '../human_eval/solver'
+require_relative '../solver'
 require_relative '../human_eval/report_generator'
 require_relative '../human_eval/reports/generator'
 require_relative 'report'
@@ -12,8 +11,7 @@ module Runner
   # Позволяет запускать тесты для конкретной задачи или модели, собирать результаты
   # и генерировать отчеты о производительности различных моделей
   class Runner
-    include HumanEval::Logger
-    include HumanEval::LogLevels
+    include Logger
     include Report
 
     DONE_MARK = "\e[32m✓\e[0m".freeze # Зеленый цвет
@@ -205,8 +203,7 @@ module Runner
 
       test_context = Module.new do
         include HumanEval::Assert
-        include HumanEval::LogLevels
-        include HumanEval::Logger
+        include Logger
 
         # Загружаем стандартные библиотеки Ruby с обработкой ошибок
         %w[prime set json date time base64 digest securerandom pathname].each do |lib|
@@ -258,8 +255,7 @@ module Runner
           # Создаем новый контекст для каждого теста
           test_context = Module.new do
             include HumanEval::Assert
-            include HumanEval::LogLevels
-            include HumanEval::Logger
+            include Logger
 
             class << self
               attr_accessor :log_level, :options
