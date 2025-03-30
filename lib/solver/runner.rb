@@ -7,6 +7,7 @@ require 'dotenv'
 require 'yaml'
 require_relative '../logger'
 require_relative '../models'
+require_relative '../model/to_path'
 require 'strscan'
 
 module Solver
@@ -195,7 +196,9 @@ module Solver
     # @param model_key [String] ключ модели
     # @return [String] путь к файлу
     def prepare_output_file(task_number, model_key)
-      model_file_name = model_key.gsub(%r{[^A-Za-z0-9/]}, '_')
+      model_info = models[model_key] || { 'name' => model_key, 'provider' => 'openrouter.ai' }
+      model_name = model_info['name']
+      model_file_name = Model::ToPath.to_path(model_name)
       File.join(@tasks_dir, "t#{task_number}-#{model_file_name}.rb")
     end
 

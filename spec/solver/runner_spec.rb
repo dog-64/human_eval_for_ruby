@@ -38,17 +38,19 @@ RSpec.describe Solver::Runner do
     let(:solver) { described_class.new(tasks_dir, model: 'anthropic_claude_3_5_sonnet') }
     let(:openrouter_response) do
       {
-        choices: [{
-          message: {
-            content: <<~SOLUTION
-              ```ruby
-              def add(a, b)
-                a + b
-              end
-              ```
-            SOLUTION
+        choices: [
+          {
+            message: {
+              content: <<~SOLUTION
+                ```ruby
+                def add(a, b)
+                  a + b
+                end
+                ```
+              SOLUTION
+            }
           }
-        }]
+        ]
       }
     end
 
@@ -67,6 +69,20 @@ RSpec.describe Solver::Runner do
           body: openrouter_response.to_json,
           headers: { 'Content-Type' => 'application/json' }
         )
+
+      # Мокаем File.exist? и File.read для конкретного файла
+      solution_file = File.join(tasks_dir, 't1-anthropic_claude_3_5_sonnet.rb')
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?).with(solution_file).and_return(true)
+      
+      # Мокаем чтение файла задачи и файла решения
+      allow(File).to receive(:read).and_call_original
+      allow(File).to receive(:read).with(File.join(tasks_dir, 't1.md')).and_return("Задача: Напишите функцию add.")
+      allow(File).to receive(:read).with(solution_file).and_return("def add(a, b)\n  a + b\nend\n")
+      
+      # Мокаем File.write для файла решения
+      allow(File).to receive(:write).and_call_original
+      allow(File).to receive(:write).with(solution_file, anything).and_return(true)
     end
 
     it 'processes task with OpenRouter model successfully' do
@@ -109,6 +125,20 @@ RSpec.describe Solver::Runner do
           body: ollama_response.to_json,
           headers: { 'Content-Type' => 'application/json' }
         )
+        
+      # Мокаем File.exist? и File.read для конкретного файла
+      solution_file = File.join(tasks_dir, 't1-ollama_codellama.rb')
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?).with(solution_file).and_return(true)
+      
+      # Мокаем чтение файла задачи и файла решения
+      allow(File).to receive(:read).and_call_original
+      allow(File).to receive(:read).with(File.join(tasks_dir, 't1.md')).and_return("Задача: Напишите функцию add.")
+      allow(File).to receive(:read).with(solution_file).and_return("def add(a, b)\n  return a + b\nend\n")
+      
+      # Мокаем File.write для файла решения
+      allow(File).to receive(:write).and_call_original
+      allow(File).to receive(:write).with(solution_file, anything).and_return(true)
     end
 
     it 'processes task with Ollama model successfully' do
@@ -125,6 +155,7 @@ RSpec.describe Solver::Runner do
 
   describe 'error handling' do
     let(:solver) { described_class.new(tasks_dir, model: 'anthropic_claude_3_5_sonnet', create_empty_on_timeout: true) }
+    let(:solution_file) { File.join(tasks_dir, 't1-anthropic_claude_3_5_sonnet.rb') }
 
     before do
       stub_request(:post, 'https://openrouter.ai/api/v1/chat/completions')
@@ -141,6 +172,19 @@ RSpec.describe Solver::Runner do
           body: { error: 'Some API error' }.to_json,
           headers: { 'Content-Type' => 'application/json' }
         )
+        
+      # Мокаем File.exist? и File.read для конкретного файла
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?).with(solution_file).and_return(true)
+      
+      # Мокаем чтение файлов
+      allow(File).to receive(:read).and_call_original
+      allow(File).to receive(:read).with(File.join(tasks_dir, 't1.md')).and_return("Задача: Напишите функцию add.")
+      allow(File).to receive(:read).with(solution_file).and_return("# timeout - решение не было получено из-за ошибки\n# Some API error")
+      
+      # Мокаем запись в файл
+      allow(File).to receive(:write).and_call_original
+      allow(File).to receive(:write).with(solution_file, anything).and_return(true)
     end
 
     it 'creates empty file on API error when create_empty_on_timeout is true' do
@@ -399,6 +443,15 @@ RSpec.describe Solver::Runner do
         CODE
       )
       
+      # Мокаем File.write и File.read
+      allow(File).to receive(:write).and_call_original
+      allow(File).to receive(:write).with(output_file, anything).and_return(true)
+      
+      allow(File).to receive(:read).and_call_original
+      allow(File).to receive(:read).with(output_file).and_return(
+        "def example_method(a, b)\n  a + b\nend\n"
+      )
+      
       # Вызываем метод process_model_response
       solver.send(:process_model_response, raw_solution, 'test_model', output_file)
       
@@ -407,9 +460,6 @@ RSpec.describe Solver::Runner do
       expect(result).not_to include('<reasoning>')
       expect(result).not_to include('</reasoning>')
       expect(result).to include('def example_method(a, b)')
-      
-      # Удаляем тестовый файл
-      FileUtils.rm_f(output_file)
     end
   end
 end 

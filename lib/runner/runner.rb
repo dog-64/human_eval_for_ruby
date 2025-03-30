@@ -4,6 +4,8 @@ require_relative '../human_eval/assert'
 require_relative '../solver'
 require_relative '../human_eval/report_generator'
 require_relative '../human_eval/reports/generator'
+require_relative '../model/to_path'
+require_relative '../models'
 require_relative 'report'
 
 module Runner
@@ -31,7 +33,7 @@ module Runner
         return {}
       end
 
-      if model && !model.to_s.match?(/^[a-zA-Z0-9_-]+$/)
+      if model && !model.to_s.match?(/^[a-zA-Z0-9_-]+$/) && !model.to_s.match?(%r{^[a-zA-Z0-9/_:-]+$})
         error 'Ошибка: Неверный формат названия модели'
         return {}
       end
@@ -50,6 +52,7 @@ module Runner
 
       @results = Hash.new { |h, k| h[k] = {} }
       has_solutions = false
+      models_manager = Models.new
 
       tasks_to_run.each do |current_task|
         test_file = "tasks/#{current_task}-assert.rb"
@@ -60,7 +63,16 @@ module Runner
 
         # Определяем список решений для тестирования
         solutions = if model
-                      solution = Dir.glob("tasks/#{current_task}-#{model}.rb").first
+                      if model.include?('/') || model.include?(':') || model.include?('-')
+                        # Если передано оригинальное имя модели, ищем ключ модели
+                        # и затем используем Model::ToPath для преобразования в путь
+                        path_name = Model::ToPath.to_path(model)
+                        solution = Dir.glob("tasks/#{current_task}-#{path_name}.rb").first
+                      else
+                        # Используем переданное имя как есть (предполагается, что это ключ модели)
+                        path_name = model
+                        solution = Dir.glob("tasks/#{current_task}-#{path_name}.rb").first
+                      end
                       solution ? [solution] : []
                     else
                       find_solution_files(current_task)
@@ -74,28 +86,37 @@ module Runner
         has_solutions = true
 
         solutions.each do |solution|
-          current_model = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
-          normal_log "Testing solution #{solution} for model #{current_model}"
+          model_path_name = File.basename(solution).split('-')[1..].join('-').sub('.rb', '')
+          # Получаем оригинальное имя модели для отображения
+          original_model_name = Model::ToPath.from_file_path(solution, models_manager) || model_path_name
+          normal_log "Testing solution #{solution} for model #{original_model_name}"
           success = test_solution(current_task, solution)
-          debug_log "Test result for #{current_model}: #{success}"
-          @results[current_task][current_model] = success
+          debug_log "Test result for #{original_model_name}: #{success}"
+          @results[current_task][original_model_name] = success
         rescue => e
           debug_log "Ошибка при тестировании #{solution}: #{e.message}"
-          @results[current_task][current_model] = false
+          original_model_name = Model::ToPath.from_file_path(solution, models_manager) || model_path_name
+          @results[current_task][original_model_name] = false
         end
       end
 
       # Если не было найдено ни одного решения, возвращаем пустой хэш
       return {} unless has_solutions
 
+      # Если установлен флаг генерации отчетов, генерируем их
       if @options[:report]
         report_data = {
           model_stats: get_model_stats,
           task_results: @results
         }
         HumanEval::ReportGenerator.new(report_data).generate_all
-        display_total_console(tasks_to_run, models)
       end
+      
+      # Всегда выводим итоговую статистику в консоль
+      # Получаем список моделей
+      models_list = models
+      # Вывод итоговой статистики
+      display_total_console(tasks_to_run, models_list)
 
       @results
     end
@@ -104,28 +125,32 @@ module Runner
       # Находим все файлы с решениями в директории tasks
       solutions = Dir.glob('tasks/t*-*.rb').reject { |f| f.end_with?('-assert.rb') }
       tasks = solutions.map { |f| File.basename(f) }.map { |f| f.gsub(/-.*$/, '') }.uniq.sort
+      models_manager = Models.new
 
+      # Используем оригинальные имена моделей для статистики
       models = solutions.map do |f|
-        filename = File.basename(f)
-        next if filename.end_with?('_asserts.rb')
-
-        filename.split('-')[1..].join('-').sub('.rb', '')
+        Model::ToPath.from_file_path(f, models_manager) || 
+          (File.basename(f).split('-')[1..].join('-').sub('.rb', ''))
       end.compact.uniq.sort
 
       return [] if models.empty? || tasks.empty? || @results.empty?
 
       # Подсчитываем статистику для каждой модели
       model_stats = models.map do |model|
+        # Находим все задачи, для которых у нас есть результаты данной модели
         total_tasks = tasks.count { |task| @results[task]&.key?(model) }
-        next [model, 0] if total_tasks.zero?
-
-        passed_tasks = tasks.count { |task| @results[task][model] }
-        percentage = (passed_tasks * 100.0 / total_tasks).round
-        [model, percentage]
+        next nil if total_tasks.zero? # Пропускаем модели без результатов
+        
+        # Подсчитываем количество успешно пройденных тестов
+        passed_tasks = tasks.count { |task| @results[task][model] == true }
+        percentage = total_tasks > 0 ? (passed_tasks * 100.0 / total_tasks).round : 0
+        
+        # Возвращаем более детальную статистику
+        [model, passed_tasks, total_tasks, percentage]
       end.compact
 
       # Сортируем по убыванию процента успешных тестов
-      model_stats.sort_by! { |_, percentage| -percentage }
+      model_stats.sort_by! { |_, _, _, percentage| -percentage }
 
       # Возвращаем результат
       model_stats
@@ -146,11 +171,11 @@ module Runner
     private
 
     def models
+      models_manager = Models.new
       find_solution_files.map do |f|
-        filename = File.basename(f)
-        next if filename.end_with?('_asserts.rb')
-
-        filename.split('-')[1..].join('-').sub('.rb', '')
+        # Всегда пытаемся получить оригинальное имя модели
+        Model::ToPath.from_file_path(f, models_manager) || 
+          (File.basename(f).split('-')[1..].join('-').sub('.rb', ''))
       end.compact.uniq.sort
     end
 
@@ -406,6 +431,13 @@ module Runner
 
     def display_results(tasks, models)
       # Генерируем файлы суммарных отчетов
+      generate_report_files(tasks, models)if @options[:report]
+
+      # Короткий отчет по результатам прогона - всегда отображаем
+      display_total_console(tasks, models)
+    end
+
+    def generate_report_files(tasks, models)
       generator = HumanEval::Reports::Generator.new(
         output_dir: 'reports',
         format: 'all',
@@ -414,11 +446,8 @@ module Runner
         models: models
       )
       generator.generate
-
-      # Короткий отчет по результатам прогона
-      display_total_console(tasks, models) if @options[:report]
     end
-
+    
     def find_solution_files(task = nil)
       pattern = task ? "tasks/#{task}-*.rb" : 'tasks/t*-*.rb'
       Dir.glob(pattern).reject { |f| f.end_with?('-assert.rb') }

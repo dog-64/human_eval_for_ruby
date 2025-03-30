@@ -37,8 +37,9 @@ module HumanEval
 
     def create_markdown
       content = "## Рейтинг\n\n"
-      @results[:model_stats].each do |model, percentage|
-        content += "- #{model}: #{percentage}%\n"
+      @results[:model_stats].each do |model_stat|
+        model, passed, total, percentage = model_stat
+        content += "- #{model}: #{passed}/#{total} (#{percentage}%)\n"
       end
       File.write(File.join(@reports_dir, 'total.md'), content)
     end
@@ -47,12 +48,48 @@ module HumanEval
       readme_path = File.join(@reports_dir, 'README.md')
       return unless File.exist?(readme_path)
 
-      readme = File.read(readme_path)
-      new_content = readme.sub(
-        /## Рейтинг.*?(?=##|\z)/m,
-        "#{File.read(File.join(@reports_dir, 'total.md'))}\n"
-      )
-      File.write(readme_path, new_content)
+      total_md_path = File.join(@reports_dir, 'total.md')
+      return unless File.exist?(total_md_path)
+      
+      # Читаем содержимое обоих файлов
+      readme_content = File.read(readme_path)
+      total_content = File.read(total_md_path)
+      
+      # Удаляем заголовок из total.md, чтобы оставить только содержимое секции
+      total_content_without_header = total_content.sub(/^## Рейтинг\s*\n+/, '')
+      
+      # Используем другой вариант замены, который показал себя стабильно в тестах
+      pattern = /(# .+?\n\n## Рейтинг\n).+?(\n\n## |\z)/m
+      
+      new_readme_content = readme_content.gsub(pattern) do |match|
+        result = "#{$1}#{total_content_without_header}#{$2}"
+        result
+      end
+      
+      puts "DEBUG: new_readme_content=#{new_readme_content.inspect}" if ENV['DEBUG']
+      puts "DEBUG: contents changed? #{new_readme_content != readme_content ? 'yes' : 'no'}" if ENV['DEBUG']
+      
+      # Запасной вариант - если регулярные выражения не сработали
+      if new_readme_content == readme_content
+        # Попробуем простую замену содержимого
+        rating_section_begin = readme_content.index("## Рейтинг\n")
+        next_section_begin = readme_content.index("\n\n##", rating_section_begin) if rating_section_begin
+        
+        if rating_section_begin && next_section_begin
+          new_readme_content = readme_content[0...rating_section_begin] + 
+                               "## Рейтинг\n\n#{total_content_without_header}" + 
+                               readme_content[next_section_begin..-1]
+        else
+          # Если и этот способ не сработал, попробуем прямую замену
+          section_pattern = /## Рейтинг.*?((?=\n##|\z))/m
+          new_readme_content = readme_content.sub(section_pattern, "## Рейтинг\n\n#{total_content_without_header}")
+        end
+      end
+      
+      # Сохраняем обновленный README.md только если он изменился
+      if new_readme_content != readme_content
+        File.write(readme_path, new_readme_content)
+      end
     end
 
     def add_soft_hyphens(text)
@@ -141,9 +178,10 @@ module HumanEval
         file.puts "<p>Дата: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}</p>"
         file.puts "<div class='model-results'>"
         file.puts '<table>'
-        file.puts '<tr><th>Модель</th><th>Успешность</th></tr>'
-        @results[:model_stats].each do |model, percentage|
-          file.puts "<tr><td>#{model}</td><td>#{percentage}%</td></tr>"
+        file.puts '<tr><th>Модель</th><th>Успешность</th><th>Пройдено</th><th>Всего</th></tr>'
+        @results[:model_stats].each do |model_stat|
+          model, passed, total, percentage = model_stat
+          file.puts "<tr><td>#{model}</td><td>#{percentage}%</td><td>#{passed}</td><td>#{total}</td></tr>"
         end
         file.puts '</table></div></body></html>'
       end
@@ -159,9 +197,10 @@ module HumanEval
         file.puts '<h2>Результаты по моделям</h2>'
         file.puts "<div class='model-results'>"
         file.puts '<table>'
-        file.puts '<tr><th>Модель</th><th>Успешность</th></tr>'
-        @results[:model_stats].each do |model, percentage|
-          file.puts "<tr><td>#{model}</td><td>#{percentage}%</td></tr>"
+        file.puts '<tr><th>Модель</th><th>Успешность</th><th>Пройдено</th><th>Всего</th></tr>'
+        @results[:model_stats].each do |model_stat|
+          model, passed, total, percentage = model_stat
+          file.puts "<tr><td>#{model}</td><td>#{percentage}%</td><td>#{passed}</td><td>#{total}</td></tr>"
         end
         file.puts '</table></div>'
 

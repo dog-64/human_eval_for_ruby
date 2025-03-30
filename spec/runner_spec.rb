@@ -126,6 +126,7 @@ RSpec.describe Runner::Runner do
     end
 
     it 'handles invalid model name format' do
+      allow(Dir).to receive(:glob).with("tasks/t1-invalid_model.rb").and_return([])
       results = runner.run_tests(task: 't1', model: 'invalid/model')
       expect(results).to eq({})
     end
@@ -311,9 +312,14 @@ RSpec.describe Runner::Runner do
     end
 
     it 'выводит статистику для каждой модели в правильном порядке' do
-      expect(runner).to receive(:log).with("\nРезультаты тестирования моделей:")
-      expect(runner).to receive(:log).with("- model1: \e[32m100%\e[0m")
-      expect(runner).to receive(:log).with("- model2: \e[31m33%\e[0m")
+      expect(runner).to receive(:log).with("\n📊 Общая статистика:")
+      expect(runner).to receive(:log).with("- Всего задач: 3")
+      expect(runner).to receive(:log).with("- Всего моделей: 2")
+      expect(runner).to receive(:log).with("- Моделей с результатами: 2")
+      expect(runner).to receive(:log).with("- Общая успешность: #{runner.send(:colorize, "4/6 (67%)", 67)}")
+      expect(runner).to receive(:log).with("\n🤖 Результаты тестирования моделей:")
+      expect(runner).to receive(:log).with("- model1: #{runner.send(:colorize, "3/3 (100%)", 100)}")
+      expect(runner).to receive(:log).with("- model2: #{runner.send(:colorize, "1/3 (33%)", 33)}")
 
       runner.send(:display_total_console, tasks, models)
     end
@@ -372,14 +378,14 @@ RSpec.describe Runner::Runner do
       it 'возвращает корректную статистику для всех моделей' do
         stats = runner.get_model_stats
         expect(stats).to eq([
-                              ['model1', 100], # 2 из 2 задач пройдены
-                              ['model2', 50] # 1 из 2 задач пройдена
+                              ['model1', 2, 2, 100], # 2 из 2 задач пройдены
+                              ['model2', 1, 2, 50]   # 1 из 2 задач пройдена
                             ])
       end
 
       it 'сортирует результаты по убыванию процента успешных тестов' do
         stats = runner.get_model_stats
-        expect(stats.map(&:last)).to eq([100, 50])
+        expect(stats.map { |s| s[3] }).to eq([100, 50])
       end
     end
 
@@ -427,8 +433,8 @@ RSpec.describe Runner::Runner do
       it 'корректно обрабатывает отсутствующие результаты' do
         stats = runner.get_model_stats
         expect(stats).to eq([
-                              ['model1', 100], # 1 из 1 задачи пройдена
-                              ['model2', 100] # 1 из 1 задачи пройдена
+                              ['model1', 1, 1, 100], # 1 из 1 задачи пройдена
+                              ['model2', 1, 1, 100]  # 1 из 1 задачи пройдена
                             ])
       end
     end
@@ -444,8 +450,8 @@ RSpec.describe Runner::Runner do
       it 'возвращает нулевой процент для всех моделей' do
         stats = runner.get_model_stats
         expect(stats).to eq([
-                              ['model1', 0], # 0 из 2 задач пройдены
-                              ['model2', 0] # 0 из 2 задач пройдены
+                              ['model1', 0, 2, 0], # 0 из 2 задач пройдены
+                              ['model2', 0, 2, 0]  # 0 из 2 задач пройдены
                             ])
       end
     end

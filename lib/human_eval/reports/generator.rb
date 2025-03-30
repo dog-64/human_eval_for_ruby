@@ -1,6 +1,9 @@
 require 'fileutils'
 require 'json'
 require_relative '../../runner/runner'
+require_relative '../reports/formatters/html'
+require_relative '../../model/to_path'
+require_relative '../../models'
 
 module HumanEval
   module Reports
@@ -13,21 +16,25 @@ module HumanEval
       RESULTS_FILE = 'reports/results.json'.freeze
 
       def initialize(options = {})
-        @options = options
-        @output_dir = options[:output_dir]
+        @output_dir = options[:output_dir] || 'reports'
         @format = options[:format] || 'all'
-        @results = options[:results] || {}
-        @tasks = options[:tasks] || []
+        @results = options[:task_results] || {}
         @models = options[:models] || []
+        @tasks = options[:tasks] || []
+        @timestamp = Time.now.strftime('%Y%m%d_%H%M%S')
+        @model_stats = options[:model_stats] || calculate_model_stats(@results)
 
         validate_options!
         validate_paths!
       end
 
       def generate
-        results = @results.empty? ? collect_results : @results
-        generate_reports(results)
-        { model_stats: calculate_model_stats(results) }
+        FileUtils.mkdir_p(@output_dir)
+        formats = @format == 'all' ? %w[html] : Array(@format)
+
+        formats.each do |format|
+          generate_by_format(format, @output_dir, @results, @model_stats, @timestamp)
+        end
       end
 
       private
@@ -61,10 +68,15 @@ module HumanEval
         end
       end
 
-      def generate_reports(results)
-        case @format
+      def generate_by_format(format, output_dir, results, model_stats, timestamp)
+        case format
         when 'html'
-          generate_html_report(results)
+          Formatters::HTML.new(
+            output_dir: output_dir,
+            task_results: results,
+            model_stats: model_stats,
+            timestamp: timestamp
+          ).generate
         when 'markdown'
           generate_markdown_report(results)
         when 'all'
@@ -170,17 +182,20 @@ module HumanEval
       end
 
       def calculate_model_stats(results)
-        return {} if results.empty?
+        stats = Hash.new { |h, k| h[k] = { total: 0, success: 0 } }
+        models_manager = Models.new
 
-        tasks = @tasks.empty? ? results.keys : @tasks
-        models = @models.empty? ? results.values.flat_map(&:keys).uniq : @models
-
-        models.to_h do |model|
-          total_tasks = tasks.size
-          passed_tasks = tasks.count { |task| results[task][model] }
-          percentage = (passed_tasks * 100.0 / total_tasks).round
-          [model, percentage]
+        results.each_value do |model_results|
+          model_results.each do |model, success|
+            stats[model][:total] += 1
+            stats[model][:success] += 1 if success
+          end
         end
+
+        stats.map do |model, data|
+          success_rate = (data[:success] * 100.0 / data[:total]).round
+          [model, success_rate]
+        end.sort_by { |_, rate| -rate }
       end
 
       def generate_html_header

@@ -1,6 +1,8 @@
 require 'thor'
 require 'fileutils'
 require_relative 'runner'
+require_relative '../model/to_path'
+require_relative '../models'
 
 module Runner
   # Класс CLI предоставляет интерфейс командной строки для запуска тестов
@@ -9,40 +11,64 @@ module Runner
   class CLI < Thor
     package_name 'Test Runner'
 
-    desc 'tests', 'Запустить тесты'
-    default_task :tests
+    desc 'execute', 'Запуск тестов для решений задач'
+    method_option :task,
+                  type: :string,
+                  aliases: '-t',
+                  desc: 'Задача для тестирования (например, t1)'
+    method_option :model,
+                  type: :string,
+                  aliases: '-m',
+                  desc: 'Модель для тестирования (например, deepseek/deepseek-chat:free или deepseek_deepseek_chat_free)'
+    method_option :report,
+                  type: :boolean,
+                  aliases: '-r',
+                  default: false,
+                  desc: 'Сгенерировать отчет'
+    method_option :log_level,
+                  type: :string,
+                  aliases: '-l',
+                  enum: %w[none normal debug],
+                  default: 'normal',
+                  desc: 'Уровень логирования'
 
-    class_option :task,
-                 type: :string,
-                 default: '',
-                 desc: 'Запуск конкретного теста (например, T1, T2, T3)'
-
-    class_option :model,
-                 type: :string,
-                 default: '',
-                 desc: 'Запуск тестов для конкретной модели'
-
-    class_option :log_level,
-                 type: :string,
-                 enum: %w[none normal debug],
-                 default: 'normal',
-                 desc: 'Уровень логирования'
-
-    class_option :report,
-                 type: :boolean,
-                 default: true,
-                 desc: 'Показать только сводный отчет по моделям'
-
-    # Запускает тесты с заданными параметрами командной строки
-    # Использует основной класс Runner для запуска тестов
-    # и обработки результатов
-    def tests
-      runner = Runner.new(options)
-      runner.run_tests(
-        task: options[:task].to_s.empty? ? nil : options[:task],
-        model: options[:model].to_s.empty? ? nil : options[:model]
-      )
+    def execute
+      options_hash = {
+        report: options[:report] || false,
+        log_level: options[:log_level] ? options[:log_level].to_sym : :normal
+      }
+      
+      runner = Runner.new(options_hash)
+      
+      # Проверяем формат модели
+      if options[:model] && (options[:model].include?('/') || options[:model].include?(':') || options[:model].include?('-'))
+        # Если передано оригинальное имя модели, используем его как есть
+        runner.run_tests(task: options[:task], model: options[:model])
+      else
+        # Иначе используем как ключ модели
+        runner.run_tests(task: options[:task], model: options[:model])
+      end
     end
+
+    desc 'list_models', 'Показать список доступных моделей'
+    def list_models
+      models_manager = Models.new
+      puts "Доступные модели:"
+      
+      puts "\nOpenRouter.ai модели:"
+      models_manager.all.select { |_, info| info['provider'] == 'openrouter.ai' }.each do |key, info|
+        done_mark = info['done'] ? " ✓" : ""
+        puts "  #{key}: #{info['name']}#{done_mark}"
+      end
+      
+      puts "\nOllama модели:"
+      models_manager.all.select { |_, info| info['provider'] == 'ollama' }.each do |key, info|
+        done_mark = info['done'] ? " ✓" : ""
+        puts "  #{key}: #{info['name']}#{done_mark}"
+      end
+    end
+
+    default_task :execute
 
     # Определяет поведение при ошибке выполнения команды
     # @return [Boolean] true - выход при ошибке, false - продолжение выполнения
