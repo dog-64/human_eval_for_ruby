@@ -1,6 +1,31 @@
 #!/usr/bin/env ruby
 require 'bundler/setup'
-require_relative '../lib/human_eval/reports'
+require_relative '../lib/human_eval/report_generator'
+require 'json'
+require 'fileutils'
 
-# Запускаем CLI
-HumanEval::Reports::CLI.start(ARGV) 
+# Проверяем, существует ли директория reports
+FileUtils.mkdir_p('reports') unless Dir.exist?('reports')
+
+# Загружаем результаты если они существуют
+results_file = 'reports/test_results.json'
+if File.exist?(results_file)
+  begin
+    data = JSON.parse(File.read(results_file))
+    results = {
+      model_stats: data['models'],
+      task_results: data['tasks']
+    }
+    
+    # Генерируем отчет
+    HumanEval::ReportGenerator.new(results).generate_all
+    puts "Отчеты успешно созданы в каталоге reports/"
+  rescue JSON::ParserError => e
+    puts "Ошибка при чтении файла с результатами: #{e.message}"
+    exit 1
+  end
+else
+  puts "Файл с результатами не найден: #{results_file}"
+  puts "Сначала запустите тесты с опцией --report или используйте bin/generate_report"
+  exit 1
+end 

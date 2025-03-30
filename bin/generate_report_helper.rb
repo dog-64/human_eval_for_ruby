@@ -4,7 +4,7 @@ require 'bundler/setup'
 require_relative '../lib/runner/runner'
 
 # Запускаем тесты и получаем результаты
-options = { report_total: true, log_level: 'normal' }
+options = { report: true, log_level: 'normal' }
 runner = Runner::Runner.new(options)
 results = runner.run_tests
 

@@ -3,7 +3,6 @@ require_relative '../logger'
 require_relative '../human_eval/assert'
 require_relative '../solver'
 require_relative '../human_eval/report_generator'
-require_relative '../human_eval/reports/generator'
 require_relative '../model/to_path'
 require_relative '../models'
 require_relative 'report'
@@ -430,24 +429,19 @@ module Runner
     end
 
     def display_results(tasks, models)
-      # Генерируем файлы суммарных отчетов
-      generate_report_files(tasks, models)if @options[:report]
+      # Если установлен флаг генерации отчетов, генерируем их
+      if @options[:report]
+        report_data = {
+          model_stats: get_model_stats,
+          task_results: @results
+        }
+        HumanEval::ReportGenerator.new(report_data).generate_all
+      end
 
       # Короткий отчет по результатам прогона - всегда отображаем
       display_total_console(tasks, models)
     end
 
-    def generate_report_files(tasks, models)
-      generator = HumanEval::Reports::Generator.new(
-        output_dir: 'reports',
-        format: 'all',
-        results: @results,
-        tasks: tasks,
-        models: models
-      )
-      generator.generate
-    end
-    
     def find_solution_files(task = nil)
       pattern = task ? "tasks/#{task}-*.rb" : 'tasks/t*-*.rb'
       Dir.glob(pattern).reject { |f| f.end_with?('-assert.rb') }
