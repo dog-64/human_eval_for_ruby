@@ -11,6 +11,41 @@ module Model
       name.to_s.gsub(%r{[/:-]}, '_')
     end
     
+    # Преобразовать имя модели в формате пути в человекочитаемый формат
+    # @param path_name [String] имя модели в формате пути (например, "deepseek_deepseek_chat_free")
+    # @param models_manager [Models, nil] объект Models для доступа к информации о моделях
+    # @return [String] полное имя модели (например, "deepseek/deepseek-chat:free")
+    def self.from_path(path_name, models_manager = nil)
+      return nil unless path_name
+      
+      # Если имя уже содержит / или -, вероятно это уже в читаемом формате
+      return path_name if path_name.include?('/') || path_name.include?('-')
+      
+      if models_manager && models_manager.class.name == 'Models'
+        # Ищем соответствующую модель в конфигурации
+        model_key = find_model_key_by_path(path_name, models_manager)
+        if model_key
+          return models_manager.get(model_key)['name']
+        end
+      end
+      
+      # Если models_manager не задан или модель не найдена в конфигурации, 
+      # используем алгоритмический подход для форматирования
+      
+      # Преобразуем google_gemini_2_5_pro_exp_03_25_free в google/gemini-2-5-pro-exp-03-25:free
+      parts = path_name.split('_')
+      return path_name if parts.size < 2
+      
+      provider = parts.shift  # Первая часть - провайдер
+      family = parts.shift    # Вторая часть - семейство моделей
+      
+      # Если последняя часть содержит информацию о версии, отделяем ее двоеточием
+      suffix = parts.last == 'free' ? ":#{parts.pop}" : ''
+      
+      # Собираем остальные части через дефис
+      "#{provider}/#{family}-#{parts.join('-')}#{suffix}"
+    end
+    
     # Получить оригинальное имя модели из файла с решением
     # @param file_path [String] путь к файлу с решением
     # @param models_manager [Models] объект Models для доступа к информации о моделях
@@ -24,18 +59,18 @@ module Model
       model_path_name = file_basename.split('-')[1..].join('-').sub('.rb', '')
       
       # В тестовом окружении может быть мок вместо реального объекта Models
-      return model_path_name if ENV['RACK_ENV'] == 'test' || models_manager.class.name != 'Models'
+      return from_path(model_path_name, models_manager) if ENV['RACK_ENV'] == 'test' || models_manager.class.name != 'Models'
       
       begin
         # Ищем соответствующую модель в конфигурации
         model_key = find_model_key_by_path(model_path_name, models_manager)
-        return model_path_name unless model_key
+        return from_path(model_path_name, models_manager) unless model_key
         
         # Возвращаем оригинальное имя модели
         models_manager.get(model_key)['name']
       rescue => e
-        # В случае ошибки возвращаем имя из пути
-        model_path_name
+        # В случае ошибки возвращаем имя из пути в читаемом формате
+        from_path(model_path_name, models_manager)
       end
     end
     

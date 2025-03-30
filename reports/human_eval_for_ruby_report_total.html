@@ -6,87 +6,239 @@
   <title>Отчет о тестировании моделей</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                   Helvetica, Arial, sans-serif;
-      line-height: 1.6;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-      color: #333;
-      hyphens: auto;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-    }
-    h1, h2, h3 { color: #2c3e50; }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-bottom: 20px;
-      font-size: 14px;
-    }
-    th, td {
-      hyphens: auto;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background-color: #f2f2f2;
-      position: sticky;
-      top: 0;
-      vertical-align: top;
-    }
-    tr:nth-child(even) { background-color: #f9f9f9; }
-    .success {
-      color: #27ae60;
-      font-weight: bold;
-    }
-    .failure {
-      color: #e74c3c;
-      font-weight: bold;
-    }
-    .model-results td:first-child,
-    .task-results td:first-child {
-      text-align: left;
-      font-weight: bold;
-    }
-    .task-results th { vertical-align: top; }
-    @media (max-width: 768px) {
-      table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-      }
-    }
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  color: #333;
+  hyphens: auto;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+h1, h2, h3 { 
+  color: #2c3e50; 
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+th, td {
+  hyphens: auto;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background-color: #f2f2f2;
+  position: sticky;
+  top: 0;
+  vertical-align: top;
+}
+
+tr:nth-child(even) { 
+  background-color: #f9f9f9; 
+}
+
+.success {
+  color: #27ae60;
+  font-weight: bold;
+}
+
+.failure {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+.model-results td:first-child,
+.task-results td:first-child {
+  text-align: left;
+  font-weight: bold;
+}
+
+.task-results th { 
+  vertical-align: top; 
+}
+
+@media (max-width: 768px) {
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+} 
   </style>
 </head>
 <body>
-<h1>Суммарный отчет о тестировании моделей</h1>
-<p>Дата: 2025-03-30 18:35:08</p>
-<div class='model-results'>
-<table>
-<tr><th>Модель</th><th>Успешность</th><th>Пройдено</th><th>Всего</th></tr>
-<tr><td>google_gemini_2_5_pro_exp_03_25_free</td><td>%</td><td>100</td><td></td></tr>
-<tr><td>google_gemini_2_0_flash_001</td><td>%</td><td>87</td><td></td></tr>
-<tr><td>openai/o3-mini-high</td><td>%</td><td>85</td><td></td></tr>
-<tr><td>deepseek/deepseek-chat-v3-0324</td><td>%</td><td>82</td><td></td></tr>
-<tr><td>deepseek/deepseek-chat:free</td><td>%</td><td>79</td><td></td></tr>
-<tr><td>google_gemini_2_0_flash_lite_001</td><td>%</td><td>79</td><td></td></tr>
-<tr><td>deepseek/deepseek-chat</td><td>%</td><td>77</td><td></td></tr>
-<tr><td>google/gemma-3-27b-it</td><td>%</td><td>77</td><td></td></tr>
-<tr><td>openai/gpt-4o-mini</td><td>%</td><td>77</td><td></td></tr>
-<tr><td>qwen_qwen_2_5_coder_32b_instruct</td><td>%</td><td>75</td><td></td></tr>
-<tr><td>mistralai/codestral-2501</td><td>%</td><td>75</td><td></td></tr>
-<tr><td>google_gemini_flash_1_5</td><td>%</td><td>75</td><td></td></tr>
-<tr><td>meta_llama_llama_3_1_70b_instruct</td><td>%</td><td>69</td><td></td></tr>
-<tr><td>mistralai_mistral_small_3_1_24b_instruct</td><td>%</td><td>67</td><td></td></tr>
-<tr><td>rekaai/reka-flash-3:free</td><td>%</td><td>57</td><td></td></tr>
-<tr><td>qwen_qwen2_5_vl_3b_instruct_free</td><td>%</td><td>41</td><td></td></tr>
-<tr><td>microsoft/phi-4-multimodal-instruct</td><td>%</td><td>35</td><td></td></tr>
-<tr><td>ollama_codellama</td><td>%</td><td>31</td><td></td></tr>
-<tr><td>ollama_codellama_13b</td><td>%</td><td>27</td><td></td></tr>
-<tr><td>ollama_llama3_2</td><td>%</td><td>25</td><td></td></tr>
-<tr><td>ollama_codellama_34b</td><td>%</td><td>17</td><td></td></tr>
-</table></div></body></html>
+  <h1>Суммарный отчет о тестировании моделей</h1>
+  <p>Дата: 2025-03-30 18:59:35</p>
+  
+  <div class='model-results'>
+    <table>
+      <tr>
+        <th>Модель</th>
+        <th>Успешность</th>
+        <th>Пройдено</th>
+        <th>Всего</th>
+      </tr>
+      
+        <tr>
+          <td>google/gemini-2-5-pro-exp-03-25:free</td>
+          <td>%</td>
+          <td>100</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>google/gemini-2-0-flash-001</td>
+          <td>%</td>
+          <td>87</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>openai/o3-mini-high</td>
+          <td>%</td>
+          <td>85</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>deepseek/deepseek-chat-v3-0324</td>
+          <td>%</td>
+          <td>82</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>deepseek/deepseek-chat:free</td>
+          <td>%</td>
+          <td>79</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>google/gemini-2-0-flash-lite-001</td>
+          <td>%</td>
+          <td>79</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>deepseek/deepseek-chat</td>
+          <td>%</td>
+          <td>77</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>google/gemma-3-27b-it</td>
+          <td>%</td>
+          <td>77</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>openai/gpt-4o-mini</td>
+          <td>%</td>
+          <td>77</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>qwen/qwen-2-5-coder-32b-instruct</td>
+          <td>%</td>
+          <td>75</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>mistralai/codestral-2501</td>
+          <td>%</td>
+          <td>75</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>google/gemini-flash-1-5</td>
+          <td>%</td>
+          <td>75</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>meta/llama-llama-3-1-70b-instruct</td>
+          <td>%</td>
+          <td>69</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>mistralai/mistral-small-3-1-24b-instruct</td>
+          <td>%</td>
+          <td>67</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>rekaai/reka-flash-3:free</td>
+          <td>%</td>
+          <td>57</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>qwen/qwen2-5-vl-3b-instruct:free</td>
+          <td>%</td>
+          <td>41</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>microsoft/phi-4-multimodal-instruct</td>
+          <td>%</td>
+          <td>35</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>ollama/codellama-</td>
+          <td>%</td>
+          <td>31</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>ollama/codellama-13b</td>
+          <td>%</td>
+          <td>27</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>ollama/llama3-2</td>
+          <td>%</td>
+          <td>25</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <td>ollama/codellama-34b</td>
+          <td>%</td>
+          <td>17</td>
+          <td></td>
+        </tr>
+      
+    </table>
+  </div>
+</body>
+</html> 

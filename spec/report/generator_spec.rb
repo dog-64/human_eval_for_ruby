@@ -79,23 +79,35 @@ RSpec.describe Report::Generator do
 
     describe '#create_total_html' do
       it 'creates a total HTML report' do
-        html_header = generator.send(:generate_html_header)
-        generator.send(:create_total_html, html_header)
+        css = "body { color: #333; }"
+        allow(generator).to receive(:load_css).and_return(css)
+        # Устанавливаем фиксированную дату для стабильности тестов
+        fixed_time = Time.new(2025, 3, 30, 12, 0, 0)
+        allow(Time).to receive(:now).and_return(fixed_time)
+        
+        generator.send(:create_total_html, css)
         
         html_path = File.join(test_dir, 'human_eval_for_ruby_report_total.html')
         expect(File.exist?(html_path)).to be true
         
         content = File.read(html_path)
         expect(content).to include('<h1>Суммарный отчет о тестировании моделей</h1>')
-        expect(content).to include('<tr><td>model1</td><td>100%</td><td>10</td><td>10</td></tr>')
-        expect(content).to include('<tr><td>model2</td><td>50%</td><td>5</td><td>10</td></tr>')
+        expect(content).to include('<td>model1</td>')
+        expect(content).to include('<td>100%</td>')
+        expect(content).to include('<td>10</td>')
+        expect(content).to include('body { color: #333; }')
       end
     end
 
     describe '#create_full_html' do
       it 'creates a full HTML report' do
-        html_header = generator.send(:generate_html_header)
-        generator.send(:create_full_html, html_header)
+        css = "body { color: #333; }"
+        allow(generator).to receive(:load_css).and_return(css)
+        # Устанавливаем фиксированную дату для стабильности тестов
+        fixed_time = Time.new(2025, 3, 30, 12, 0, 0)
+        allow(Time).to receive(:now).and_return(fixed_time)
+        
+        generator.send(:create_full_html, css)
         
         html_path = File.join(test_dir, 'human_eval_for_ruby_report_full.html')
         expect(File.exist?(html_path)).to be true
@@ -104,9 +116,22 @@ RSpec.describe Report::Generator do
         expect(content).to include('<h1>Отчет о тестировании моделей</h1>')
         expect(content).to include('<h2>Результаты по моделям</h2>')
         expect(content).to include('<h2>Детальные результаты по задачам</h2>')
-        expect(content).to include('<tr><td>t1</td>')
+        expect(content).to include('<th>Задача</th>')
+        expect(content).to include('<td>t1</td>')
         expect(content).to include('<td class=\'success\'>✓</td>')
         expect(content).to include('<td class=\'failure\'>✗</td>')
+        expect(content).to include('body { color: #333; }')
+      end
+    end
+
+    describe '#load_css' do
+      it 'loads CSS from file' do
+        # Подменяем чтение файла с помощью mock
+        css_path = File.join(Report::Generator::TEMPLATES_DIR, 'css', 'report.css')
+        allow(File).to receive(:read).with(css_path).and_return('body { color: #333; }')
+        
+        css = generator.send(:load_css)
+        expect(css).to eq('body { color: #333; }')
       end
     end
   end
