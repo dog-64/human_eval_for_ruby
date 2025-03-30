@@ -1,4 +1,4 @@
-module TestRunner
+module Runner
   # Модуль для форматирования и отображения результатов тестирования
   module Report
     def display_total_console(tasks, models)

@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'fileutils'
 require_relative '../lib/test_runner/runner'
 
-RSpec.describe TestRunner::Runner do
+RSpec.describe Runner::Runner do
   let(:runner) { described_class.new(log_level: 'none') }
   let(:solution1_content) { "def add(a, b)\n  a + b\nend" }
   let(:solution2_content) { "def add(a, b)\n  a - b\nend" }

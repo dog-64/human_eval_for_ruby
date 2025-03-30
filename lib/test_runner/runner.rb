@@ -7,14 +7,14 @@ require_relative '../human_eval/report_generator'
 require_relative '../human_eval/reports/generator'
 require_relative 'report'
 
-module TestRunner
+module Runner
   # Класс Runner отвечает за запуск и обработку тестов для решений задач
   # Позволяет запускать тесты для конкретной задачи или модели, собирать результаты
   # и генерировать отчеты о производительности различных моделей
   class Runner
     include HumanEval::Logger
     include HumanEval::LogLevels
-    include TestRunner::Report
+    include Report
 
     DONE_MARK = "\e[32m✓\e[0m".freeze # Зеленый цвет
     FAIL_MARK = "\e[31m✗\e[0m".freeze # Красный цвет
@@ -409,7 +409,7 @@ module TestRunner
     end
 
     def display_results(tasks, models)
-      # Создаем отчеты через генератор отчетов
+      # Генерируем файлы суммарных отчетов
       generator = HumanEval::Reports::Generator.new(
         output_dir: 'reports',
         format: 'all',
@@ -417,11 +417,9 @@ module TestRunner
         tasks: tasks,
         models: models
       )
-
-      # Генерируем отчеты
       generator.generate
 
-      # Отчеты генерируются и отображаются через Reports::Generator
+      # Короткий отчет по результатам прогона
       display_total_console(tasks, models) if @options[:report]
     end
 

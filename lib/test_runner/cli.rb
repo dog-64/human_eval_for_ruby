@@ -2,7 +2,7 @@ require 'thor'
 require 'fileutils'
 require_relative 'runner'
 
-module TestRunner
+module Runner
   # Класс CLI предоставляет интерфейс командной строки для запуска тестов
   # Построен на базе Thor и позволяет запускать тесты для конкретных задач и моделей,
   # управлять уровнем логирования и генерацией отчетов

@@ -8,4 +8,4 @@ require_relative "../lib/test_runner/cli"
 #   ARGV << "--report-total" unless ARGV.any? { |arg| arg.include?("report-total") }
 # end
 
-TestRunner::CLI.start(ARGV) 
+Runner::CLI.start(ARGV) 
