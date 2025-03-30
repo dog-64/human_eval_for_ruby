@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Ensure rbenv is loaded if it exists
+if [ -d "$HOME/.rbenv" ]; then
+  export PATH="$HOME/.rbenv/bin:$PATH"
+  eval "$(rbenv init -)"
+fi
+
+# Run the Ruby helper script with Bundler
+bundle exec ruby "$(dirname "$0")/solver_helper.rb" "$@" 
