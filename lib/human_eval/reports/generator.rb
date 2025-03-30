@@ -1,6 +1,6 @@
 require 'fileutils'
 require 'json'
-require_relative '../../test_runner/runner'
+require_relative '../../runner/runner'
 
 module HumanEval
   module Reports

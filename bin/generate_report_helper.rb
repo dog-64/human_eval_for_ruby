@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'bundler/setup'
-require_relative '../lib/test_runner/runner'
+require_relative '../lib/runner/runner'
 
 # Запускаем тесты и получаем результаты
 options = { report_total: true, log_level: 'normal' }

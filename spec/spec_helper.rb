@@ -7,8 +7,8 @@ SimpleCov.start do
 
   # Добавляем группы файлов
   add_group 'Library', 'lib'
-  add_group 'CLI', 'lib/test_runner_cli.rb'
-  add_group 'Runner', 'lib/test_runner.rb'
+  add_group 'CLI', 'lib/runner/cli.rb'
+  add_group 'Runner', 'lib/runner/runner.rb'
 end
 
 require 'rspec'
@@ -19,7 +19,7 @@ require 'pry-byebug'
 require 'fileutils'
 
 require_relative '../lib/human_eval/solver'
-require_relative '../lib/test_runner/runner'
+require_relative '../lib/runner/runner'
 require_relative '../lib/human_eval/assert'
 require_relative '../lib/human_eval/converter'
 require_relative '../lib/human_eval/reports'

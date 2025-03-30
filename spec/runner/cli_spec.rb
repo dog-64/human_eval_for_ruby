@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'test_runner/cli'
+require 'runner/cli'
 
 RSpec.describe Runner::CLI do
   describe '#tests' do
@@ -42,4 +42,4 @@ RSpec.describe Runner::CLI do
       end
     end
   end
-end
+end 

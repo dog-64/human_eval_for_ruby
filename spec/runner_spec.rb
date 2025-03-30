@@ -1,6 +1,6 @@
 require 'spec_helper'
 require 'fileutils'
-require_relative '../lib/test_runner/runner'
+require_relative '../lib/runner/runner'
 
 RSpec.describe Runner::Runner do
   let(:runner) { described_class.new(log_level: 'none') }
