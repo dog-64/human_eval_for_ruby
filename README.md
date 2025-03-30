@@ -112,6 +112,9 @@ OLLAMA_BASE_URL=http://localhost:11434
 # Включение подробного логирования
 ./bin/solver solve tasks --model "MODEL_NAME" --log-level debug
 
+# Создание пустых файлов с комментарием при ошибке или таймауте
+./bin/solver solve tasks --model "MODEL_NAME" --create-empty-on-timeout
+
 # Вывод всех доступных команд и опций
 ./bin/solver
 ```

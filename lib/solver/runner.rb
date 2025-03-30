@@ -373,7 +373,8 @@ module Solver
 
       # Парсим ответ
       parsed_response = JSON.parse(response.body)
-      debug "Успешно получен ответ от OpenRouter для модели #{model_name}"
+      debug_log "Успешно получен ответ от OpenRouter для модели #{model_name}"
+      debug_log "#{__FILE__}:#{__LINE__} [DEBUG] | parsed_response=#{parsed_response.inspect}"
 
       # Проверяем наличие содержимого в ответе
       content = parsed_response.dig('choices', 0, 'message', 'content')
