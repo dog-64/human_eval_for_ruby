@@ -5,14 +5,16 @@ require_relative '../human_eval/log_levels'
 require_relative '../human_eval/solver'
 require_relative '../human_eval/report_generator'
 require_relative '../human_eval/reports/generator'
+require_relative 'report'
 
-module TestRunner
+module Runner
   # Класс Runner отвечает за запуск и обработку тестов для решений задач
   # Позволяет запускать тесты для конкретной задачи или модели, собирать результаты
   # и генерировать отчеты о производительности различных моделей
   class Runner
     include HumanEval::Logger
     include HumanEval::LogLevels
+    include Report
 
     DONE_MARK = "\e[32m✓\e[0m".freeze # Зеленый цвет
     FAIL_MARK = "\e[31m✗\e[0m".freeze # Красный цвет
@@ -406,36 +408,8 @@ module TestRunner
       false
     end
 
-    def display_total_console(tasks, models)
-      # Подсчитываем статистику для каждой модели
-      model_stats = models.map do |model|
-        total_tasks = tasks.size
-        passed_tasks = tasks.count { |task| @results[task][model] }
-        percentage = (passed_tasks * 100.0 / total_tasks).round
-        [model, percentage]
-      end
-
-      # Сортируем по убыванию процента успешных тестов
-      model_stats.sort_by! { |_, percentage| -percentage }
-
-      # Выводим общую статистику
-      log "\nРезультаты тестирования моделей:"
-      model_stats.each do |model, percentage|
-        log "- #{model}: #{colorize("#{percentage}%", percentage)}"
-      end
-    end
-
-    def colorize(text, percentage)
-      color = case percentage
-              when 0..33 then "\e[31m" # Красный
-              when 34..66 then "\e[33m" # Желтый
-              else "\e[32m" # Зеленый
-              end
-      "#{color}#{text}\e[0m"
-    end
-
     def display_results(tasks, models)
-      # Создаем отчеты через генератор отчетов
+      # Генерируем файлы суммарных отчетов
       generator = HumanEval::Reports::Generator.new(
         output_dir: 'reports',
         format: 'all',
@@ -443,45 +417,10 @@ module TestRunner
         tasks: tasks,
         models: models
       )
-
-      # Генерируем отчеты
       generator.generate
 
-      # Отображаем результаты в консоли в зависимости от опции report_total
+      # Короткий отчет по результатам прогона
       display_total_console(tasks, models) if @options[:report]
-    end
-
-    def get_model_info(model_key)
-      # Используем класс Models для получения информации о модели
-      begin
-        require_relative '../models'
-        models_manager = Models.new
-        model_info = models_manager.get(model_key)
-        model_info || { 'name' => model_key, 'provider' => 'unknown' }
-      rescue => e
-        # В случае ошибки возвращаем базовую информацию
-        { 'name' => model_key, 'provider' => 'unknown' }
-      end
-    end
-
-    def get_display_model_name(model_key)
-      model_info = get_model_info(model_key)
-      name = model_info['name']
-      provider = model_info['provider']
-      note = model_info['note']
-
-      display_name = name.dup
-      display_name << " (#{provider})" if provider != 'unknown'
-      display_name << " - #{note}" if note
-
-      display_name
-    end
-
-    # Форматирует название модели с мягкими переносами
-    # @param text [String] текст для форматирования
-    # @return [String] отформатированный текст с мягкими переносами
-    def add_soft_hyphens(text)
-      text.gsub('_', '_&shy;')
     end
 
     def find_solution_files(task = nil)
@@ -489,4 +428,4 @@ module TestRunner
       Dir.glob(pattern).reject { |f| f.end_with?('-assert.rb') }
     end
   end
-end
+end 

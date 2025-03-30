@@ -1,12 +1,12 @@
 require 'spec_helper'
-require 'test_runner/cli'
+require 'runner/cli'
 
-RSpec.describe TestRunner::CLI do
+RSpec.describe Runner::CLI do
   describe '#tests' do
-    let(:runner) { instance_double(TestRunner::Runner) }
+    let(:runner) { instance_double(Runner::Runner) }
 
     before do
-      allow(TestRunner::Runner).to receive(:new).and_return(runner)
+      allow(Runner::Runner).to receive(:new).and_return(runner)
       allow(runner).to receive(:run_tests)
     end
 
@@ -42,4 +42,4 @@ RSpec.describe TestRunner::CLI do
       end
     end
   end
-end
+end 

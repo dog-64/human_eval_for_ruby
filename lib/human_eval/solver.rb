@@ -280,7 +280,7 @@ module HumanEval
         model: model_name,
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.1,
-        max_tokens: 32_000, # 1000 - для всех, 32000 - для o3-mini-high
+        max_tokens: 31_000, # 1000 - для всех, 31000 - для o3-mini-high
         stream: false
       }.to_json
 

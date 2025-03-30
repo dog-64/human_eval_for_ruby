@@ -4,47 +4,58 @@ openrouter:
   deepseek_deepseek_chat:
     name: deepseek/deepseek-chat
     provider: openrouter.ai
+    done: true
   
   deepseek_deepseek_chat_free:
     name: deepseek/deepseek-chat:free
     provider: openrouter.ai
+    done: true
   
   google_gemini_2_0_flash_001:
     name: google/gemini-2.0-flash-001
     provider: openrouter.ai
+    done: true
   
   google_gemini_2_0_flash_lite_001:
     name: google/gemini-2.0-flash-lite-001
     provider: openrouter.ai
+    done: true
   
   google_gemini_flash_1_5:
     name: google/gemini-flash-1.5
     provider: openrouter.ai
+    done: true
   
   meta_llama_llama_3_1_70b_instruct:
     name: meta-llama/llama-3.1-70b-instruct
     provider: openrouter.ai
+    done: true
   
   qwen_qwen_2_5_coder_32b:
     name: qwen/qwen-2.5-coder-32b
     provider: openrouter.ai
+    done: true
   
   qwen_qwen_2_5_coder_32b_instruct:
     name: qwen/qwen-2.5-coder-32b-instruct:free
     provider: openrouter.ai
+    done: true
   
   mistralai_codestral_2501:
     name: mistralai/codestral-2501
     provider: openrouter.ai
+    done: true
   
   openai_gpt_4o_mini:
     name: openai/gpt-4o-mini
     provider: openrouter.ai
+    done: true
   
   openai_o3_mini_high:
     name: openai/o3-mini-high
     provider: openrouter.ai
     note: дорогой, медленный
+    done: true
   
   anthropic_claude_3_5_sonnet:
     name: anthropic/claude-3.5-sonnet
@@ -54,49 +65,71 @@ openrouter:
     name: mistralai/mistral-small-3.1-24b-instruct
     provider: openrouter.ai
     note: 32b https://openrouter.ai/mistralai/mistral-small-3.1-24b-instruct-2503
+    done: true
   
   google_gemma-3-27b-it:
     name: google/gemma-3-27b-it
     provider: openrouter.ai
     note: https://openrouter.ai/google/gemma-3-27b-it
+    done: true
   
   microsoft_phi-4-multimodal-instruct:
     name: microsoft/phi-4-multimodal-instruct
     provider: openrouter.ai
     note: https://openrouter.ai/microsoft/phi-4-multimodal-instruct
+    done: true
   
   google_gemini-2_5-pro-exp-03-25_free:
     name: google/gemini-2.5-pro-exp-03-25:free
     provider: openrouter.ai
     note: https://openrouter.ai/google/gemini-2.5-pro-exp-03-25:free
+    done: false
   
   qwen_qwen2_5-vl-3b-instruct_free:
     name: qwen/qwen2.5-vl-3b-instruct:free
     provider: openrouter.ai
     note: https://openrouter.ai/google/gemini-2.5-pro-exp-03-25:free
+    done: true
   
   deepseek_deepseek-chat-v3-0324:
     name: deepseek/deepseek-chat-v3-0324
     provider: openrouter.ai
     note: https://openrouter.ai/deepseek/deepseek-chat-v3-0324
+    done: true
 
+  open-r1_olympiccoder-32b_free:
+    name: open-r1/olympiccoder-32b:free
+    provider: openrouter.ai
+    note: https://openrouter.ai/open-r1/olympiccoder-32b:free
+    done: false
+
+  rekaai_reka-flash-3_free:
+    name: rekaai/reka-flash-3:free
+    provider: openrouter.ai
+    note: https://openrouter.ai/rekaai/reka-flash-3:free
+    done: false
+      
 # Ollama модели
 ollama:
   ollama_llama3_2:
     name: llama3.2
     provider: ollama
+    done: true
   
   ollama_codellama:
     name: codellama
     provider: ollama
     note: CodeLlama 7B https://ollama.com/library/codellama
+    done: true
   
   ollama_codellama:13b:
     name: codellama:13b
     provider: ollama
     note: CodeLlama 13bB https://ollama.com/library/codellama:13b
+    done: true
   
   ollama_codellama:34b:
     name: codellama:34b
     provider: ollama
     note: CodeLlama 13bB https://ollama.com/library/codellama:34b 
+    done: true
