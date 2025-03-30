@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Отчет о тестировании моделей</title>
+  <style>
+    <%= css %>
+  </style>
+</head>
+<body>
+  <h1>Отчет о тестировании моделей</h1>
+  <p>Дата: <%= timestamp %></p>
+
+  <!-- Результаты по моделям -->
+  <h2>Результаты по моделям</h2>
+  <div class='model-results'>
+    <table>
+      <tr>
+        <th>Модель</th>
+        <th>Успешность</th>
+        <th>Пройдено</th>
+        <th>Всего</th>
+      </tr>
+      <% model_stats.each do |model, passed, total, percentage| %>
+        <tr>
+          <td><%= model %></td>
+          <td><%= percentage %>%</td>
+          <td><%= passed %></td>
+          <td><%= total %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+
+  <!-- Детальные результаты -->
+  <h2>Детальные результаты по задачам</h2>
+  <div class='task-results'>
+    <table>
+      <!-- Заголовок таблицы с задачами -->
+      <tr>
+        <th>Задача</th>
+        <% models.each do |model| %>
+          <th><%= model %></th>
+        <% end %>
+      </tr>
+
+      <!-- Данные по задачам -->
+      <% task_results.each do |task, results| %>
+        <tr>
+          <td><%= task %></td>
+          <% results.each_value do |success| %>
+            <td class='<%= success ? "success" : "failure" %>'><%= success ? "✓" : "✗" %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</body>
+</html> 
