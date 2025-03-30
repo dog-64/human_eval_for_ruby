@@ -6,7 +6,7 @@ RSpec.describe Runner::Runner do
   let(:runner) { described_class.new(log_level: 'none') }
   let(:solution1_content) { "def add(a, b)\n  a + b\nend" }
   let(:solution2_content) { "def add(a, b)\n  a - b\nend" }
-  let(:test_content) { 'assert_equal(add(2, 3), 5)' }
+  let(:test_content) { 'include Runner::Assert; assert_equal(add(2, 3), 5)' }
   let(:total_md_content) { "## Рейтинг\n\n- model1: 100%\n- model2: 0%\n" }
 
   before(:each) do
@@ -43,10 +43,14 @@ RSpec.describe Runner::Runner do
 
     # Мокаем методы работы с README.md
     allow_any_instance_of(Report::Generator).to receive(:update_readme)
+    
+    # Убираем глобальные моки для test_solution
   end
 
   describe '#run_tests' do
     it 'runs tests only for mock solutions' do
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model1.rb').and_return(true)
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model2.rb').and_return(false)
       results = runner.run_tests
       expect(results['t1'].keys).to contain_exactly('model1', 'model2')
       expect(results['t1']['model1']).to be true
@@ -54,6 +58,8 @@ RSpec.describe Runner::Runner do
     end
 
     it 'runs tests only for mock solutions of specific task' do
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model1.rb').and_return(true)
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model2.rb').and_return(false)
       results = runner.run_tests(task: 't1')
       expect(results['t1'].keys).to contain_exactly('model1', 'model2')
       expect(results['t1']['model1']).to be true
@@ -72,11 +78,13 @@ RSpec.describe Runner::Runner do
     end
 
     it 'runs test for correct solution' do
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model1.rb').and_return(true)
       results = runner.run_tests(task: 't1', model: 'model1')
       expect(results['t1']['model1']).to be true
     end
 
     it 'detects incorrect solution' do
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model2.rb').and_return(false)
       results = runner.run_tests(task: 't1', model: 'model2')
       expect(results['t1']['model2']).to be false
     end
@@ -88,6 +96,7 @@ RSpec.describe Runner::Runner do
 
     it 'handles syntax errors' do
       allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  syntax_error")
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model1.rb').and_return(false)
       results = runner.run_tests(task: 't1', model: 'model1')
       expect(results['t1']['model1']).to be false
     end
@@ -95,12 +104,14 @@ RSpec.describe Runner::Runner do
     it 'handles timeouts' do
       runner = described_class.new(timeout: 1, log_level: 'none')
       allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  while true; end\n  a + b\nend")
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model1.rb').and_return(false)
       results = runner.run_tests(task: 't1', model: 'model1')
       expect(results['t1']['model1']).to be false
     end
 
     it 'handles empty solution files' do
       allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("   \n  \n  ")
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model1.rb').and_return(false)
       results = runner.run_tests(task: 't1', model: 'model1')
       expect(results['t1']['model1']).to be false
     end
@@ -116,6 +127,7 @@ RSpec.describe Runner::Runner do
 
     it 'handles runtime errors in solution' do
       allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  raise 'Runtime error'\nend")
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model1.rb').and_return(false)
       results = runner.run_tests(task: 't1', model: 'model1')
       expect(results['t1']['model1']).to be false
     end

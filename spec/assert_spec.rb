@@ -1,11 +1,11 @@
 require 'spec_helper'
-require_relative '../lib/human_eval/assert'
+require_relative '../lib/runner/assert'
 require_relative '../lib/logger'
 
-RSpec.describe HumanEval::Assert do
+RSpec.describe Runner::Assert do
   let(:test_class) do
     Class.new do
-      include HumanEval::Assert
+      include Runner::Assert
       include Logger
       def initialize
         @options = { log_level: :debug }
@@ -18,7 +18,7 @@ RSpec.describe HumanEval::Assert do
 
   describe 'AssertionError' do
     it 'stores expected, actual and assertion info' do
-      error = HumanEval::Assert::AssertionError.new('test message', :expected, :actual, 'assert(true)')
+      error = Runner::Assert::AssertionError.new('test message', :expected, :actual, 'assert(true)')
       expect(error.message).to eq('test message')
       expect(error.expected).to eq(:expected)
       expect(error.actual).to eq(:actual)
@@ -26,7 +26,7 @@ RSpec.describe HumanEval::Assert do
     end
 
     it 'uses default message if none provided' do
-      error = HumanEval::Assert::AssertionError.new(nil)
+      error = Runner::Assert::AssertionError.new(nil)
       expect(error.message).to eq('Assertion failed')
     end
   end
@@ -43,16 +43,16 @@ RSpec.describe HumanEval::Assert do
     end
 
     it 'fails when condition is false' do
-      expect { test_object.assert(false) }.to raise_error(HumanEval::Assert::AssertionError)
+      expect { test_object.assert(false) }.to raise_error(Runner::Assert::AssertionError)
     end
 
     it 'fails when condition is falsy' do
-      expect { test_object.assert(nil) }.to raise_error(HumanEval::Assert::AssertionError)
+      expect { test_object.assert(nil) }.to raise_error(Runner::Assert::AssertionError)
     end
 
     it 'includes custom message in error' do
       expect { test_object.assert(false, 'custom message') }
-        .to raise_error(HumanEval::Assert::AssertionError, /custom message/)
+        .to raise_error(Runner::Assert::AssertionError, /custom message/)
     end
 
     it 'handles NoMethodError' do
@@ -60,14 +60,14 @@ RSpec.describe HumanEval::Assert do
         begin
           test_object.assert(nil.some_method)
         rescue NoMethodError => e
-          raise HumanEval::Assert::AssertionError.new(
+          raise Runner::Assert::AssertionError.new(
             "NoMethodError: #{e.message}",
             true,
             nil,
             "assert(...) - #{e.class}"
           )
         end
-      end.to raise_error(HumanEval::Assert::AssertionError, /NoMethodError/)
+      end.to raise_error(Runner::Assert::AssertionError, /NoMethodError/)
     end
 
     it 'handles other errors' do
@@ -75,14 +75,14 @@ RSpec.describe HumanEval::Assert do
         begin
           test_object.assert(1 / 0)
         rescue ZeroDivisionError => e
-          raise HumanEval::Assert::AssertionError.new(
+          raise Runner::Assert::AssertionError.new(
             'Error: divided by 0',
             true,
             nil,
             "assert(...) - #{e.class}"
           )
         end
-      end.to raise_error(HumanEval::Assert::AssertionError, /Error: divided by 0/)
+      end.to raise_error(Runner::Assert::AssertionError, /Error: divided by 0/)
     end
   end
 
@@ -95,14 +95,14 @@ RSpec.describe HumanEval::Assert do
 
     it 'fails when values are not equal' do
       expect { test_object.assert_equal(1, 2) }
-        .to raise_error(HumanEval::Assert::AssertionError)
+        .to raise_error(Runner::Assert::AssertionError)
     end
 
     it 'includes expected and actual values in error' do
       error = nil
       begin
         test_object.assert_equal(1, 2)
-      rescue HumanEval::Assert::AssertionError => e
+      rescue Runner::Assert::AssertionError => e
         error = e
       end
       expect(error.expected).to eq(1)
@@ -111,7 +111,7 @@ RSpec.describe HumanEval::Assert do
 
     it 'includes custom message in error' do
       expect { test_object.assert_equal(1, 2, 'custom message') }
-        .to raise_error(HumanEval::Assert::AssertionError, /custom message/)
+        .to raise_error(Runner::Assert::AssertionError, /custom message/)
     end
   end
 
@@ -124,14 +124,14 @@ RSpec.describe HumanEval::Assert do
 
     it 'fails when values are equal' do
       expect { test_object.assert_not_equal(1, 1) }
-        .to raise_error(HumanEval::Assert::AssertionError)
+        .to raise_error(Runner::Assert::AssertionError)
     end
 
     it 'includes expected and actual values in error' do
       error = nil
       begin
         test_object.assert_not_equal(1, 1)
-      rescue HumanEval::Assert::AssertionError => e
+      rescue Runner::Assert::AssertionError => e
         error = e
       end
       expect(error.expected).to eq(1)
@@ -140,7 +140,7 @@ RSpec.describe HumanEval::Assert do
 
     it 'includes custom message in error' do
       expect { test_object.assert_not_equal(1, 1, 'custom message') }
-        .to raise_error(HumanEval::Assert::AssertionError, /custom message/)
+        .to raise_error(Runner::Assert::AssertionError, /custom message/)
     end
   end
 
@@ -153,14 +153,14 @@ RSpec.describe HumanEval::Assert do
 
     it 'fails when values are not within delta' do
       expect { test_object.assert_in_delta(1.0, 1.5, 0.2) }
-        .to raise_error(HumanEval::Assert::AssertionError)
+        .to raise_error(Runner::Assert::AssertionError)
     end
 
     it 'includes expected and actual values in error' do
       error = nil
       begin
         test_object.assert_in_delta(1.0, 1.5, 0.2)
-      rescue HumanEval::Assert::AssertionError => e
+      rescue Runner::Assert::AssertionError => e
         error = e
       end
       expect(error.expected).to eq(1.0)
@@ -169,12 +169,12 @@ RSpec.describe HumanEval::Assert do
 
     it 'includes custom message in error' do
       expect { test_object.assert_in_delta(1.0, 1.5, 0.2, 'custom message') }
-        .to raise_error(HumanEval::Assert::AssertionError, /custom message/)
+        .to raise_error(Runner::Assert::AssertionError, /custom message/)
     end
 
     it 'handles invalid number format' do
       expect { test_object.assert_in_delta('not a number', 1.0, 0.2) }
-        .to raise_error(HumanEval::Assert::AssertionError, /Error: invalid value for Float/)
+        .to raise_error(Runner::Assert::AssertionError, /Error: invalid value for Float/)
     end
   end
 
@@ -191,12 +191,12 @@ RSpec.describe HumanEval::Assert do
 
     it 'fails when no exception is raised' do
       expect { test_object.assert_raises { true } }
-        .to raise_error(HumanEval::Assert::AssertionError, /nothing was raised/)
+        .to raise_error(Runner::Assert::AssertionError, /nothing was raised/)
     end
 
     it 'fails when different exception is raised' do
       expect { test_object.assert_raises(RuntimeError) { raise ArgumentError } }
-        .to raise_error(HumanEval::Assert::AssertionError, /Expected RuntimeError but got ArgumentError/)
+        .to raise_error(Runner::Assert::AssertionError, /Expected RuntimeError but got ArgumentError/)
     end
 
     it 'uses StandardError as default exception class' do
@@ -233,7 +233,7 @@ RSpec.describe HumanEval::Assert do
 
     it 'fails when condition is false' do
       expect { test_object.debug_assert(false) }
-        .to raise_error(HumanEval::Assert::AssertionError)
+        .to raise_error(Runner::Assert::AssertionError)
     end
 
     it 'outputs debug information' do
