@@ -9,8 +9,8 @@ module Report
   # Генерирует HTML и Markdown отчеты, сохраняет результаты в JSON,
   # обновляет README и создает сводные и детальные представления результатов
   class Generator
-    TEMPLATES_DIR = File.expand_path('../templates', __FILE__)
-    
+    TEMPLATES_DIR = File.expand_path('templates', __dir__)
+
     def initialize(results, reports_dir: 'reports')
       @results = results
       @reports_dir = reports_dir
@@ -56,43 +56,43 @@ module Report
 
       total_md_path = File.join(@reports_dir, 'total.md')
       return unless File.exist?(total_md_path)
-      
+
       # Читаем содержимое обоих файлов
       readme_content = File.read(readme_path)
       total_content = File.read(total_md_path)
-      
+
       # Удаляем заголовок из total.md, чтобы оставить только содержимое секции
       total_content_without_header = total_content.sub(/^## Рейтинг\s*\n+/, '')
-      
+
       # Используем другой вариант замены, который показал себя стабильно в тестах
       pattern = /(# .+?\n\n## Рейтинг\n).+?(\n\n## |\z)/m
-      
-      new_readme_content = readme_content.gsub(pattern) do |match|
-        result = "#{$1}#{total_content_without_header}#{$2}"
+
+      new_readme_content = readme_content.gsub(pattern) do |_match|
+        result = "#{::Regexp.last_match(1)}#{total_content_without_header}#{::Regexp.last_match(2)}"
         result
       end
-      
+
       # Запасной вариант - если регулярные выражения не сработали
       if new_readme_content == readme_content
         # Попробуем простую замену содержимого
         rating_section_begin = readme_content.index("## Рейтинг\n")
         next_section_begin = readme_content.index("\n\n##", rating_section_begin) if rating_section_begin
-        
+
         if rating_section_begin && next_section_begin
-          new_readme_content = readme_content[0...rating_section_begin] + 
-                               "## Рейтинг\n\n#{total_content_without_header}" + 
-                               readme_content[next_section_begin..-1]
+          new_readme_content = readme_content[0...rating_section_begin] +
+                               "## Рейтинг\n\n#{total_content_without_header}" +
+                               readme_content[next_section_begin..]
         else
           # Если и этот способ не сработал, попробуем прямую замену
           section_pattern = /## Рейтинг.*?((?=\n##|\z))/m
           new_readme_content = readme_content.sub(section_pattern, "## Рейтинг\n\n#{total_content_without_header}")
         end
       end
-      
+
       # Сохраняем обновленный README.md только если он изменился
-      if new_readme_content != readme_content
-        File.write(readme_path, new_readme_content)
-      end
+      return unless new_readme_content != readme_content
+
+      File.write(readme_path, new_readme_content)
     end
 
     def add_soft_hyphens(text)
@@ -118,7 +118,7 @@ module Report
     def create_total_html(css)
       template_path = File.join(TEMPLATES_DIR, 'total.html.erb')
       template = ERB.new(File.read(template_path))
-      
+
       timestamp = Time.now.strftime('%Y-%m-%d %H:%M:%S')
       # Преобразуем имена моделей в читаемый формат
       model_stats = @results[:model_stats].map do |model_stat|
@@ -126,16 +126,16 @@ module Report
         model_stat[0] = format_model_name(model_stat[0])
         model_stat
       end
-      
+
       html = template.result(binding)
-      
+
       File.write(File.join(@reports_dir, 'human_eval_for_ruby_report_total.html'), html)
     end
 
     def create_full_html(css)
       template_path = File.join(TEMPLATES_DIR, 'full.html.erb')
       template = ERB.new(File.read(template_path))
-      
+
       timestamp = Time.now.strftime('%Y-%m-%d %H:%M:%S')
       # Преобразуем имена моделей в читаемый формат для отображения
       model_stats = @results[:model_stats].map do |model_stat|
@@ -143,7 +143,7 @@ module Report
         model_stat[0] = format_model_name(model_stat[0])
         model_stat
       end
-      
+
       # Преобразуем ключи моделей в читаемый формат и обновляем результаты задач
       readable_task_results = {}
       @results[:task_results].each do |task, results|
@@ -152,14 +152,14 @@ module Report
           readable_task_results[task][format_model_name(model)] = success
         end
       end
-      
+
       task_results = readable_task_results
       # Получаем массив имен моделей в читаемом формате
       models = task_results.values.first&.keys || []
-      
+
       html = template.result(binding)
-      
+
       File.write(File.join(@reports_dir, 'human_eval_for_ruby_report_full.html'), html)
     end
   end
-end 
+end

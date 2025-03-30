@@ -4,4 +4,4 @@ require_relative 'solver/help'
 
 module Solver
   # Модуль Solver содержит классы для решения задач с использованием AI моделей
-end 
+end

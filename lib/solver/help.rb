@@ -100,4 +100,4 @@ module Solver
       puts '    --create-empty-on-timeout: Создавать пустой файл решения с комментарием при таймауте или ошибке (по умолчанию: false)'
     end
   end
-end 
+end

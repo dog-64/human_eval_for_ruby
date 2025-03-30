@@ -74,12 +74,12 @@ RSpec.describe Solver::Runner do
       solution_file = File.join(tasks_dir, 't1-anthropic_claude_3_5_sonnet.rb')
       allow(File).to receive(:exist?).and_call_original
       allow(File).to receive(:exist?).with(solution_file).and_return(true)
-      
+
       # Мокаем чтение файла задачи и файла решения
       allow(File).to receive(:read).and_call_original
-      allow(File).to receive(:read).with(File.join(tasks_dir, 't1.md')).and_return("Задача: Напишите функцию add.")
+      allow(File).to receive(:read).with(File.join(tasks_dir, 't1.md')).and_return('Задача: Напишите функцию add.')
       allow(File).to receive(:read).with(solution_file).and_return("def add(a, b)\n  a + b\nend\n")
-      
+
       # Мокаем File.write для файла решения
       allow(File).to receive(:write).and_call_original
       allow(File).to receive(:write).with(solution_file, anything).and_return(true)
@@ -125,17 +125,17 @@ RSpec.describe Solver::Runner do
           body: ollama_response.to_json,
           headers: { 'Content-Type' => 'application/json' }
         )
-        
+
       # Мокаем File.exist? и File.read для конкретного файла
       solution_file = File.join(tasks_dir, 't1-ollama_codellama.rb')
       allow(File).to receive(:exist?).and_call_original
       allow(File).to receive(:exist?).with(solution_file).and_return(true)
-      
+
       # Мокаем чтение файла задачи и файла решения
       allow(File).to receive(:read).and_call_original
-      allow(File).to receive(:read).with(File.join(tasks_dir, 't1.md')).and_return("Задача: Напишите функцию add.")
+      allow(File).to receive(:read).with(File.join(tasks_dir, 't1.md')).and_return('Задача: Напишите функцию add.')
       allow(File).to receive(:read).with(solution_file).and_return("def add(a, b)\n  return a + b\nend\n")
-      
+
       # Мокаем File.write для файла решения
       allow(File).to receive(:write).and_call_original
       allow(File).to receive(:write).with(solution_file, anything).and_return(true)
@@ -172,16 +172,16 @@ RSpec.describe Solver::Runner do
           body: { error: 'Some API error' }.to_json,
           headers: { 'Content-Type' => 'application/json' }
         )
-        
+
       # Мокаем File.exist? и File.read для конкретного файла
       allow(File).to receive(:exist?).and_call_original
       allow(File).to receive(:exist?).with(solution_file).and_return(true)
-      
+
       # Мокаем чтение файлов
       allow(File).to receive(:read).and_call_original
-      allow(File).to receive(:read).with(File.join(tasks_dir, 't1.md')).and_return("Задача: Напишите функцию add.")
+      allow(File).to receive(:read).with(File.join(tasks_dir, 't1.md')).and_return('Задача: Напишите функцию add.')
       allow(File).to receive(:read).with(solution_file).and_return("# timeout - решение не было получено из-за ошибки\n# Some API error")
-      
+
       # Мокаем запись в файл
       allow(File).to receive(:write).and_call_original
       allow(File).to receive(:write).with(solution_file, anything).and_return(true)
@@ -335,56 +335,56 @@ RSpec.describe Solver::Runner do
 
   describe '#remove_reasoning_tags' do
     let(:test_tasks_dir) { File.join('spec', 'tmp', 'test_tasks_reasoning') }
-    
+
     before(:each) do
       FileUtils.mkdir_p(test_tasks_dir)
     end
-    
+
     after(:each) do
       FileUtils.rm_rf(test_tasks_dir)
     end
-    
+
     let(:solver) { described_class.new(test_tasks_dir) }
-    
+
     it 'удаляет все содержимое между тегами reasoning' do
       content = <<~CODE
         <reasoning>
         Это рассуждения, которые нужно удалить.
         Много текста с обоснованием решения.
         </reasoning>
-        
+
         def example_method(a, b)
           a + b
         end
       CODE
-      
+
       expected = <<~CODE
 
         def example_method(a, b)
           a + b
         end
       CODE
-      
+
       result = solver.send(:remove_reasoning_tags, content)
       expect(result).to eq(expected)
     end
-    
+
     it 'не изменяет содержимое без тегов reasoning' do
       content = <<~CODE
         def example_method(a, b)
           a + b
         end
       CODE
-      
+
       expect(solver.send(:remove_reasoning_tags, content)).to eq(content)
     end
-    
+
     it 'корректно обрабатывает несколько блоков reasoning' do
       content = <<~CODE
         <reasoning>
         Первый блок рассуждений.
         </reasoning>
-        
+
         def example_method(a, b)
           <reasoning>
           Второй блок внутри метода.
@@ -392,10 +392,10 @@ RSpec.describe Solver::Runner do
           a + b
         end
       CODE
-      
+
       # Вручную создаем ожидаемый результат
       expected = "\ndef example_method(a, b)\n\n  a + b\nend\n"
-      
+
       result = solver.send(:remove_reasoning_tags, content)
       expect(result).to eq(expected)
     end
@@ -403,58 +403,58 @@ RSpec.describe Solver::Runner do
 
   describe '#process_model_response' do
     let(:test_tasks_dir) { File.join('spec', 'tmp', 'test_tasks_process') }
-    
+
     before(:each) do
       FileUtils.mkdir_p(test_tasks_dir)
     end
-    
+
     after(:each) do
       FileUtils.rm_rf(test_tasks_dir)
     end
-    
+
     let(:solver) { described_class.new(test_tasks_dir) }
-    
+
     it 'удаляет теги reasoning из решения перед сохранением' do
       raw_solution = <<~SOLUTION
         ```ruby
         <reasoning>
         Это некоторое рассуждение о решении.
         </reasoning>
-        
+
         def example_method(a, b)
           a + b
         end
         ```
       SOLUTION
-      
+
       output_file = File.join('tmp', 'test_solution.rb')
       FileUtils.mkdir_p(File.dirname(output_file))
-      
+
       # Мокаем метод extract_and_join_code_blocks, чтобы он возвращал содержимое без кавычек
       allow(solver).to receive(:extract_and_join_code_blocks).and_return(
         <<~CODE
           <reasoning>
           Это некоторое рассуждение о решении.
           </reasoning>
-          
+
           def example_method(a, b)
             a + b
           end
         CODE
       )
-      
+
       # Мокаем File.write и File.read
       allow(File).to receive(:write).and_call_original
       allow(File).to receive(:write).with(output_file, anything).and_return(true)
-      
+
       allow(File).to receive(:read).and_call_original
       allow(File).to receive(:read).with(output_file).and_return(
         "def example_method(a, b)\n  a + b\nend\n"
       )
-      
+
       # Вызываем метод process_model_response
       solver.send(:process_model_response, raw_solution, 'test_model', output_file)
-      
+
       # Проверяем, что результат не содержит тега reasoning
       result = File.read(output_file)
       expect(result).not_to include('<reasoning>')
@@ -462,4 +462,4 @@ RSpec.describe Solver::Runner do
       expect(result).to include('def example_method(a, b)')
     end
   end
-end 
+end

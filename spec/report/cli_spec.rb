@@ -14,7 +14,7 @@ RSpec.describe Report::CLI do
     it 'calls the runner with default options' do
       # Мокаем Thor.start, чтобы не запускать реальные команды
       expect(described_class).to receive(:start).with(args)
-      
+
       # Вызываем метод
       described_class.start(args)
     end
@@ -63,10 +63,10 @@ RSpec.describe Report::CLI do
           output_dir: 'output'
         }
       )
-      
+
       allow(runner_instance).to receive(:generate).and_return(true)
-      
+
       cli.generate
     end
   end
-end 
+end

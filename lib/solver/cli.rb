@@ -59,4 +59,4 @@ module Solver
       true
     end
   end
-end 
+end

@@ -19,7 +19,7 @@ RSpec.describe Report do
     context 'при передаче блока' do
       it 'вызывает блок с результатом выполнения' do
         allow(cli_class).to receive(:start).and_return(true)
-        
+
         expect { |b| described_class.cli(args, &b) }.to yield_with_args(true)
       end
     end
@@ -27,10 +27,10 @@ RSpec.describe Report do
     context 'без передачи блока' do
       it 'не вызывает yield' do
         allow(cli_class).to receive(:start).and_return(true)
-        
+
         # Нет ошибки без блока
         expect { described_class.cli(args) }.not_to raise_error
       end
     end
   end
-end 
+end

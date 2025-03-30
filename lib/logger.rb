@@ -56,7 +56,7 @@ module Logger
                     else
                       :normal
                     end
-    
+
     LOG_LEVELS[current_level] >= LOG_LEVELS[name]
   end
 
@@ -132,4 +132,4 @@ module Logger
 
     error(message)
   end
-end 
+end

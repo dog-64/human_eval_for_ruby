@@ -40,9 +40,7 @@ module Solver
 
     # Доступ к менеджеру моделей
     # @return [Models] объект для работы с моделями
-    def models_manager
-      @models_manager
-    end
+    attr_reader :models_manager
 
     # Возвращает список всех моделей
     # @return [Hash] хеш с моделями
@@ -144,7 +142,7 @@ module Solver
       log_task_details(content)
 
       prompt = prepare_prompt(content)
-      
+
       solve_with_error_handling(task_number, model_name, output_file) do
         raw_solution = call_model_api(prompt, model_key, provider)
         process_model_response(raw_solution, model_name, output_file)
@@ -156,12 +154,12 @@ module Solver
     # @param model_name [String] имя модели
     # @param output_file [String] путь к файлу для сохранения решения
     # @yield блок кода для выполнения
-    def solve_with_error_handling(task_number, model_name, output_file, &block)
+    def solve_with_error_handling(task_number, model_name, output_file)
       yield
     rescue => e
       handle_solution_error(task_number, model_name, output_file, e)
     end
-    
+
     # Обрабатывает ошибку при решении задачи
     # @param task_number [String] номер задачи
     # @param model_name [String] имя модели
@@ -169,15 +167,13 @@ module Solver
     # @param error [Exception] возникшая ошибка
     def handle_solution_error(task_number, model_name, output_file, error)
       error "❌ Ошибка при решении задачи #{task_number} с моделью #{model_name}: #{error.message}"
-      
-      if @create_empty_on_timeout
-        create_empty_solution_file(output_file, error.message)
-        log "✓ Создан пустой файл решения для задачи #{task_number} (#{model_name})"
-      else
-        raise error
-      end
+
+      raise error unless @create_empty_on_timeout
+
+      create_empty_solution_file(output_file, error.message)
+      log "✓ Создан пустой файл решения для задачи #{task_number} (#{model_name})"
     end
-    
+
     # Создает пустой файл решения с комментарием о причине ошибки
     # @param output_file [String] путь к файлу для сохранения
     # @param error_message [String] сообщение об ошибке
@@ -186,7 +182,7 @@ module Solver
         # timeout - решение не было получено из-за ошибки
         # #{error_message}
       SOLUTION
-      
+
       File.write(output_file, empty_solution)
       debug "Создан пустой файл решения: #{output_file}"
     end
@@ -282,7 +278,7 @@ module Solver
       http.verify_mode = OpenSSL::SSL::VERIFY_PEER
       # Устанавливаем таймаут на соединение и чтение (в секундах)
       http.open_timeout = 10
-      http.read_timeout = 180  # 3 минуты на ожидание ответа
+      http.read_timeout = 180 # 3 минуты на ожидание ответа
       http
     end
 
@@ -363,14 +359,14 @@ module Solver
       # Проверяем успешность запроса
       unless response.is_a?(Net::HTTPSuccess)
         error_message = "❌ Ошибка API (статус: #{response.code})"
-        
+
         begin
           error_data = JSON.parse(response.body)
           error_message += ": #{error_data['error'] || error_data['message'] || 'неизвестная ошибка'}"
         rescue
           error_message += ": #{response.body}"
         end
-        
+
         error error_message
         raise error_message
       end
@@ -445,14 +441,14 @@ module Solver
       # Проверяем успешность запроса
       unless response.is_a?(Net::HTTPSuccess)
         error_message = "❌ Ошибка API Ollama (статус: #{response.code})"
-        
+
         begin
           error_data = JSON.parse(response.body)
           error_message += ": #{error_data['error'] || 'неизвестная ошибка'}"
         rescue
           error_message += ": #{response.body}"
         end
-        
+
         error error_message
         raise error_message
       end
@@ -477,13 +473,13 @@ module Solver
     # @return [String] содержимое ответа
     def extract_ollama_content(parsed_response, model_name)
       content = parsed_response.dig('message', 'content') || parsed_response['response']
-      
+
       if content.nil? || content.empty?
         error_message = "❌ Пустой ответ от модели Ollama #{model_name}"
         error error_message
         raise error_message
       end
-      
+
       content
     end
 
@@ -519,10 +515,10 @@ module Solver
     # @return [String] код без тегов reasoning
     def remove_reasoning_tags(content)
       return content unless content.include?('<reasoning>') && content.include?('</reasoning>')
-      
+
       # Удаляем все, что находится между тегами <reasoning> и </reasoning>
-      new_content = content.gsub(/<reasoning>.*?<\/reasoning>/m, '')
-      
+      new_content = content.gsub(%r{<reasoning>.*?</reasoning>}m, '')
+
       # Удаляем лишние пустые строки, которые могли остаться
       # Заменяем любую последовательность пустых строк на одну пустую строку
       new_content.gsub(/\n\s*\n+/, "\n\n").gsub(/\A\s*\n+/, "\n")
@@ -531,6 +527,7 @@ module Solver
     # Проверяет окружение на возможность запуска решателя
     def validate_environment
       raise "Каталог #{@tasks_dir} не найден" unless Dir.exist?(@tasks_dir)
+
       validate_model_environment
     end
 
@@ -547,10 +544,10 @@ module Solver
     def validate_specific_model
       model_info = models[@model] || { 'name' => @model, 'provider' => 'openrouter.ai' }
       provider = model_info['provider']
-      
-      if provider != 'ollama' && !openrouter_api_key
-        raise 'Для использования моделей OpenRouter.ai необходимо указать OPENROUTER_API_KEY в переменных окружения'
-      end
+
+      return unless provider != 'ollama' && !openrouter_api_key
+
+      raise 'Для использования моделей OpenRouter.ai необходимо указать OPENROUTER_API_KEY в переменных окружения'
     end
 
     # Проверяет доступность моделей по умолчанию
@@ -558,14 +555,12 @@ module Solver
       # Если модель не указана, проверяем наличие ключа OpenRouter.ai,
       # так как по умолчанию будут использоваться все модели, включая OpenRouter.ai˝
       return if openrouter_api_key
-      
+
       # Если ключа нет, проверяем наличие хотя бы одной модели Ollama
       ollama_list = ollama_models
-      if ollama_list.empty?
-        raise 'Нет доступных локальных моделей Ollama и не указан OPENROUTER_API_KEY'
-      end
-      
-      log "API ключ OpenRouter.ai не найден. Будут использоваться только локальные модели Ollama."
+      raise 'Нет доступных локальных моделей Ollama и не указан OPENROUTER_API_KEY' if ollama_list.empty?
+
+      log 'API ключ OpenRouter.ai не найден. Будут использоваться только локальные модели Ollama.'
     end
   end
-end 
+end

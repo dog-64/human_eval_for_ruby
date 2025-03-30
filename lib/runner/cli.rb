@@ -37,33 +37,32 @@ module Runner
         report: options[:report] || false,
         log_level: options[:log_level] ? options[:log_level].to_sym : :normal
       }
-      
+
       runner = Runner.new(options_hash)
-      
+
       # Проверяем формат модели
       if options[:model] && (options[:model].include?('/') || options[:model].include?(':') || options[:model].include?('-'))
         # Если передано оригинальное имя модели, используем его как есть
-        runner.run_tests(task: options[:task], model: options[:model])
       else
         # Иначе используем как ключ модели
-        runner.run_tests(task: options[:task], model: options[:model])
       end
+      runner.run_tests(task: options[:task], model: options[:model])
     end
 
     desc 'list_models', 'Показать список доступных моделей'
     def list_models
       models_manager = Models.new
-      puts "Доступные модели:"
-      
+      puts 'Доступные модели:'
+
       puts "\nOpenRouter.ai модели:"
       models_manager.all.select { |_, info| info['provider'] == 'openrouter.ai' }.each do |key, info|
-        done_mark = info['done'] ? " ✓" : ""
+        done_mark = info['done'] ? ' ✓' : ''
         puts "  #{key}: #{info['name']}#{done_mark}"
       end
-      
+
       puts "\nOllama модели:"
       models_manager.all.select { |_, info| info['provider'] == 'ollama' }.each do |key, info|
-        done_mark = info['done'] ? " ✓" : ""
+        done_mark = info['done'] ? ' ✓' : ''
         puts "  #{key}: #{info['name']}#{done_mark}"
       end
     end

@@ -62,16 +62,15 @@ module Runner
 
         # Определяем список решений для тестирования
         solutions = if model
-                      if model.include?('/') || model.include?(':') || model.include?('-')
-                        # Если передано оригинальное имя модели, ищем ключ модели
-                        # и затем используем Model::ToPath для преобразования в путь
-                        path_name = Model::ToPath.to_path(model)
-                        solution = Dir.glob("tasks/#{current_task}-#{path_name}.rb").first
-                      else
-                        # Используем переданное имя как есть (предполагается, что это ключ модели)
-                        path_name = model
-                        solution = Dir.glob("tasks/#{current_task}-#{path_name}.rb").first
-                      end
+                      path_name = if model.include?('/') || model.include?(':') || model.include?('-')
+                                    # Если передано оригинальное имя модели, ищем ключ модели
+                                    # и затем используем Model::ToPath для преобразования в путь
+                                    Model::ToPath.to_path(model)
+                                  else
+                                    # Используем переданное имя как есть (предполагается, что это ключ модели)
+                                    model
+                                  end
+                      solution = Dir.glob("tasks/#{current_task}-#{path_name}.rb").first
                       solution ? [solution] : []
                     else
                       find_solution_files(current_task)
@@ -110,7 +109,7 @@ module Runner
         }
         Report::Generator.new(report_data).generate_all
       end
-      
+
       # Всегда выводим итоговую статистику в консоль
       # Получаем список моделей
       models_list = models
@@ -128,8 +127,8 @@ module Runner
 
       # Используем оригинальные имена моделей для статистики
       models = solutions.map do |f|
-        Model::ToPath.from_file_path(f, models_manager) || 
-          (File.basename(f).split('-')[1..].join('-').sub('.rb', ''))
+        Model::ToPath.from_file_path(f, models_manager) ||
+          File.basename(f).split('-')[1..].join('-').sub('.rb', '')
       end.compact.uniq.sort
 
       return [] if models.empty? || tasks.empty? || @results.empty?
@@ -139,11 +138,11 @@ module Runner
         # Находим все задачи, для которых у нас есть результаты данной модели
         total_tasks = tasks.count { |task| @results[task]&.key?(model) }
         next nil if total_tasks.zero? # Пропускаем модели без результатов
-        
+
         # Подсчитываем количество успешно пройденных тестов
         passed_tasks = tasks.count { |task| @results[task][model] == true }
-        percentage = total_tasks > 0 ? (passed_tasks * 100.0 / total_tasks).round : 0
-        
+        percentage = total_tasks.positive? ? (passed_tasks * 100.0 / total_tasks).round : 0
+
         # Возвращаем более детальную статистику
         [model, passed_tasks, total_tasks, percentage]
       end.compact
@@ -173,8 +172,8 @@ module Runner
       models_manager = Models.new
       find_solution_files.map do |f|
         # Всегда пытаемся получить оригинальное имя модели
-        Model::ToPath.from_file_path(f, models_manager) || 
-          (File.basename(f).split('-')[1..].join('-').sub('.rb', ''))
+        Model::ToPath.from_file_path(f, models_manager) ||
+          File.basename(f).split('-')[1..].join('-').sub('.rb', '')
       end.compact.uniq.sort
     end
 
@@ -447,4 +446,4 @@ module Runner
       Dir.glob(pattern).reject { |f| f.end_with?('-assert.rb') }
     end
   end
-end 
+end

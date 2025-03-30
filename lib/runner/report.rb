@@ -3,16 +3,16 @@ module Runner
   module Report
     def display_total_console(tasks, models)
       return if models.empty? || tasks.empty? || @results.empty?
-      
+
       # Подсчитываем статистику для каждой модели
       model_stats = models.map do |model|
         # Находим все задачи, для которых у нас есть результаты данной модели
         total_tasks = tasks.count { |task| @results[task]&.key?(model) }
         next nil if total_tasks.zero? # Пропускаем модели без результатов
-        
+
         # Подсчитываем количество успешно пройденных тестов
         passed_tasks = tasks.count { |task| @results[task][model] == true }
-        percentage = total_tasks > 0 ? (passed_tasks * 100.0 / total_tasks).round : 0
+        percentage = total_tasks.positive? ? (passed_tasks * 100.0 / total_tasks).round : 0
         [model, passed_tasks, total_tasks, percentage]
       end.compact
 
@@ -24,19 +24,20 @@ module Runner
       log "- Всего задач: #{tasks.size}"
       log "- Всего моделей: #{models.size}"
       log "- Моделей с результатами: #{model_stats.size}"
-      
+
       # Рассчитываем общую успешность всех моделей
       if model_stats.any?
         total_passed = model_stats.sum { |_, passed, _, _| passed }
         total_total = model_stats.sum { |_, _, total, _| total }
         overall_percentage = (total_passed * 100.0 / total_total).round
-        log "- Общая успешность: #{colorize("#{total_passed}/#{total_total} (#{overall_percentage}%)", overall_percentage)}"
+        log "- Общая успешность: #{colorize("#{total_passed}/#{total_total} (#{overall_percentage}%)",
+                                            overall_percentage)}"
       end
 
       # Выводим статистику по моделям
       log "\n🤖 Результаты тестирования моделей:"
       if model_stats.empty?
-        log "- Нет данных для отображения"
+        log '- Нет данных для отображения'
       else
         model_stats.each do |model, passed, total, percentage|
           log "- #{model}: #{colorize("#{passed}/#{total} (#{percentage}%)", percentage)}"
@@ -60,7 +61,7 @@ module Runner
         models_manager = Models.new
         model_info = models_manager.get(model_key)
         model_info || { 'name' => model_key, 'provider' => 'unknown' }
-      rescue => e
+      rescue
         # В случае ошибки возвращаем базовую информацию
         { 'name' => model_key, 'provider' => 'unknown' }
       end
@@ -86,4 +87,4 @@ module Runner
       text.gsub('_', '_&shy;')
     end
   end
-end 
+end

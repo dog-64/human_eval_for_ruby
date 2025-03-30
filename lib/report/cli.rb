@@ -35,4 +35,4 @@ module Report
       true
     end
   end
-end 
+end

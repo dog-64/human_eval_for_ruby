@@ -5,12 +5,12 @@ RSpec.describe Report::Runner do
   let(:test_dir) { 'spec/tmp/report_runner' }
   let(:results_file) { File.join(test_dir, 'test_results.json') }
   let(:model_stats) { [['model1', 10, 10, 100], ['model2', 5, 10, 50]] }
-  let(:task_results) {
+  let(:task_results) do
     {
       't1' => { 'model1' => true, 'model2' => false },
       't2' => { 'model1' => true, 'model2' => true }
     }
-  }
+  end
   let(:options) { { output_dir: test_dir, results_file: results_file } }
   let(:runner) { described_class.new(options) }
 
@@ -28,10 +28,10 @@ RSpec.describe Report::Runner do
       before do
         # Создаем тестовый файл с результатами
         File.write(results_file, JSON.generate({
-          'models' => model_stats,
-          'tasks' => task_results,
-          'timestamp' => Time.now.strftime('%Y-%m-%d %H:%M:%S')
-        }))
+                                                 'models' => model_stats,
+                                                 'tasks' => task_results,
+                                                 'timestamp' => Time.now.strftime('%Y-%m-%d %H:%M:%S')
+                                               }))
       end
 
       it 'generates reports successfully' do
@@ -41,7 +41,7 @@ RSpec.describe Report::Runner do
           .with({ model_stats: model_stats, task_results: task_results }, reports_dir: test_dir)
           .and_return(generator)
         expect(generator).to receive(:generate_all)
-        
+
         # Подавляем вывод сообщения о создании отчетов
         expect(runner).to receive(:puts).with(/Отчеты успешно созданы/)
 
@@ -53,7 +53,7 @@ RSpec.describe Report::Runner do
       it 'returns false and displays error message' do
         expect(runner).to receive(:puts).with(/Файл с результатами не найден/)
         expect(runner).to receive(:puts).with(/Сначала запустите тесты/)
-        
+
         expect(runner.generate).to be false
       end
     end
@@ -65,7 +65,7 @@ RSpec.describe Report::Runner do
 
       it 'returns false and displays error message' do
         expect(runner).to receive(:puts).with(/Ошибка при чтении файла с результатами/)
-        
+
         expect(runner.generate).to be false
       end
     end
@@ -73,18 +73,18 @@ RSpec.describe Report::Runner do
     context 'when generator raises an error' do
       before do
         File.write(results_file, JSON.generate({
-          'models' => model_stats,
-          'tasks' => task_results
-        }))
+                                                 'models' => model_stats,
+                                                 'tasks' => task_results
+                                               }))
       end
 
       it 'returns false and displays error message' do
         generator = instance_double(Report::Generator)
         expect(Report::Generator).to receive(:new).and_return(generator)
         expect(generator).to receive(:generate_all).and_raise(StandardError.new('Test error'))
-        
+
         expect(runner).to receive(:puts).with(/Ошибка при генерации отчетов: Test error/)
-        
+
         expect(runner.generate).to be false
       end
     end
@@ -96,7 +96,7 @@ RSpec.describe Report::Runner do
         new_dir = File.join(test_dir, 'new_dir')
         options = { output_dir: new_dir }
         runner = described_class.new(options)
-        
+
         expect(Dir.exist?(new_dir)).to be false
         runner.send(:ensure_output_directory)
         expect(Dir.exist?(new_dir)).to be true
@@ -106,15 +106,15 @@ RSpec.describe Report::Runner do
     describe '#load_results' do
       it 'loads and transforms results from JSON file' do
         File.write(results_file, JSON.generate({
-          'models' => model_stats,
-          'tasks' => task_results
-        }))
-        
+                                                 'models' => model_stats,
+                                                 'tasks' => task_results
+                                               }))
+
         results = runner.send(:load_results, results_file)
-        
+
         expect(results[:model_stats]).to eq(model_stats)
         expect(results[:task_results]).to eq(task_results)
       end
     end
   end
-end 
+end

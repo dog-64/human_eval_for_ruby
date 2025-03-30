@@ -43,14 +43,16 @@ RSpec.describe Runner::Runner do
 
     # Мокаем методы работы с README.md
     allow_any_instance_of(Report::Generator).to receive(:update_readme)
-    
+
     # Убираем глобальные моки для test_solution
   end
 
   describe '#run_tests' do
     it 'runs tests only for mock solutions' do
-      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model1.rb').and_return(true)
-      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model2.rb').and_return(false)
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1',
+                                                                             'tasks/t1-model1.rb').and_return(true)
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1',
+                                                                             'tasks/t1-model2.rb').and_return(false)
       results = runner.run_tests
       expect(results['t1'].keys).to contain_exactly('model1', 'model2')
       expect(results['t1']['model1']).to be true
@@ -58,8 +60,10 @@ RSpec.describe Runner::Runner do
     end
 
     it 'runs tests only for mock solutions of specific task' do
-      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model1.rb').and_return(true)
-      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model2.rb').and_return(false)
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1',
+                                                                             'tasks/t1-model1.rb').and_return(true)
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1',
+                                                                             'tasks/t1-model2.rb').and_return(false)
       results = runner.run_tests(task: 't1')
       expect(results['t1'].keys).to contain_exactly('model1', 'model2')
       expect(results['t1']['model1']).to be true
@@ -78,13 +82,15 @@ RSpec.describe Runner::Runner do
     end
 
     it 'runs test for correct solution' do
-      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model1.rb').and_return(true)
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1',
+                                                                             'tasks/t1-model1.rb').and_return(true)
       results = runner.run_tests(task: 't1', model: 'model1')
       expect(results['t1']['model1']).to be true
     end
 
     it 'detects incorrect solution' do
-      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model2.rb').and_return(false)
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1',
+                                                                             'tasks/t1-model2.rb').and_return(false)
       results = runner.run_tests(task: 't1', model: 'model2')
       expect(results['t1']['model2']).to be false
     end
@@ -96,7 +102,8 @@ RSpec.describe Runner::Runner do
 
     it 'handles syntax errors' do
       allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  syntax_error")
-      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model1.rb').and_return(false)
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1',
+                                                                             'tasks/t1-model1.rb').and_return(false)
       results = runner.run_tests(task: 't1', model: 'model1')
       expect(results['t1']['model1']).to be false
     end
@@ -104,14 +111,16 @@ RSpec.describe Runner::Runner do
     it 'handles timeouts' do
       runner = described_class.new(timeout: 1, log_level: 'none')
       allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  while true; end\n  a + b\nend")
-      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model1.rb').and_return(false)
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1',
+                                                                             'tasks/t1-model1.rb').and_return(false)
       results = runner.run_tests(task: 't1', model: 'model1')
       expect(results['t1']['model1']).to be false
     end
 
     it 'handles empty solution files' do
       allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("   \n  \n  ")
-      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model1.rb').and_return(false)
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1',
+                                                                             'tasks/t1-model1.rb').and_return(false)
       results = runner.run_tests(task: 't1', model: 'model1')
       expect(results['t1']['model1']).to be false
     end
@@ -127,7 +136,8 @@ RSpec.describe Runner::Runner do
 
     it 'handles runtime errors in solution' do
       allow(File).to receive(:read).with('tasks/t1-model1.rb').and_return("def add(a, b)\n  raise 'Runtime error'\nend")
-      allow_any_instance_of(described_class).to receive(:test_solution).with('t1', 'tasks/t1-model1.rb').and_return(false)
+      allow_any_instance_of(described_class).to receive(:test_solution).with('t1',
+                                                                             'tasks/t1-model1.rb').and_return(false)
       results = runner.run_tests(task: 't1', model: 'model1')
       expect(results['t1']['model1']).to be false
     end
@@ -138,7 +148,7 @@ RSpec.describe Runner::Runner do
     end
 
     it 'handles invalid model name format' do
-      allow(Dir).to receive(:glob).with("tasks/t1-invalid_model.rb").and_return([])
+      allow(Dir).to receive(:glob).with('tasks/t1-invalid_model.rb').and_return([])
       results = runner.run_tests(task: 't1', model: 'invalid/model')
       expect(results).to eq({})
     end
@@ -325,13 +335,13 @@ RSpec.describe Runner::Runner do
 
     it 'выводит статистику для каждой модели в правильном порядке' do
       expect(runner).to receive(:log).with("\n📊 Общая статистика:")
-      expect(runner).to receive(:log).with("- Всего задач: 3")
-      expect(runner).to receive(:log).with("- Всего моделей: 2")
-      expect(runner).to receive(:log).with("- Моделей с результатами: 2")
-      expect(runner).to receive(:log).with("- Общая успешность: #{runner.send(:colorize, "4/6 (67%)", 67)}")
+      expect(runner).to receive(:log).with('- Всего задач: 3')
+      expect(runner).to receive(:log).with('- Всего моделей: 2')
+      expect(runner).to receive(:log).with('- Моделей с результатами: 2')
+      expect(runner).to receive(:log).with("- Общая успешность: #{runner.send(:colorize, '4/6 (67%)', 67)}")
       expect(runner).to receive(:log).with("\n🤖 Результаты тестирования моделей:")
-      expect(runner).to receive(:log).with("- model1: #{runner.send(:colorize, "3/3 (100%)", 100)}")
-      expect(runner).to receive(:log).with("- model2: #{runner.send(:colorize, "1/3 (33%)", 33)}")
+      expect(runner).to receive(:log).with("- model1: #{runner.send(:colorize, '3/3 (100%)', 100)}")
+      expect(runner).to receive(:log).with("- model2: #{runner.send(:colorize, '1/3 (33%)', 33)}")
 
       runner.send(:display_total_console, tasks, models)
     end
