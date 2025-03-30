@@ -23,7 +23,6 @@ require_relative '../lib/solver'
 require_relative '../lib/runner/runner'
 require_relative '../lib/human_eval/assert'
 require_relative '../lib/human_eval/converter'
-require_relative '../lib/human_eval/reports'
 
 WebMock.enable!
 WebMock.disable_net_connect!
