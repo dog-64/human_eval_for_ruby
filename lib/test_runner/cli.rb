@@ -10,6 +10,7 @@ module TestRunner
     package_name 'Test Runner'
 
     desc 'tests', 'Запустить тесты'
+    default_task :tests
 
     class_option :task,
                  type: :string,
