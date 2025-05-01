@@ -91,6 +91,12 @@ openrouter:
     note: https://openrouter.ai/google/gemini-2.5-pro-exp-03-25:free
     done: true
   
+  qwen_qwen3-235b-a22b:
+    name: qwen/qwen3-235b-a22b
+    provider: openrouter.ai
+    note: https://openrouter.ai/qwen/qwen3-235b-a22b
+    done: false
+  
   deepseek_deepseek-chat-v3-0324:
     name: deepseek/deepseek-chat-v3-0324
     provider: openrouter.ai
