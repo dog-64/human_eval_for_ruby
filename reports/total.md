@@ -1,12 +1,10 @@
 ## Рейтинг
 
-- deepseek_deepseek_chat_free: 100%
-- deepseek_deepseek_chat_v3_0324: 100%
-- google_gemini_2_0_flash_lite_001: 100%
-- openai_o3_mini_high: 100%
+- google_gemini_2_5_flash_preview: 82%
 - rekaai_reka_flash_3_free: 0%
 - qwen_qwen_2_5_coder_32b_instruct: 0%
 - qwen_qwen2_5_vl_3b_instruct_free: 0%
+- openai_o3_mini_high: 0%
 - openai_gpt_4o_mini: 0%
 - ollama_llama3_2: 0%
 - ollama_codellama_34b: 0%
@@ -18,6 +16,8 @@
 - meta_llama_llama_3_1_70b_instruct: 0%
 - google_gemma_3_27b_it: 0%
 - google_gemini_flash_1_5: 0%
-- google_gemini_2_5_pro_exp_03_25_free: 0%
+- google_gemini_2_0_flash_lite_001: 0%
 - google_gemini_2_0_flash_001: 0%
+- deepseek_deepseek_chat_v3_0324: 0%
+- deepseek_deepseek_chat_free: 0%
 - deepseek_deepseek_chat: 0%

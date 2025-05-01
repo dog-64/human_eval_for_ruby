@@ -428,4 +428,4 @@ module Runner
       Dir.glob(pattern).reject { |f| f.end_with?('-assert.rb') }
     end
   end
-end 
+end

@@ -42,4 +42,4 @@ RSpec.describe Runner::CLI do
       end
     end
   end
-end 
+end

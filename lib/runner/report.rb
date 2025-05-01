@@ -36,7 +36,7 @@ module Runner
         models_manager = Models.new
         model_info = models_manager.get(model_key)
         model_info || { 'name' => model_key, 'provider' => 'unknown' }
-      rescue => e
+      rescue
         # В случае ошибки возвращаем базовую информацию
         { 'name' => model_key, 'provider' => 'unknown' }
       end
@@ -62,4 +62,4 @@ module Runner
       text.gsub('_', '_&shy;')
     end
   end
-end 
+end

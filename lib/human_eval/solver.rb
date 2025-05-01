@@ -37,9 +37,7 @@ module HumanEval
 
     # Доступ к менеджеру моделей
     # @return [Models] объект для работы с моделями
-    def models_manager
-      @models_manager
-    end
+    attr_reader :models_manager
 
     # Возвращает список всех моделей
     # @return [Hash] хеш с моделями
