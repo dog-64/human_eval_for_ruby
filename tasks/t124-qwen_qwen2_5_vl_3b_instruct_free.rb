@@ -4,10 +4,14 @@ def valid_date?(date_string)
   parts = date_string.split('-')
   return false if parts.length != 3
 
-  month, day, year = parts.map(&:to_i)
+  month, day, year = parts
+  return false if month.empty? || day.empty? || year.empty?
 
-  return false if month < 1 || month > 12
-  return false if day < 1 || day > 31
+  month = month.to_i
+  day = day.to_i
+  year = year.to_i
+
+  return false if month < 1 || month > 12 || day < 1 || day > 31
 
   case month
   when 2

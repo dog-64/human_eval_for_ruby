@@ -1,7 +1,7 @@
 def move_one_ball(arr)
   return true if arr.empty?
   
-  arr.each_cons(2).each do |a, b|
+  arr.each_cons(2) do |a, b|
     return false if a > b
   end
   

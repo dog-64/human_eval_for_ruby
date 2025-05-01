@@ -89,7 +89,7 @@ openrouter:
   qwen_qwen2_5-vl-3b-instruct_free:
     name: qwen/qwen2.5-vl-3b-instruct:free
     provider: openrouter.ai
-    note: https://openrouter.ai/google/gemini-2.5-pro-exp-03-25:free
+    note: https://openrouter.ai/qwen/qwen2.5-vl-3b-instruct:free
     done: true
   
   deepseek_deepseek-chat-v3-0324:
