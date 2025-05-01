@@ -1,0 +1,20 @@
+# Sensitive files
+*.key
+*.pem
+*.crt
+*.cer
+*.p12
+*.pfx
+
+# Rails credentials
+config/credentials.yml.enc
+config/credentials/*.yml.enc
+
+# Environment files
+.env.*
+!.env.example
+
+# Other sensitive files
+*.dump
+*.sql
+dump.rdb 
