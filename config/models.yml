@@ -79,10 +79,11 @@ openrouter:
     note: https://openrouter.ai/microsoft/phi-4-multimodal-instruct
     done: true
   
-  google_gemini-2_5-pro-exp-03-25_free:
-    name: google/gemini-2.5-pro-exp-03-25:free
+  google_gemini-2_5-flash-preview:
+    name: google/gemini-2.5-flash-preview
     provider: openrouter.ai
-    note: https://openrouter.ai/google/gemini-2.5-pro-exp-03-25:free
+    date: Apr 17, 2025
+    note: https://openrouter.ai/google/gemini-2.5-flash-preview
     done: false
   
   qwen_qwen2_5-vl-3b-instruct_free:
