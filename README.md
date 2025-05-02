@@ -75,6 +75,76 @@ OLLAMA_BASE_URL=http://localhost:11434
 
 ## Использование
 
+### Как добавить модель
+
+#### В их список
+
+В файл `models.ym` добавляем описание:
+```yml
+  qwen_qwen3-235b-a22b:
+    name: qwen/qwen3-235b-a22b
+    provider: openrouter.ai
+    note: https://openrouter.ai/qwen/qwen3-235b-a22b
+    done: false
+```
+
+- `done` - boolean - обработана ли модель
+- `date` - дата добавления модели на openrouter.ai, со страницы `https://openrouter.ai/google/gemini-2.5-flash-preview`
+- `name` - имя модели с той же страницы
+
+#### Решаем моделью
+
+```shell
+./bin/solver solve tasks --model "qwen/qwen3-235b-a22b" --keep-existing  --create_empty_on_timeout
+...
+Обработка задачи 97 (162/164)
+  Модель 1/1: google_gemini-2_5-flash-preview (google/gemini-2.5-flash-preview)
+Обработка задачи 98 (163/164)
+  Модель 1/1: google_gemini-2_5-flash-preview (google/gemini-2.5-flash-preview)
+Обработка задачи 99 (164/164)
+  Модель 1/1: google_gemini-2_5-flash-preview (google/gemini-2.5-flash-preview)
+Обработка задач завершена   
+```
+
+#### Запускаем решения 
+
+Все:
+```shell
+./bin/run 
+...
+Результаты тестирования моделей:
+- google_gemini_2_0_flash_001: 86%
+- openai_o3_mini_high: 85%
+- deepseek_deepseek_chat_v3_0324: 82%
+- google_gemini_2_5_flash_preview: 82%
+- deepseek_deepseek_chat_free: 78%
+- google_gemini_2_0_flash_lite_001: 78%
+- google_gemma_3_27b_it: 77%
+- openai_gpt_4o_mini: 77%
+- deepseek_deepseek_chat: 76%
+- qwen_qwen_2_5_coder_32b_instruct: 75%
+- mistralai_codestral_2501: 75%
+- google_gemini_flash_1_5: 75%
+- meta_llama_llama_3_1_70b_instruct: 69%
+- mistralai_mistral_small_3_1_24b_instruct: 67%
+- qwen_qwen2_5_vl_3b_instruct_free: 41%
+- microsoft_phi_4_multimodal_instruct: 35%
+- ollama_codellama: 31%
+- ollama_codellama_13b: 27%
+- ollama_llama3_2: 25%
+- ollama_codellama_34b: 17%
+```
+
+Только по модели:
+```shell
+ ./bin/run --model google_gemini_2_5_flash_preview
+...
+Результаты тестирования моделей:
+- google_gemini_2_5_flash_preview: 82%
+...
+```
+#### Кладем отчет в README.md 
+
 ### Запуск тестов
 
 ```bash
