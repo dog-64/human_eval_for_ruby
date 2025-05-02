@@ -5,28 +5,29 @@
 Что полезно для оценки качества работы LLM именно для Ruby и промптов на русском. 
 
 ## Рейтинг
-
-Результаты тестирования моделей:
-- google_gemini_2_0_flash_001: 87%
-- openai_o3_mini_high: 85%
-- deepseek_deepseek_chat_v3_0324: 82%
-- deepseek_deepseek_chat_free: 79%
-- google_gemini_2_0_flash_lite_001: 79%
-- deepseek_deepseek_chat: 77%
-- google_gemma_3_27b_it: 77%
-- openai_gpt_4o_mini: 77%
-- qwen_qwen_2_5_coder_32b_instruct: 75%
-- mistralai_codestral_2501: 75%
-- google_gemini_flash_1_5: 75%
-- meta_llama_llama_3_1_70b_instruct: 69%
-- mistralai_mistral_small_3_1_24b_instruct: 67%
-- qwen_qwen2_5_vl_3b_instruct_free: 41%
-- microsoft_phi_4_multimodal_instruct: 35%
-- ollama_codellama: 31%
-- ollama_codellama:13b: 27%
-- ollama_llama3_2: 25%
-- ollama_codellama:34b: 17%
-- google_gemini_2_5_pro_exp_03_25_free: 1%
+- google/gemini-2-5-pro-exp-03-25:free: 1/1 (100%)
+- google/gemini-2-0-flash-001: 141/163 (87%)
+- openai/o3-mini-high: 139/164 (85%)
+- deepseek/deepseek-chat-v3-0324: 134/164 (82%)
+- deepseek/deepseek-chat:free: 128/163 (79%)
+- google/gemini-2-0-flash-lite-001: 128/163 (79%)
+- google/gemini-2.5-pro-exp-03-25:free: 7/9 (78%)
+- deepseek/deepseek-chat: 125/163 (77%)
+- google/gemma-3-27b-it: 127/164 (77%)
+- openai/gpt-4o-mini: 126/164 (77%)
+- qwen/qwen-2-5-coder-32b-instruct: 123/164 (75%)
+- mistralai/codestral-2501: 123/164 (75%)
+- google/gemini-flash-1-5: 123/164 (75%)
+- meta/llama-llama-3-1-70b-instruct: 113/164 (69%)
+- mistralai/mistral-small-3-1-24b-instruct: 110/164 (67%)
+- qwen/qwen3-235b-a22b: 101/164 (62%)
+- rekaai/reka-flash-3:free: 95/164 (58%)
+- qwen/qwen2-5-vl-3b-instruct:free: 68/164 (41%)
+- microsoft/phi-4-multimodal-instruct: 58/164 (35%)
+- ollama/codellama-: 51/164 (31%)
+- ollama/codellama-13b: 44/164 (27%)
+- ollama/llama3-2: 41/163 (25%)
+- ollama/codellama-34b: 28/164 (17%)
 
 ## Возможности
 

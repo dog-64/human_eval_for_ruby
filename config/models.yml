@@ -95,7 +95,8 @@ openrouter:
     name: qwen/qwen3-235b-a22b
     provider: openrouter.ai
     note: https://openrouter.ai/qwen/qwen3-235b-a22b
-    done: false
+    done: true
+    text: очень долго думает часто упираясь в таймауты
   
   deepseek_deepseek-chat-v3-0324:
     name: deepseek/deepseek-chat-v3-0324
