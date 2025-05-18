@@ -1,2 +1,5 @@
-# timeout - решение не было получено из-за ошибки
-# ❌ Пустой ответ от модели qwen/qwen3-235b-a22b
+def count_up_to(n)
+  return [] if n <= 2
+
+  sieve = Array.new(n, true)
+  sieve

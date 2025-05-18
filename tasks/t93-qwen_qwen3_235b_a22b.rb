@@ -1,2 +1,8 @@
-# timeout - решение не было получено из-за ошибки
-# ❌ Пустой ответ от модели qwen/qwen3-235b-a22b
+def encode(message)
+  swapped = message.swapcase
+  vowels = {
+    'a' => 'c', 'e' => 'g', 'i' => 'k', 'o' => 'q', 'u' => 'w',
+    'A' => 'C', 'E' => 'G', 'I' => 'K', 'O' => 'Q', 'U' => 'W'
+  }
+  swapped.chars.map { |c| vowels[c] || c }.join
+end
