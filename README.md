@@ -19,6 +19,7 @@
 - qwen_qwen_2_5_coder_32b_instruct: 75%
 - mistralai_codestral_2501: 75%
 - google_gemini_flash_1_5: 75%
+- inception_mercury_coder_small_beta: 74%
 - meta_llama_llama_3_1_70b_instruct: 69%
 - mistralai_mistral_small_3_1_24b_instruct: 67%
 - qwen_qwen2_5_vl_3b_instruct_free: 41%
@@ -27,6 +28,7 @@
 - ollama_codellama_13b: 27%
 - ollama_llama3_2: 25%
 - ollama_codellama_34b: 17%
+- qwen_qwen3_235b_a22b: 14%
 
 ## Возможности
 
