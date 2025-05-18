@@ -110,6 +110,12 @@ openrouter:
     note: https://openrouter.ai/rekaai/reka-flash-3:free
     done: false
       
+  inception_mercury-coder-small-beta:
+    name: inception/mercury-coder-small-beta
+    provider: openrouter.ai
+    note: https://openrouter.ai/inception/mercury-coder-small-beta
+    done: false
+      
 # Ollama модели
 ollama:
   ollama_llama3_2:
