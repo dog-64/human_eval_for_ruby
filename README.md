@@ -9,6 +9,7 @@
 Результаты тестирования моделей:
 - google_gemini_2_0_flash_001: 86%
 - openai_o3_mini_high: 85%
+- google_gemini_2_5_flash_preview_05_20: 84%
 - deepseek_deepseek_chat_v3_0324: 82%
 - google_gemini_2_5_flash_preview: 82%
 - deepseek_deepseek_chat_free: 78%
