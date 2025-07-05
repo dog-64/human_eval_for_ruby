@@ -7,14 +7,14 @@
 - google_gemini_2_5_flash_preview: 82%
 - deepseek_deepseek_chat_free: 79%
 - google_gemini_2_0_flash_lite_001: 79%
-- deepseek_deepseek_chat: 77%
-- google_gemma_3_27b_it: 77%
 - openai_gpt_4o_mini: 77%
-- qwen_qwen_2_5_coder_32b_instruct: 75%
-- mistralai_codestral_2501: 75%
+- google_gemma_3_27b_it: 77%
+- deepseek_deepseek_chat: 77%
 - google_gemini_flash_1_5: 75%
-- inception_mercury_coder_small_beta: 74%
+- mistralai_codestral_2501: 75%
+- qwen_qwen_2_5_coder_32b_instruct: 75%
 - qwen_qwen3_235b_a22b: 74%
+- inception_mercury_coder_small_beta: 74%
 - meta_llama_llama_3_1_70b_instruct: 69%
 - mistralai_mistral_small_3_1_24b_instruct: 67%
 - qwen_qwen2_5_vl_3b_instruct_free: 41%
@@ -23,4 +23,6 @@
 - ollama_codellama_13b: 27%
 - ollama_llama3_2: 25%
 - ollama_codellama_34b: 17%
+- google_gemini_2_5_pro_preview_06_05: 14%
+- google_gemini_2_5_pro_preview: 6%
 - rekaai_reka_flash_3_free: 0%

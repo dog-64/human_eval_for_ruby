@@ -177,8 +177,10 @@ OLLAMA_BASE_URL=http://localhost:11434
 ### Получение решений от моделей
 
 ```bash
-# Решение всех задач конкретной моделью
-./bin/human_eval_solver solve tasks --model "MODEL_NAME"
+# Решение всех задач конкретной моделью (можно указывать человекочитаемый ключ или идентификатор)
+./bin/human_eval_solver solve tasks --model "google_gemini_2.5 pro_preview_06-05" --keep-existing
+# или
+./bin/human_eval_solver solve tasks --model google/gemini-2.5-pro-preview-06-05 --keep-existing
 
 # Решение конкретной задачи
 ./bin/human_eval_solver solve tasks --task t1 --model "MODEL_NAME"

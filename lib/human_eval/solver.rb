@@ -32,6 +32,7 @@ module HumanEval
       @keep_existing = options[:keep_existing]
       self.log_level = options[:log_level] || :normal
       @models_manager = Models.new
+      @model = resolve_model_key(@model) if @model
       validate_environment
     end
 
@@ -491,6 +492,18 @@ module HumanEval
       end
 
       log "Используются только локальные модели Ollama: #{models_to_use.join(', ')}"
+    end
+
+    # Сопоставляет "человеческий" ключ модели с идентификатором из models.yml
+    def resolve_model_key(model_key)
+      return model_key if models[model_key]
+      # ищем по name среди всех моделей
+      found = models.find { |k, v| v['name'] == model_key || k.tr(' _', '/-') == model_key.tr(' _', '/-') }
+      return found[0] if found
+      # ищем по частичному совпадению (например, без дефисов и слэшей)
+      found = models.find { |k, v| k.gsub(/[^a-zA-Z0-9]/, '') == model_key.gsub(/[^a-zA-Z0-9]/, '') }
+      return found[0] if found
+      model_key # если не нашли — возвращаем как есть
     end
   end
 end
