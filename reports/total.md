@@ -2,11 +2,11 @@
 
 - google_gemini_2_0_flash_001: 87%
 - openai_o3_mini_high: 85%
-- google_gemini_2_5_flash_preview_05_20: 84%
 - deepseek_deepseek_chat_v3_0324: 82%
 - google_gemini_2_5_flash_preview: 82%
 - deepseek_deepseek_chat_free: 79%
 - google_gemini_2_0_flash_lite_001: 79%
+- google_gemini_2_5_flash_lite_preview_06_17: 78%
 - deepseek_deepseek_chat: 77%
 - google_gemma_3_27b_it: 77%
 - openai_gpt_4o_mini: 77%
