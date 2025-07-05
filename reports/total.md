@@ -18,6 +18,7 @@
 - google_gemma_3_12b_it: 71%
 - meta_llama_llama_3_1_70b_instruct: 69%
 - mistralai_mistral_small_3_1_24b_instruct: 67%
+- google_gemma_3_4b_it: 47%
 - qwen_qwen2_5_vl_3b_instruct_free: 41%
 - microsoft_phi_4_multimodal_instruct: 35%
 - ollama_codellama: 31%

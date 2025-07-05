@@ -24,6 +24,7 @@
 - google_gemma_3_12b_it: 71%
 - meta_llama_llama_3_1_70b_instruct: 69%
 - mistralai_mistral_small_3_1_24b_instruct: 67%
+- google_gemma_3_4b_it: 47%
 - qwen_qwen2_5_vl_3b_instruct_free: 41%
 - microsoft_phi_4_multimodal_instruct: 35%
 - ollama_codellama: 31%
@@ -31,7 +32,6 @@
 - ollama_llama3_2: 25%
 - ollama_codellama_34b: 17%
 - qwen_qwen3_235b_a22b: 14%
-- rekaai_reka_flash_3_free: 0%
 
 ## Возможности
 
