@@ -9,11 +9,11 @@
 Результаты тестирования моделей:
 - google_gemini_2_0_flash_001: 86%
 - openai_o3_mini_high: 85%
-- google_gemini_2_5_flash_preview_05_20: 84%
 - deepseek_deepseek_chat_v3_0324: 82%
 - google_gemini_2_5_flash_preview: 82%
 - deepseek_deepseek_chat_free: 78%
 - google_gemini_2_0_flash_lite_001: 78%
+- google_gemini_2_5_flash_lite_preview_06_17: 78%
 - google_gemma_3_27b_it: 77%
 - openai_gpt_4o_mini: 77%
 - deepseek_deepseek_chat: 76%
@@ -108,6 +108,11 @@ OLLAMA_BASE_URL=http://localhost:11434
 Обработка задачи 99 (164/164)
   Модель 1/1: google_gemini-2_5-flash-preview (google/gemini-2.5-flash-preview)
 Обработка задач завершена   
+```
+
+Для проверки формата результата (не попадает ли в код посторонние теги) можно решить только одну задачу:
+```shell
+./bin/human_eval_solver solve tasks --model google_gemini-2.5-flash-lite-preview-06-17 --task 1  
 ```
 
 #### Запускаем решения 
