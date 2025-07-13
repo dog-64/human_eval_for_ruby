@@ -140,6 +140,12 @@ openrouter:
     note: https://openrouter.ai/google/gemini-2.5-flash-lite-preview-06-17
     done: false
       
+  moonshotai_kimi-k2:
+    name: moonshotai/kimi-k2
+    provider: openrouter.ai
+    note: https://openrouter.ai/moonshotai/kimi-k2
+    done: false
+      
 # Ollama модели
 ollama:
   ollama_llama3_2:
