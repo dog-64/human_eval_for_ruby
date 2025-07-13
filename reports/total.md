@@ -1,7 +1,9 @@
 ## Рейтинг
 
+- google_gemma_3_9b_it: 100%
 - google_gemini_2_0_flash_001: 87%
 - openai_o3_mini_high: 85%
+- moonshotai_kimi_k2: 83%
 - deepseek_deepseek_chat_v3_0324: 82%
 - google_gemini_2_5_flash_preview: 82%
 - deepseek_deepseek_chat_free: 79%
