@@ -9,6 +9,7 @@
 Результаты тестирования моделей:
 - google_gemini_2_0_flash_001: 86%
 - openai_o3_mini_high: 85%
+- moonshotai_kimi_k2: 83%
 - deepseek_deepseek_chat_v3_0324: 82%
 - google_gemini_2_5_flash_preview: 82%
 - deepseek_deepseek_chat_free: 78%
@@ -32,6 +33,7 @@
 - ollama_llama3_2: 25%
 - ollama_codellama_34b: 17%
 - qwen_qwen3_235b_a22b: 14%
+- google_gemma_3_9b_it: 1%
 
 ## Возможности
 
