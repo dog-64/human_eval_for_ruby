@@ -146,6 +146,12 @@ openrouter:
     note: https://openrouter.ai/moonshotai/kimi-k2
     done: false
       
+  z-ai_glm_4:
+    name: z-ai/glm-4.5
+    provider: openrouter.ai
+    note: https://openrouter.ai/z-ai/glm-4.5
+    done: false
+      
 # Ollama модели
 ollama:
   ollama_llama3_2:

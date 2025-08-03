@@ -183,6 +183,7 @@ module HumanEval
 
       # Логируем полный промпт
       debug 'Полный промпт для отправки:'
+      debug "Длина промпта: #{prompt.length} символов"
       debug '---BEGIN FULL PROMPT---'
       debug prompt
       debug '---END FULL PROMPT---'
@@ -212,12 +213,16 @@ module HumanEval
     def process_model_response(raw_solution, model_name, output_file)
       # Логируем полученный ответ
       debug "Получено решение от модели #{model_name}"
+      debug "Длина ответа: #{raw_solution.length}"
       debug '---BEGIN MODEL RESPONSE---'
       debug raw_solution
       debug '---END MODEL RESPONSE---'
 
       # Извлекаем код из ответа
       solution = extract_and_join_code_blocks(raw_solution)
+
+      debug "Длина извлеченного решения: #{solution.length}"
+      debug "Решение пустое после strip: #{solution.strip.empty?}"
 
       # Проверяем, что решение не пустое
       if solution.strip.empty?
@@ -279,7 +284,7 @@ module HumanEval
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.1,
         # max_tokens: 31_000, # 1000 - для всех, 31000 - для o3-mini-high
-        max_tokens: 1_000, # 1000 - для всех, 31000 - для o3-mini-high
+        max_tokens: 16_000, # Увеличиваем лимит для предотвращения обрезания
         stream: false
       }.to_json
 
@@ -302,6 +307,16 @@ module HumanEval
         # Парсим JSON
         parsed_response = JSON.parse(response.body)
 
+        # Добавляем отладку
+        debug "Полный ответ API: #{parsed_response.inspect}"
+
+        # Проверяем finish_reason
+        finish_reason = parsed_response.dig('choices', 0, 'finish_reason')
+        if finish_reason == 'length'
+          error "⚠️ Ответ модели #{model_name} был обрезан из-за лимита токенов (finish_reason: length)"
+          error 'Увеличьте max_tokens или сократите промпт'
+        end
+
         # Извлекаем содержимое
         content = parsed_response.dig('choices', 0, 'message', 'content')
 
@@ -311,6 +326,11 @@ module HumanEval
           error "Ответ API: #{parsed_response.inspect}"
           raise 'Пустой ответ от API'
         end
+
+        debug "Извлеченное содержимое (длина: #{content.length}):"
+        debug '---BEGIN CONTENT---'
+        debug content
+        debug '---END CONTENT---'
 
         # Кодируем в UTF-8
         content.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
