@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-07-13 13:03:04",
+  "timestamp": "2025-08-03 17:30:21",
   "models": [
     [
       "google_gemma_3_9b_it",
@@ -54,19 +54,23 @@
       75
     ],
     [
-      "mistralai_codestral_2501",
-      75
-    ],
-    [
       "google_gemini_flash_1_5",
       75
     ],
     [
-      "inception_mercury_coder_small_beta",
-      74
+      "mistralai_codestral_2501",
+      75
     ],
     [
       "qwen_qwen3_235b_a22b",
+      74
+    ],
+    [
+      "z_ai_glm_4",
+      74
+    ],
+    [
+      "inception_mercury_coder_small_beta",
       74
     ],
     [
@@ -137,7 +141,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t1": {
       "deepseek_deepseek_chat": false,
@@ -166,7 +171,8 @@
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": false,
       "qwen_qwen_2_5_coder_32b_instruct": false,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": false
     },
     "t10": {
       "deepseek_deepseek_chat": true,
@@ -194,7 +200,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen_2_5_coder_32b_instruct": false,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": true
     },
     "t100": {
       "deepseek_deepseek_chat": false,
@@ -222,7 +229,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen_2_5_coder_32b_instruct": false,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": true
     },
     "t101": {
       "deepseek_deepseek_chat": true,
@@ -251,7 +259,8 @@
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": true,
       "qwen_qwen_2_5_coder_32b_instruct": true,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": true
     },
     "t102": {
       "deepseek_deepseek_chat": false,
@@ -279,7 +288,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen_2_5_coder_32b_instruct": true,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": true
     },
     "t103": {
       "deepseek_deepseek_chat": false,
@@ -306,7 +316,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen_2_5_coder_32b_instruct": false,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": false
     },
     "t104": {
       "deepseek_deepseek_chat": true,
@@ -334,7 +345,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen_2_5_coder_32b_instruct": true,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": false
     },
     "t105": {
       "deepseek_deepseek_chat": true,
@@ -362,7 +374,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen_2_5_coder_32b_instruct": true,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": true
     },
     "t106": {
       "deepseek_deepseek_chat": true,
@@ -390,7 +403,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen_2_5_coder_32b_instruct": true,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": true
     },
     "t107": {
       "deepseek_deepseek_chat": true,
@@ -418,7 +432,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
       "qwen_qwen_2_5_coder_32b_instruct": true,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": false
     },
     "t108": {
       "deepseek_deepseek_chat": false,
@@ -446,7 +461,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen_2_5_coder_32b_instruct": false,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": true
     },
     "t109": {
       "deepseek_deepseek_chat": true,
@@ -475,7 +491,8 @@
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": true,
       "qwen_qwen_2_5_coder_32b_instruct": true,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": true
     },
     "t11": {
       "deepseek_deepseek_chat": true,
@@ -503,7 +520,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen_2_5_coder_32b_instruct": true,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": false
     },
     "t110": {
       "deepseek_deepseek_chat": true,
@@ -531,7 +549,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
       "qwen_qwen_2_5_coder_32b_instruct": false,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": true
     },
     "t111": {
       "deepseek_deepseek_chat": false,
@@ -560,7 +579,8 @@
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": true,
       "qwen_qwen_2_5_coder_32b_instruct": false,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": true
     },
     "t112": {
       "deepseek_deepseek_chat": false,
@@ -589,7 +609,8 @@
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": true,
       "qwen_qwen_2_5_coder_32b_instruct": true,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": true
     },
     "t113": {
       "deepseek_deepseek_chat": true,
@@ -618,7 +639,8 @@
       "qwen_qwen2_5_vl_3b_instruct_free": true,
       "qwen_qwen3_235b_a22b": true,
       "qwen_qwen_2_5_coder_32b_instruct": true,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": false
     },
     "t114": {
       "deepseek_deepseek_chat": true,
@@ -646,7 +668,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen_2_5_coder_32b_instruct": true,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": true
     },
     "t115": {
       "deepseek_deepseek_chat": false,
@@ -675,7 +698,8 @@
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": true,
       "qwen_qwen_2_5_coder_32b_instruct": true,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": false
     },
     "t116": {
       "deepseek_deepseek_chat": false,
@@ -702,7 +726,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t117": {
       "deepseek_deepseek_chat": true,
@@ -729,7 +754,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t118": {
       "deepseek_deepseek_chat": false,
@@ -757,7 +783,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t119": {
       "deepseek_deepseek_chat": false,
@@ -785,7 +812,8 @@
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
       "qwen_qwen3_235b_a22b": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": false
     },
     "t12": {
       "deepseek_deepseek_chat": true,
@@ -813,7 +841,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
       "qwen_qwen3_235b_a22b": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t120": {
       "deepseek_deepseek_chat": false,
@@ -841,7 +870,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t121": {
       "deepseek_deepseek_chat": true,
@@ -869,7 +899,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t122": {
       "deepseek_deepseek_chat": false,
@@ -896,7 +927,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t123": {
       "deepseek_deepseek_chat": true,
@@ -923,7 +955,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t124": {
       "deepseek_deepseek_chat": true,
@@ -950,7 +983,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t125": {
       "deepseek_deepseek_chat": true,
@@ -978,7 +1012,8 @@
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t126": {
       "deepseek_deepseek_chat": true,
@@ -1005,7 +1040,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t127": {
       "deepseek_deepseek_chat": true,
@@ -1032,7 +1068,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t128": {
       "deepseek_deepseek_chat": false,
@@ -1059,7 +1096,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": false
     },
     "t129": {
       "deepseek_deepseek_chat": false,
@@ -1086,7 +1124,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t13": {
       "deepseek_deepseek_chat": true,
@@ -1113,7 +1152,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t130": {
       "deepseek_deepseek_chat": false,
@@ -1140,7 +1180,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t131": {
       "deepseek_deepseek_chat": true,
@@ -1168,7 +1209,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t132": {
       "deepseek_deepseek_chat": true,
@@ -1195,7 +1237,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t133": {
       "deepseek_deepseek_chat": true,
@@ -1223,7 +1266,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
       "qwen_qwen3_235b_a22b": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t134": {
       "deepseek_deepseek_chat": true,
@@ -1250,7 +1294,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": false
     },
     "t135": {
       "deepseek_deepseek_chat": false,
@@ -1277,7 +1322,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t136": {
       "deepseek_deepseek_chat": true,
@@ -1304,7 +1350,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t137": {
       "deepseek_deepseek_chat": false,
@@ -1331,7 +1378,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": false
     },
     "t138": {
       "deepseek_deepseek_chat": true,
@@ -1358,7 +1406,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t139": {
       "deepseek_deepseek_chat": true,
@@ -1385,7 +1434,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t14": {
       "deepseek_deepseek_chat": true,
@@ -1412,7 +1462,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t140": {
       "deepseek_deepseek_chat": true,
@@ -1439,7 +1490,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t141": {
       "deepseek_deepseek_chat": true,
@@ -1466,7 +1518,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t142": {
       "deepseek_deepseek_chat": true,
@@ -1493,7 +1546,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t143": {
       "deepseek_deepseek_chat": true,
@@ -1520,7 +1574,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t144": {
       "deepseek_deepseek_chat": true,
@@ -1547,7 +1602,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t145": {
       "deepseek_deepseek_chat": true,
@@ -1574,7 +1630,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": false
     },
     "t146": {
       "deepseek_deepseek_chat": true,
@@ -1601,7 +1658,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t147": {
       "deepseek_deepseek_chat": false,
@@ -1628,7 +1686,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": false
     },
     "t148": {
       "deepseek_deepseek_chat": true,
@@ -1655,7 +1714,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t149": {
       "deepseek_deepseek_chat": true,
@@ -1683,7 +1743,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
       "qwen_qwen3_235b_a22b": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t15": {
       "deepseek_deepseek_chat": true,
@@ -1710,7 +1771,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t150": {
       "deepseek_deepseek_chat": true,
@@ -1737,7 +1799,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t151": {
       "deepseek_deepseek_chat": true,
@@ -1764,7 +1827,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t152": {
       "deepseek_deepseek_chat": true,
@@ -1791,7 +1855,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t153": {
       "deepseek_deepseek_chat": true,
@@ -1818,7 +1883,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t154": {
       "deepseek_deepseek_chat": false,
@@ -1845,7 +1911,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t155": {
       "deepseek_deepseek_chat": true,
@@ -1872,7 +1939,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t156": {
       "deepseek_deepseek_chat": true,
@@ -1899,7 +1967,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t157": {
       "deepseek_deepseek_chat": true,
@@ -1926,7 +1995,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t158": {
       "deepseek_deepseek_chat": false,
@@ -1953,7 +2023,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t159": {
       "deepseek_deepseek_chat": false,
@@ -1980,7 +2051,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t16": {
       "deepseek_deepseek_chat": true,
@@ -2007,7 +2079,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t160": {
       "deepseek_deepseek_chat": true,
@@ -2034,7 +2107,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t161": {
       "deepseek_deepseek_chat": true,
@@ -2062,7 +2136,8 @@
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t162": {
       "deepseek_deepseek_chat": true,
@@ -2089,7 +2164,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t163": {
       "deepseek_deepseek_chat": true,
@@ -2117,7 +2193,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t17": {
       "deepseek_deepseek_chat": true,
@@ -2144,7 +2221,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t18": {
       "deepseek_deepseek_chat": true,
@@ -2171,7 +2249,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t19": {
       "deepseek_deepseek_chat": true,
@@ -2199,7 +2278,8 @@
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
       "qwen_qwen3_235b_a22b": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t2": {
       "deepseek_deepseek_chat": true,
@@ -2226,7 +2306,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t20": {
       "deepseek_deepseek_chat": true,
@@ -2253,7 +2334,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t21": {
       "deepseek_deepseek_chat": false,
@@ -2281,7 +2363,8 @@
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen_2_5_coder_32b_instruct": false,
-      "rekaai_reka_flash_3_free": false
+      "rekaai_reka_flash_3_free": false,
+      "z_ai_glm_4": false
     },
     "t22": {
       "deepseek_deepseek_chat": true,
@@ -2308,7 +2391,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t23": {
       "deepseek_deepseek_chat": true,
@@ -2335,7 +2419,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t24": {
       "deepseek_deepseek_chat": true,
@@ -2362,7 +2447,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t25": {
       "deepseek_deepseek_chat": true,
@@ -2390,7 +2476,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t26": {
       "deepseek_deepseek_chat": true,
@@ -2417,7 +2504,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t27": {
       "deepseek_deepseek_chat": true,
@@ -2444,7 +2532,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t28": {
       "deepseek_deepseek_chat": true,
@@ -2471,7 +2560,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t29": {
       "deepseek_deepseek_chat": true,
@@ -2498,7 +2588,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t3": {
       "deepseek_deepseek_chat": true,
@@ -2525,7 +2616,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t30": {
       "deepseek_deepseek_chat": true,
@@ -2552,7 +2644,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t31": {
       "deepseek_deepseek_chat": true,
@@ -2579,7 +2672,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t32": {
       "deepseek_deepseek_chat": false,
@@ -2606,7 +2700,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t33": {
       "deepseek_deepseek_chat": true,
@@ -2633,7 +2728,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t34": {
       "deepseek_deepseek_chat": true,
@@ -2660,7 +2756,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t35": {
       "deepseek_deepseek_chat": true,
@@ -2687,7 +2784,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t36": {
       "deepseek_deepseek_chat": true,
@@ -2715,7 +2813,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": true,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t37": {
       "deepseek_deepseek_chat": true,
@@ -2742,7 +2841,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t38": {
       "deepseek_deepseek_chat": true,
@@ -2769,7 +2869,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t39": {
       "deepseek_deepseek_chat": true,
@@ -2797,7 +2898,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t4": {
       "deepseek_deepseek_chat": true,
@@ -2824,7 +2926,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t40": {
       "deepseek_deepseek_chat": false,
@@ -2851,7 +2954,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t41": {
       "deepseek_deepseek_chat": true,
@@ -2878,7 +2982,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t42": {
       "deepseek_deepseek_chat": true,
@@ -2905,7 +3010,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t43": {
       "deepseek_deepseek_chat": true,
@@ -2932,7 +3038,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t44": {
       "deepseek_deepseek_chat": false,
@@ -2960,7 +3067,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t45": {
       "deepseek_deepseek_chat": false,
@@ -2988,7 +3096,8 @@
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": false
     },
     "t46": {
       "deepseek_deepseek_chat": true,
@@ -3016,7 +3125,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
       "qwen_qwen3_235b_a22b": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t47": {
       "deepseek_deepseek_chat": false,
@@ -3043,7 +3153,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t48": {
       "deepseek_deepseek_chat": true,
@@ -3070,7 +3181,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t49": {
       "deepseek_deepseek_chat": true,
@@ -3098,7 +3210,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
       "qwen_qwen3_235b_a22b": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t5": {
       "deepseek_deepseek_chat": true,
@@ -3125,7 +3238,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t50": {
       "deepseek_deepseek_chat": true,
@@ -3152,7 +3266,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t51": {
       "deepseek_deepseek_chat": true,
@@ -3179,7 +3294,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t52": {
       "deepseek_deepseek_chat": true,
@@ -3206,7 +3322,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t53": {
       "deepseek_deepseek_chat": true,
@@ -3233,7 +3350,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t54": {
       "deepseek_deepseek_chat": true,
@@ -3260,7 +3378,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t55": {
       "deepseek_deepseek_chat": true,
@@ -3287,7 +3406,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t56": {
       "deepseek_deepseek_chat": true,
@@ -3314,7 +3434,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t57": {
       "deepseek_deepseek_chat": true,
@@ -3341,7 +3462,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t58": {
       "deepseek_deepseek_chat": true,
@@ -3368,7 +3490,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t59": {
       "deepseek_deepseek_chat": false,
@@ -3395,7 +3518,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t6": {
       "deepseek_deepseek_chat": true,
@@ -3422,7 +3546,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t60": {
       "deepseek_deepseek_chat": true,
@@ -3449,7 +3574,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t61": {
       "deepseek_deepseek_chat": true,
@@ -3476,7 +3602,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t62": {
       "deepseek_deepseek_chat": true,
@@ -3503,7 +3630,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": false
     },
     "t63": {
       "deepseek_deepseek_chat": true,
@@ -3530,7 +3658,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t64": {
       "deepseek_deepseek_chat": true,
@@ -3557,7 +3686,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t65": {
       "deepseek_deepseek_chat": true,
@@ -3584,7 +3714,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": false
     },
     "t66": {
       "deepseek_deepseek_chat": true,
@@ -3611,7 +3742,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t67": {
       "deepseek_deepseek_chat": true,
@@ -3638,7 +3770,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t68": {
       "deepseek_deepseek_chat": true,
@@ -3665,7 +3798,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t69": {
       "deepseek_deepseek_chat": true,
@@ -3692,7 +3826,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t7": {
       "deepseek_deepseek_chat": true,
@@ -3719,7 +3854,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t70": {
       "deepseek_deepseek_chat": false,
@@ -3746,7 +3882,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t71": {
       "deepseek_deepseek_chat": true,
@@ -3773,7 +3910,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t72": {
       "deepseek_deepseek_chat": true,
@@ -3800,7 +3938,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t73": {
       "deepseek_deepseek_chat": true,
@@ -3827,7 +3966,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t74": {
       "deepseek_deepseek_chat": true,
@@ -3854,7 +3994,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t75": {
       "deepseek_deepseek_chat": true,
@@ -3882,7 +4023,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t76": {
       "deepseek_deepseek_chat": false,
@@ -3909,7 +4051,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": false
     },
     "t77": {
       "deepseek_deepseek_chat": false,
@@ -3937,7 +4080,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t78": {
       "deepseek_deepseek_chat": true,
@@ -3964,7 +4108,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t79": {
       "deepseek_deepseek_chat": true,
@@ -3991,7 +4136,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t8": {
       "deepseek_deepseek_chat": true,
@@ -4018,7 +4164,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t80": {
       "deepseek_deepseek_chat": false,
@@ -4045,7 +4192,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t81": {
       "deepseek_deepseek_chat": false,
@@ -4072,7 +4220,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": false
     },
     "t82": {
       "deepseek_deepseek_chat": true,
@@ -4100,7 +4249,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
       "qwen_qwen3_235b_a22b": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": false
     },
     "t83": {
       "deepseek_deepseek_chat": false,
@@ -4127,7 +4277,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t84": {
       "deepseek_deepseek_chat": true,
@@ -4154,7 +4305,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t85": {
       "deepseek_deepseek_chat": true,
@@ -4181,7 +4333,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t86": {
       "deepseek_deepseek_chat": true,
@@ -4209,7 +4362,8 @@
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": false
     },
     "t87": {
       "deepseek_deepseek_chat": true,
@@ -4236,7 +4390,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t88": {
       "deepseek_deepseek_chat": true,
@@ -4263,7 +4418,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t89": {
       "deepseek_deepseek_chat": false,
@@ -4290,7 +4446,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t9": {
       "deepseek_deepseek_chat": true,
@@ -4317,7 +4474,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t90": {
       "deepseek_deepseek_chat": true,
@@ -4345,7 +4503,8 @@
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
       "qwen_qwen3_235b_a22b": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t91": {
       "deepseek_deepseek_chat": false,
@@ -4372,7 +4531,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t92": {
       "deepseek_deepseek_chat": true,
@@ -4399,7 +4559,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t93": {
       "deepseek_deepseek_chat": false,
@@ -4426,7 +4587,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t94": {
       "deepseek_deepseek_chat": true,
@@ -4453,7 +4615,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t95": {
       "deepseek_deepseek_chat": true,
@@ -4480,7 +4643,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t96": {
       "deepseek_deepseek_chat": true,
@@ -4507,7 +4671,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t97": {
       "deepseek_deepseek_chat": true,
@@ -4534,7 +4699,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": false,
-      "qwen_qwen_2_5_coder_32b_instruct": false
+      "qwen_qwen_2_5_coder_32b_instruct": false,
+      "z_ai_glm_4": true
     },
     "t98": {
       "deepseek_deepseek_chat": true,
@@ -4561,7 +4727,8 @@
       "openai_gpt_4o_mini": true,
       "openai_o3_mini_high": false,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     },
     "t99": {
       "deepseek_deepseek_chat": true,
@@ -4588,7 +4755,8 @@
       "openai_gpt_4o_mini": false,
       "openai_o3_mini_high": true,
       "qwen_qwen2_5_vl_3b_instruct_free": true,
-      "qwen_qwen_2_5_coder_32b_instruct": true
+      "qwen_qwen_2_5_coder_32b_instruct": true,
+      "z_ai_glm_4": true
     }
   }
 }
