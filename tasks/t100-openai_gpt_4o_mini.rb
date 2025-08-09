@@ -1,9 +1,9 @@
 def make_a_pile(n)
   pile = []
-  current = n
+  current_stones = n
   n.times do
-    pile << current
-    current += (current.odd? ? 2 : 2)
+    pile << current_stones
+    current_stones += (current_stones.even? ? 2 : 2)
   end
   pile
 end

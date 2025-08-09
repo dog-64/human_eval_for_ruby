@@ -128,13 +128,15 @@ OLLAMA_BASE_URL=http://localhost:11434
 ./bin/run 
 ...
 Результаты тестирования моделей:
+- openai_gpt_oss_20b: 87%
 - google_gemini_2_0_flash_001: 86%
 - openai_o3_mini_high: 85%
-- google_gemini_2_5_flash_preview_05_20: 84%
+- moonshotai_kimi_k2: 83%
 - deepseek_deepseek_chat_v3_0324: 82%
 - google_gemini_2_5_flash_preview: 82%
 - deepseek_deepseek_chat_free: 78%
 - google_gemini_2_0_flash_lite_001: 78%
+- google_gemini_2_5_flash_lite_preview_06_17: 78%
 - google_gemma_3_27b_it: 77%
 - openai_gpt_4o_mini: 77%
 - deepseek_deepseek_chat: 76%
@@ -142,8 +144,11 @@ OLLAMA_BASE_URL=http://localhost:11434
 - mistralai_codestral_2501: 75%
 - google_gemini_flash_1_5: 75%
 - inception_mercury_coder_small_beta: 74%
+- z_ai_glm_4: 74%
+- google_gemma_3_12b_it: 71%
 - meta_llama_llama_3_1_70b_instruct: 69%
 - mistralai_mistral_small_3_1_24b_instruct: 67%
+- google_gemma_3_4b_it: 47%
 - qwen_qwen2_5_vl_3b_instruct_free: 41%
 - microsoft_phi_4_multimodal_instruct: 35%
 - ollama_codellama: 31%
@@ -151,6 +156,7 @@ OLLAMA_BASE_URL=http://localhost:11434
 - ollama_llama3_2: 25%
 - ollama_codellama_34b: 17%
 - qwen_qwen3_235b_a22b: 14%
+- google_gemma_3_9b_it: 1%
 ```
 
 Только по модели:
