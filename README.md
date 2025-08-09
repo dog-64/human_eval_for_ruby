@@ -13,6 +13,7 @@
 - moonshotai_kimi_k2: 83%
 - deepseek_deepseek_chat_v3_0324: 82%
 - google_gemini_2_5_flash_preview: 82%
+- openai_gpt_oss_120b: 82%
 - deepseek_deepseek_chat_free: 78%
 - google_gemini_2_0_flash_lite_001: 78%
 - google_gemini_2_5_flash_lite_preview_06_17: 78%
