@@ -1,5 +1,9 @@
 def choose_num(x, y)
-  return -1 if y < x
-  max_even = (y.even? ? y : y - 1)
-  max_even >= x ? max_even : -1
+  max_even = -1
+  (x..y).each do |num|
+    if num.even? && num > max_even
+      max_even = num
+    end
+  end
+  max_even
 end

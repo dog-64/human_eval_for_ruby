@@ -1,9 +1,11 @@
 def f(n)
-  (1..n).map do |i|
+  result = []
+  (1..n).each do |i|
     if i.even?
-      (1..i).inject(:*) || 1
+      result << (1..i).inject(:*) || 1
     else
-      (1..i).sum
+      result << (1..i).sum
     end
   end
+  result
 end

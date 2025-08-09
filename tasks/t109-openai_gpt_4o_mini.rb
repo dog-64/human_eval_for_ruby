@@ -1,8 +1,10 @@
 def move_one_ball(arr)
   return true if arr.empty?
-  
-  max_index = arr.each_with_index.max[1]
-  rotated = arr[max_index..-1] + arr[0...max_index]
-  
-  rotated == rotated.sort
+  count = 0
+  arr.each_with_index do |num, index|
+    if index > 0 && num < arr[index - 1]
+      count += 1
+    end
+  end
+  count <= 1
 end
