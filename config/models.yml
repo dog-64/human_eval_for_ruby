@@ -158,6 +158,12 @@ openrouter:
     note: https://openrouter.ai/openai/gpt-oss-20b
     done: false
       
+  openai-gpt-oss-120b:
+    name: openai/gpt-oss-120b
+    provider: openrouter.ai
+    note: https://openrouter.ai/openai/gpt-oss-120b
+    done: false
+      
 # Ollama модели
 ollama:
   ollama_llama3_2:

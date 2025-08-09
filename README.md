@@ -7,22 +7,24 @@
 ## Рейтинг
 
 Результаты тестирования моделей:
+- openai_gpt_oss_20b: 87%
 - google_gemini_2_0_flash_001: 86%
 - openai_o3_mini_high: 85%
 - moonshotai_kimi_k2: 83%
 - deepseek_deepseek_chat_v3_0324: 82%
 - google_gemini_2_5_flash_preview: 82%
+- openai_gpt_oss_120b: 82%
 - deepseek_deepseek_chat_free: 78%
 - google_gemini_2_0_flash_lite_001: 78%
 - google_gemini_2_5_flash_lite_preview_06_17: 78%
 - google_gemma_3_27b_it: 77%
 - openai_gpt_4o_mini: 77%
 - deepseek_deepseek_chat: 76%
-- google_gemini_flash_1_5: 75%
 - qwen_qwen_2_5_coder_32b_instruct: 75%
 - mistralai_codestral_2501: 75%
-- z_ai_glm_4: 74%
+- google_gemini_flash_1_5: 75%
 - inception_mercury_coder_small_beta: 74%
+- z_ai_glm_4: 74%
 - google_gemma_3_12b_it: 71%
 - meta_llama_llama_3_1_70b_instruct: 69%
 - mistralai_mistral_small_3_1_24b_instruct: 67%
